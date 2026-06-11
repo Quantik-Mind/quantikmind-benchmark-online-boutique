@@ -81,7 +81,11 @@
         "product-detail-page-has-price",
         "product-detail-page-has-non-empty-body",
         "product-detail-refresh-keeps-content",
-        "cart-add-tests-requiring-product-detail"
+        "cart-add-product-from-detail-page",
+        "cart-add-product-and-view-cart",
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-add-from-product-detail-keeps-price-context",
+        "frontend-basic-user-journey-home-product-cart"
       ],
       "validated_detecting_tests": [],
       "expected_unaffected_tests": [
