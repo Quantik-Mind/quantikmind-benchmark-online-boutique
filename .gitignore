@@ -34,3 +34,8 @@ qmind-home/
 
 # Upstream Google Online Boutique local clone
 microservices-demo/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
