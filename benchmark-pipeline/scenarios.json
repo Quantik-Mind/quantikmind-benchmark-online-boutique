@@ -145,19 +145,16 @@
       "baseline_ref": "benchmark-baseline",
       "scenario_ref": "benchmark/scenario-ob004",
       "expected_changed_files": [
-        "src/paymentservice/charge.js",
-        "src/paymentservice/server.js",
-        "src/checkoutservice/main.go"
+        "src/paymentservice/charge.js"
       ],
       "defect_behavior": [
-        "Valid Visa or Mastercard payments are rejected.",
+        "paymentservice Charge always fails, so valid Visa or Mastercard payments are rejected.",
         "Cart, checkout form rendering, shipping quote, and product browsing should remain healthy.",
         "The preferred implementation is to reject otherwise valid cards after normal validation in charge.js."
       ],
       "signal_breadth": "narrow",
       "expected_detecting_tests": [
-        "order-complete-happy-path",
-        "order-form-requires-payment-data"
+        "payment-order-completion-confirms-success"
       ],
       "expected_unaffected_tests": [
         "homepage-tests",
@@ -166,10 +163,14 @@
         "checkout-form-visibility-tests",
         "empty-cart-negative-tests"
       ],
-      "validation_status": "planned",
+      "validation_status": "validated",
       "notes": [
-        "order-form-requires-payment-data is provisional until baseline behavior and final assertions are confirmed.",
-        "This scenario intentionally has a narrow signal and depends heavily on order-complete-happy-path.",
+        "Validated against the full 51-test Playwright suite: 1 failed, 50 passed.",
+        "Baseline validation passed with 51 passed.",
+        "Failing test: payment-order-completion-confirms-success.",
+        "Validated external scenario commit b7ecc963 on benchmark/scenario-ob004.",
+        "Implementation changed src/paymentservice/charge.js so paymentservice Charge always fails.",
+        "This scenario intentionally has a narrow signal and depends heavily on a payment-aware successful order assertion.",
         "Payment validation has date-sensitive logic, so tests should avoid relying on expiration edge cases."
       ]
     }
