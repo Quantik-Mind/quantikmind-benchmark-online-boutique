@@ -4,7 +4,7 @@
 
 Baseline validation confirms that the canonical Online Boutique Playwright suite is stable against a clean Online Boutique deployment before any benchmark defect scenarios are implemented.
 
-The baseline run is the clean-control check for the benchmark. It answers one question: can the full canonical 50-test library run successfully against the application when no benchmark defect has been injected?
+The baseline run is the clean-control check for the benchmark. It answers one question: can the full canonical 51-test library run successfully against the application when no benchmark defect has been injected?
 
 ## Why baseline validation is required before defect injection
 
@@ -14,7 +14,7 @@ Run baseline validation before scenario work so that:
 
 - clean-deployment failures are separated from injected-defect failures
 - flaky tests are identified before they pollute scenario evidence
-- the canonical 50-test library is confirmed runnable in the current harness
+- the canonical 51-test library is confirmed runnable in the current harness
 - later oracle validation can compare scenario failures against a known stable baseline
 
 Defect scenarios must not be implemented until the clean baseline is stable.
@@ -24,9 +24,9 @@ Defect scenarios must not be implemented until the clean baseline is stable.
 - Online Boutique is deployed and reachable.
 - `FRONTEND_URL` is known, for example `http://YOUR_FRONTEND_URL`.
 - Playwright dependencies are installed under `qmind-test-harness/playwright`.
-- The canonical 50-test library exists at `qmind-test-library/online-boutique-playwright-50.json`.
+- The canonical 51-test library exists at `qmind-test-library/online-boutique-playwright-51.json`.
 
-## Run the full 50-test suite
+## Run the full 51-test suite
 
 Use the baseline validation helper from the repository root:
 

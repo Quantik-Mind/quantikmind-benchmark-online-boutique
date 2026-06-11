@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-50.json"
+DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-51.json"
 METHOD_LABELS = {
     "full-suite": "Traditional Approach (Full Suite)",
     "random": "Random Approach",

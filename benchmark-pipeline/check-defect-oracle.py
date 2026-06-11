@@ -11,7 +11,7 @@ from typing import Any
 
 
 DEFAULT_ORACLE = "defect-oracle/online-boutique-defect-oracle.v2.json"
-DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-50.json"
+DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-51.json"
 TEST_ID_KEYS = ("test_id", "id", "name", "title")
 
 
