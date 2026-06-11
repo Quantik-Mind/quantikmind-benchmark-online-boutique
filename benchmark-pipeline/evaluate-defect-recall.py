@@ -27,6 +27,10 @@ SELECTION_FIELDS = (
 NESTED_SELECTION_FIELDS = ("data", "result", "selection", "payload")
 
 
+class NormalizationError(Exception):
+    """Raised when selected tests cannot be normalized to canonical test IDs."""
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Evaluate selected tests against benchmark defect scenarios."
@@ -72,13 +76,22 @@ def load_json(path: Path, label: str) -> Any:
         raise SystemExit(f"{label} path is not a file: {path}")
 
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        raw = path.read_bytes()
     except OSError as exc:
         raise SystemExit(f"Could not read {label} file {path}: {exc}") from exc
-    except json.JSONDecodeError as exc:
-        raise SystemExit(
-            f"Invalid JSON in {label} file {path}: line {exc.lineno}, column {exc.colno}: {exc.msg}"
-        ) from exc
+
+    last_decode_error: UnicodeDecodeError | None = None
+    for encoding in ("utf-8", "utf-8-sig", "utf-16"):
+        try:
+            return json.loads(raw.decode(encoding))
+        except UnicodeDecodeError as exc:
+            last_decode_error = exc
+            continue
+        except json.JSONDecodeError as exc:
+            raise SystemExit(
+                f"Invalid JSON in {label} file {path}: line {exc.lineno}, column {exc.colno}: {exc.msg}"
+            ) from exc
+    raise SystemExit(f"Could not decode {label} file {path}: {last_decode_error}")
 
 
 def string_list(value: Any, field_name: str) -> list[str]:
@@ -166,7 +179,7 @@ def mapping_items(data: Any) -> Iterable[Any]:
 
 def load_library_api_mapping(path: Path) -> dict[str, str]:
     if not path.exists() or not path.is_file():
-        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+        raise NormalizationError("Missing library API mapping for qmind numeric IDs.")
 
     data = load_json(path, "Library API mapping")
     mapping: dict[str, str] = {}
@@ -180,28 +193,41 @@ def load_library_api_mapping(path: Path) -> dict[str, str]:
         mapping[str(raw_id).strip()] = test_id.strip()
 
     if not mapping:
-        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+        raise NormalizationError("Missing library API mapping for qmind numeric IDs.")
     return mapping
 
 
 def normalize_numeric_selected_tests(
     selected_tests: list[str], library_api: str | None
-) -> list[str]:
+) -> tuple[list[str], dict[str, Any]]:
     numeric_ids = [
         test_id for test_id in selected_tests if NUMERIC_ID_PATTERN.fullmatch(test_id)
     ]
     if not numeric_ids:
-        return selected_tests
+        return selected_tests, {
+            "status": "canonical",
+            "numeric_ids_present": False,
+            "mapped_numeric_ids": 0,
+            "unmapped_numeric_ids": [],
+        }
 
     if not library_api:
-        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+        raise NormalizationError("Missing library API mapping for qmind numeric IDs.")
 
     mapping = load_library_api_mapping(Path(library_api))
     missing = sorted(set(numeric_ids) - set(mapping))
     if missing:
-        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+        raise NormalizationError(
+            "Missing library API mapping for qmind numeric IDs: " + ", ".join(missing)
+        )
 
-    return sorted(set(mapping.get(test_id, test_id) for test_id in selected_tests))
+    return sorted(set(mapping.get(test_id, test_id) for test_id in selected_tests)), {
+        "status": "normalized",
+        "numeric_ids_present": True,
+        "mapped_numeric_ids": len(set(numeric_ids)),
+        "unmapped_numeric_ids": [],
+        "library_api": library_api,
+    }
 
 
 def load_oracle(path: Path) -> dict[str, Any]:
@@ -274,10 +300,31 @@ def write_output(path: Path, payload: str) -> None:
 
 def main() -> int:
     args = parse_args()
-    oracle = load_oracle(Path(args.oracle))
-    selected_tests = load_selected_tests(Path(args.selected))
-    selected_tests = normalize_numeric_selected_tests(selected_tests, args.library_api)
+    try:
+        oracle = load_oracle(Path(args.oracle))
+        selected_tests = load_selected_tests(Path(args.selected))
+        selected_tests, normalization = normalize_numeric_selected_tests(
+            selected_tests, args.library_api
+        )
+    except NormalizationError as exc:
+        error_report = {
+            "method": args.method,
+            "status": "normalization_error",
+            "error": str(exc),
+            "selected": args.selected,
+            "library_api": args.library_api,
+            "defect_recall": None,
+            "detected_scenarios_count": None,
+            "missed_scenarios_count": None,
+        }
+        payload = json.dumps(error_report, indent=2)
+        print(payload)
+        if args.output:
+            write_output(Path(args.output), payload)
+        return 1
+
     report = evaluate(oracle, selected_tests, args.method, args.use_validated)
+    report["normalization"] = normalization
     payload = json.dumps(report, indent=2)
 
     print(payload)

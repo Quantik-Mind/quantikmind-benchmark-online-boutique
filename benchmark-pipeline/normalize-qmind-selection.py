@@ -143,13 +143,24 @@ def load_library_api_mapping(path: Path) -> dict[str, str]:
         raise SystemExit("Missing library API mapping for qmind numeric IDs.")
 
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        raw = path.read_bytes()
     except OSError as exc:
         raise SystemExit(f"Could not read library API mapping {path}: {exc}") from exc
-    except json.JSONDecodeError as exc:
-        raise SystemExit(
-            f"Invalid JSON in library API mapping {path}: line {exc.lineno}, column {exc.colno}: {exc.msg}"
-        ) from exc
+
+    last_decode_error: UnicodeDecodeError | None = None
+    for encoding in ("utf-8", "utf-8-sig", "utf-16"):
+        try:
+            data = json.loads(raw.decode(encoding))
+            break
+        except UnicodeDecodeError as exc:
+            last_decode_error = exc
+            continue
+        except json.JSONDecodeError as exc:
+            raise SystemExit(
+                f"Invalid JSON in library API mapping {path}: line {exc.lineno}, column {exc.colno}: {exc.msg}"
+            ) from exc
+    else:
+        raise SystemExit(f"Could not decode library API mapping {path}: {last_decode_error}")
 
     mapping: dict[str, str] = {}
     for item in mapping_items(data):

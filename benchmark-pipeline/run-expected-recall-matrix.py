@@ -16,6 +16,7 @@ DEFAULT_ORACLE = "defect-oracle/online-boutique-defect-oracle.v2.json"
 DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-51.json"
 DEFAULT_QMIND_SELECTED = DEFAULT_LIBRARY
 DEFAULT_SCENARIOS = "benchmark-pipeline/scenarios.json"
+NUMERIC_ID_PATTERN = re.compile(r"^\d+$")
 EXPECTED_ORACLE_WARNING = (
     "These results use expected oracle data. They are useful for pipeline "
     "validation only and must not be presented as validated defect-recall results."
@@ -64,6 +65,10 @@ STOPWORDS = {
 }
 
 
+class NormalizationError(Exception):
+    """Raised when a method selection cannot be normalized to canonical test IDs."""
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run expected-oracle recall across benchmark comparison methods."
@@ -106,13 +111,22 @@ def load_json(path: Path, label: str) -> Any:
         raise SystemExit(f"{label} path is not a file: {path}")
 
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        raw = path.read_bytes()
     except OSError as exc:
         raise SystemExit(f"Could not read {label} file {path}: {exc}") from exc
-    except json.JSONDecodeError as exc:
-        raise SystemExit(
-            f"Invalid JSON in {label} file {path}: line {exc.lineno}, column {exc.colno}: {exc.msg}"
-        ) from exc
+
+    last_decode_error: UnicodeDecodeError | None = None
+    for encoding in ("utf-8", "utf-8-sig", "utf-16"):
+        try:
+            return json.loads(raw.decode(encoding))
+        except UnicodeDecodeError as exc:
+            last_decode_error = exc
+            continue
+        except json.JSONDecodeError as exc:
+            raise SystemExit(
+                f"Invalid JSON in {label} file {path}: line {exc.lineno}, column {exc.colno}: {exc.msg}"
+            ) from exc
+    raise SystemExit(f"Could not decode {label} file {path}: {last_decode_error}")
 
 
 def test_id_from_item(item: Any) -> str | None:
@@ -178,6 +192,100 @@ def load_selected_tests(path: Path) -> list[str]:
     if not selected_tests:
         raise SystemExit(f"No selected tests found in {path}.")
     return selected_tests
+
+
+def mapping_items(data: Any) -> Iterable[Any]:
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        for field in ("data", "tests", "items", "results"):
+            value = data.get(field)
+            if isinstance(value, list):
+                return value
+    return []
+
+
+def load_numeric_id_mapping(path: Path) -> dict[str, str]:
+    data = load_json(path, "Library API mapping")
+    mapping: dict[str, str] = {}
+    for item in mapping_items(data):
+        if not isinstance(item, dict):
+            continue
+        raw_id = item.get("id")
+        test_id = item.get("test_id")
+        if raw_id is None or not isinstance(test_id, str) or not test_id.strip():
+            continue
+        mapping[str(raw_id).strip()] = test_id.strip()
+    return mapping
+
+
+def candidate_mapping_paths(qmind_path: Path) -> list[Path]:
+    candidates = [
+        qmind_path.with_name("library-api-51.json"),
+        qmind_path.with_name("library-api.json"),
+        qmind_path.parent / "library-api-51.json",
+        qmind_path.parent / "library-api.json",
+    ]
+    unique: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved not in seen:
+            seen.add(resolved)
+            unique.append(candidate)
+    return unique
+
+
+def normalize_selection_to_library(
+    method: str,
+    selected_tests: list[str],
+    library_id_set: set[str],
+    qmind_path: Path | None = None,
+) -> tuple[list[str], dict[str, Any]]:
+    numeric_ids = [
+        test_id for test_id in selected_tests if NUMERIC_ID_PATTERN.fullmatch(test_id)
+    ]
+    if not numeric_ids:
+        unknown_ids = sorted(set(selected_tests) - library_id_set)
+        if unknown_ids:
+            raise NormalizationError(
+                f"{method} selected tests include IDs not found in the canonical library: "
+                + ", ".join(unknown_ids)
+            )
+        return sorted(set(selected_tests)), {
+            "status": "canonical",
+            "numeric_ids_present": False,
+            "mapped_numeric_ids": 0,
+            "unmapped_numeric_ids": [],
+        }
+
+    mappings: dict[str, str] = {}
+    mapping_paths = candidate_mapping_paths(qmind_path) if qmind_path else []
+    for path in mapping_paths:
+        if path.exists() and path.is_file():
+            mappings.update(load_numeric_id_mapping(path))
+
+    missing = sorted(set(numeric_ids) - set(mappings))
+    if missing:
+        raise NormalizationError(
+            "Missing library API mapping for qmind numeric IDs: " + ", ".join(missing)
+        )
+
+    normalized = sorted(set(mappings.get(test_id, test_id) for test_id in selected_tests))
+    unknown_ids = sorted(set(normalized) - library_id_set)
+    if unknown_ids:
+        raise NormalizationError(
+            f"{method} normalized selected tests include IDs not found in the canonical library: "
+            + ", ".join(unknown_ids)
+        )
+
+    return normalized, {
+        "status": "normalized",
+        "numeric_ids_present": True,
+        "mapped_numeric_ids": len(set(numeric_ids)),
+        "unmapped_numeric_ids": [],
+        "mapping_artifacts": [str(path) for path in mapping_paths if path.exists()],
+    }
 
 
 def load_oracle(path: Path) -> dict[str, Any]:
@@ -498,12 +606,17 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         )
 
     library_id_set = set(full_suite_ids)
-    unknown_qmind_ids = sorted(set(qmind_selected) - library_id_set)
-    if unknown_qmind_ids:
-        raise SystemExit(
-            "Quantik Mind selected tests include IDs not found in the canonical library: "
-            + ", ".join(unknown_qmind_ids)
-        )
+    full_suite_ids, full_suite_normalization = normalize_selection_to_library(
+        "Full Suite",
+        full_suite_ids,
+        library_id_set,
+    )
+    qmind_selected, qmind_normalization = normalize_selection_to_library(
+        "Quantik Mind",
+        qmind_selected,
+        library_id_set,
+        qmind_path,
+    )
 
     qmind_selection_size = len(qmind_selected)
     if qmind_selection_size > full_suite_size:
@@ -521,6 +634,11 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
     random_selected = sorted(
         random.Random(args.random_seed).sample(full_suite_ids, qmind_selection_size)
     )
+    random_selected, random_normalization = normalize_selection_to_library(
+        "Random",
+        random_selected,
+        library_id_set,
+    )
 
     full_detected, full_missed = evaluate_static_selection(oracle_scenarios, full_suite_ids)
     random_detected, random_missed = evaluate_static_selection(
@@ -532,6 +650,12 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
         scenario_scenarios,
         qmind_selection_size,
     )
+    for scenario_id, selected_tests in list(history_selections.items()):
+        history_selections[scenario_id], _ = normalize_selection_to_library(
+            f"History + Code Change {scenario_id}",
+            selected_tests,
+            library_id_set,
+        )
     qmind_detected, qmind_missed = evaluate_static_selection(
         oracle_scenarios, qmind_selected
     )
@@ -549,7 +673,10 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 full_suite_size,
                 full_detected,
                 full_missed,
-                {"selected_tests": full_suite_ids},
+                {
+                    "selected_tests": full_suite_ids,
+                    "normalization": full_suite_normalization,
+                },
             ),
             method_summary(
                 "random",
@@ -557,7 +684,11 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 full_suite_size,
                 random_detected,
                 random_missed,
-                {"random_seed": args.random_seed, "selected_tests": random_selected},
+                {
+                    "random_seed": args.random_seed,
+                    "selected_tests": random_selected,
+                    "normalization": random_normalization,
+                },
             ),
             method_summary(
                 "history-code-change",
@@ -565,7 +696,15 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 full_suite_size,
                 history_detected,
                 history_missed,
-                {"scenario_selections": history_selections},
+                {
+                    "scenario_selections": history_selections,
+                    "normalization": {
+                        "status": "canonical",
+                        "numeric_ids_present": False,
+                        "mapped_numeric_ids": 0,
+                        "unmapped_numeric_ids": [],
+                    },
+                },
             ),
             method_summary(
                 "qmind",
@@ -573,7 +712,7 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
                 full_suite_size,
                 qmind_detected,
                 qmind_missed,
-                {"selected_tests": qmind_selected},
+                {"selected_tests": qmind_selected, "normalization": qmind_normalization},
             ),
         ],
     }
@@ -581,7 +720,22 @@ def build_summary(args: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> int:
     args = parse_args()
-    summary = build_summary(args)
+    try:
+        summary = build_summary(args)
+    except NormalizationError as exc:
+        summary = {
+            "status": "normalization_error",
+            "error": str(exc),
+            "defect_recall": None,
+            "methods": [],
+        }
+        json_payload = json.dumps(summary, indent=2)
+        print(json_payload)
+        if args.output_json:
+            write_output(Path(args.output_json), json_payload + "\n")
+        if args.output_md:
+            write_output(Path(args.output_md), "# Normalization Error\n\n" + str(exc) + "\n")
+        return 1
     json_payload = json.dumps(summary, indent=2)
 
     print(json_payload)
