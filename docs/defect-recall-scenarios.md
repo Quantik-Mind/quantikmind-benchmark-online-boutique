@@ -50,7 +50,7 @@ The defect scenarios should be implemented later as Git states in the external O
 
 ## 3. Test/Domain Mapping
 
-The Playwright suite under `qmind-test-harness/playwright/tests` currently contains 50 E2E tests. The following grouping should be used as the benchmark's domain map.
+The Playwright suite under `qmind-test-harness/playwright/tests` currently contains 51 E2E tests. The following grouping should be used as the benchmark's domain map.
 
 ### Frontend / Catalog Browsing
 
@@ -114,6 +114,7 @@ The Playwright suite under `qmind-test-harness/playwright/tests` currently conta
 
 ### Payment
 
+- `payment-order-completion-confirms-success`
 - `order-form-requires-payment-data`
 - `order-complete-happy-path`
 
@@ -302,19 +303,29 @@ Target domain:
 Expected upstream files to modify later:
 
 - `src/paymentservice/charge.js`
-- Optional: `src/paymentservice/server.js`
-- Optional: `src/checkoutservice/main.go`
 
 Defect behavior:
 
-- Valid Visa/Mastercard payments are rejected.
+- `paymentservice` `Charge` always fails, so valid Visa/Mastercard payments are rejected.
 - Cart, checkout form rendering, shipping quote, and product browsing should remain healthy.
 - The preferred implementation is to reject otherwise valid cards after normal validation in `charge.js`.
 
 Expected failing tests:
 
-- `order-complete-happy-path`
-- Potentially `order-form-requires-payment-data`, depending on baseline behavior and final test assertions.
+- `payment-order-completion-confirms-success`
+
+Validated failing tests:
+
+- `payment-order-completion-confirms-success`
+
+Validation notes:
+
+- Validated on 2026-06-11 against the full 51-test Playwright suite: 1 failed, 50 passed.
+- Baseline validation passed with 51 passed.
+- Validated external scenario commit `b7ecc963` on `benchmark/scenario-ob004`.
+- Failing test: `payment-order-completion-confirms-success`.
+- OB-004 originally exposed a real coverage gap: the payment service failed correctly, but the previous benchmark suite did not verify successful payment completion.
+- The new payment-aware test now detects the regression.
 
 Expected unaffected tests:
 
@@ -326,9 +337,9 @@ Expected unaffected tests:
 
 Risk notes:
 
-- This is intentionally narrow and depends heavily on the full order happy path test.
+- This is intentionally narrow and depends heavily on a payment-aware successful order assertion.
 - Payment validation has date-sensitive logic, so tests should avoid relying on expiration edge cases.
-- If `order-complete-happy-path` is flaky, this scenario becomes unreliable; baseline stability matters.
+- If `payment-order-completion-confirms-success` is flaky, this scenario becomes unreliable; baseline stability matters.
 
 ## 6. External Online Boutique Branch/Tag Strategy
 
@@ -457,11 +468,11 @@ No `.gitignore` change is currently required for this plan.
 
 1. Validate the external Online Boutique baseline.
    - Deploy the external app at the intended baseline.
-   - Run the full 50-test Playwright suite.
+   - Run the full 51-test Playwright suite.
    - Identify unstable or invalid baseline tests before introducing defects.
 
 2. Freeze canonical test metadata.
-   - Use the 50-test Playwright library for the final recall benchmark.
+   - Use the 51-test Playwright library for the final recall benchmark.
    - Correct service/domain metadata if needed before final evaluation.
 
 3. Create scenario metadata in the benchmark repo.
@@ -516,6 +527,6 @@ Risk: Generated outputs or external app files could be committed accidentally.
 
 Mitigation: Keep generated paths ignored and run `git status --short` before any commit.
 
-Risk: qmind library metadata may not accurately represent all 50 tests.
+Risk: qmind library metadata may not accurately represent all 51 tests.
 
-Mitigation: Review and correct the 50-test library metadata before final benchmark runs, especially service mappings inferred from test names.
+Mitigation: Review and correct the 51-test library metadata before final benchmark runs, especially service mappings inferred from test names.

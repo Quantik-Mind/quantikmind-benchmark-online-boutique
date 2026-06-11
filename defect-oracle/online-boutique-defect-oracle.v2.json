@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "benchmark": "online-boutique-defect-recall",
-  "full_suite_size": 50,
-  "oracle_status": "expected_not_validated",
+  "full_suite_size": 51,
+  "oracle_status": "validated",
   "scenarios": [
     {
       "id": "OB-001",
@@ -145,10 +145,11 @@
       "affected_service": "paymentservice",
       "scenario_ref": "benchmark/scenario-ob004",
       "expected_detecting_tests": [
-        "order-complete-happy-path",
-        "order-form-requires-payment-data"
+        "payment-order-completion-confirms-success"
       ],
-      "validated_detecting_tests": [],
+      "validated_detecting_tests": [
+        "payment-order-completion-confirms-success"
+      ],
       "expected_unaffected_tests": [
         "homepage-tests",
         "catalog-and-product-detail-tests",
@@ -156,12 +157,15 @@
         "checkout-form-visibility-tests",
         "empty-cart-negative-tests"
       ],
-      "validated_at": null,
-      "validation_status": "planned",
+      "validated_at": "2026-06-11",
+      "validation_status": "validated",
       "severity": "medium",
       "notes": [
-        "order-form-requires-payment-data is provisional until baseline behavior and final assertions are confirmed.",
-        "Final oracle should use observed full-suite failures from the scenario branch."
+        "Validated against the full 51-test Playwright suite: 1 failed, 50 passed.",
+        "Baseline validation passed with 51 passed.",
+        "External scenario commit b7ecc963 on benchmark/scenario-ob004.",
+        "The implementation changes src/paymentservice/charge.js so paymentservice Charge always fails.",
+        "The previous benchmark suite exposed a real coverage gap: payment failures could occur without an assertion confirming successful payment completion."
       ]
     }
   ]
