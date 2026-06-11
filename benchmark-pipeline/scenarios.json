@@ -1,0 +1,172 @@
+{
+  "scenarios": [
+    {
+      "id": "OB-001",
+      "name": "Checkout Regression",
+      "description": "Checkout form rendering regresses after a product is added to the cart while homepage, catalog, product detail, and basic cart access remain healthy.",
+      "target_domain": "Checkout page and checkout frontend flow",
+      "target_service": "frontend",
+      "external_repo": "microservices-demo",
+      "baseline_ref": "benchmark-baseline",
+      "scenario_ref": "benchmark/scenario-ob001",
+      "expected_changed_files": [
+        "src/frontend/templates/cart.html",
+        "src/frontend/handlers.go"
+      ],
+      "defect_behavior": [
+        "After a product is added to the cart, the checkout form no longer renders the required checkout fields or actions.",
+        "Homepage, product listing, and basic cart access should remain unaffected.",
+        "A deterministic UI-level break is preferred over a crash or timing-sensitive service failure."
+      ],
+      "signal_breadth": "narrow-to-medium",
+      "expected_detecting_tests": [
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "expected_unaffected_tests": [
+        "homepage-smoke-tests",
+        "catalog-browsing-tests",
+        "product-detail-price-link-tests",
+        "empty-cart-tests",
+        "basic-cart-accessibility-tests"
+      ],
+      "validation_status": "planned",
+      "notes": [
+        "order-form-requires-payment-data is provisional until baseline behavior is confirmed.",
+        "Renaming only one label may make the signal too narrow.",
+        "Service crashes may broaden the signal through HTTP 500s or slow recovery."
+      ]
+    },
+    {
+      "id": "OB-002",
+      "name": "Cart Regression",
+      "description": "Adding a product to the cart fails deterministically, creating a cart-centered signal that also affects checkout and order flows dependent on cart state.",
+      "target_domain": "Cart service and add-to-cart flow",
+      "target_service": "cartservice",
+      "external_repo": "microservices-demo",
+      "baseline_ref": "benchmark-baseline",
+      "scenario_ref": "benchmark/scenario-ob002",
+      "expected_changed_files": [
+        "src/cartservice/src/services/CartService.cs",
+        "src/cartservice/src/cartstore/RedisCartStore.cs",
+        "src/frontend/handlers.go"
+      ],
+      "defect_behavior": [
+        "Adding a product to the cart fails deterministically.",
+        "The preferred implementation is for AddItem to return a service error instead of storing the item.",
+        "Silent no-op behavior should be avoided because generic cart text assertions may still pass on an empty-cart page."
+      ],
+      "signal_breadth": "medium-to-broad",
+      "expected_detecting_tests": [
+        "cart-add-product-from-detail-page",
+        "cart-add-product-and-view-cart",
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-add-from-product-detail-keeps-price-context",
+        "frontend-basic-user-journey-home-product-cart",
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path"
+      ],
+      "expected_unaffected_tests": [
+        "homepage-tests",
+        "product-detail-tests-before-cart-mutation",
+        "empty-cart-page-tests",
+        "catalog-link-and-price-tests"
+      ],
+      "validation_status": "planned",
+      "notes": [
+        "A silent cart-state drop may not be detected by tests that only assert generic cart text.",
+        "A service error gives a clearer detection signal but may create frontend error-page assertions in multiple tests.",
+        "Checkout and order flows are expected to fail because they depend on cart state."
+      ]
+    },
+    {
+      "id": "OB-003",
+      "name": "Product Detail Regression",
+      "description": "Product detail lookup for valid product IDs fails or returns unusable data while homepage product listing remains intact.",
+      "target_domain": "Product catalog service and product detail pages",
+      "target_service": "productcatalogservice",
+      "external_repo": "microservices-demo",
+      "baseline_ref": "benchmark-baseline",
+      "scenario_ref": "benchmark/scenario-ob003",
+      "expected_changed_files": [
+        "src/productcatalogservice/product_catalog.go",
+        "src/productcatalogservice/products.json",
+        "src/frontend/templates/product.html"
+      ],
+      "defect_behavior": [
+        "Product detail lookup for valid product IDs fails or returns unusable product data.",
+        "Homepage product listing should remain intact.",
+        "The preferred implementation is to break GetProduct while leaving ListProducts healthy."
+      ],
+      "signal_breadth": "medium",
+      "expected_detecting_tests": [
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-has-price",
+        "product-detail-page-has-body-content",
+        "product-detail-allows-return-navigation",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-keeps-product-context",
+        "catalog-first-product-opens-detail-page",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-price",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-refresh-keeps-content",
+        "cart-add-tests-requiring-product-detail"
+      ],
+      "expected_unaffected_tests": [
+        "homepage-load-tests",
+        "product-links-visible-tests",
+        "multiple-products-visible-tests",
+        "homepage-price-tests-if-list-products-remains-intact",
+        "empty-cart-tests"
+      ],
+      "validation_status": "planned",
+      "notes": [
+        "Breaking product data globally may also break homepage tests and make the scenario too broad.",
+        "Changing only product template text may create a frontend-only scenario rather than a product catalog scenario.",
+        "The cleanest signal is a deterministic GetProduct regression with product listing preserved."
+      ]
+    },
+    {
+      "id": "OB-004",
+      "name": "Payment Regression",
+      "description": "Valid Visa or Mastercard payments are rejected while cart, checkout form rendering, shipping quote, and product browsing remain healthy.",
+      "target_domain": "Payment authorization and checkout/payment integration",
+      "target_service": "paymentservice",
+      "external_repo": "microservices-demo",
+      "baseline_ref": "benchmark-baseline",
+      "scenario_ref": "benchmark/scenario-ob004",
+      "expected_changed_files": [
+        "src/paymentservice/charge.js",
+        "src/paymentservice/server.js",
+        "src/checkoutservice/main.go"
+      ],
+      "defect_behavior": [
+        "Valid Visa or Mastercard payments are rejected.",
+        "Cart, checkout form rendering, shipping quote, and product browsing should remain healthy.",
+        "The preferred implementation is to reject otherwise valid cards after normal validation in charge.js."
+      ],
+      "signal_breadth": "narrow",
+      "expected_detecting_tests": [
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "expected_unaffected_tests": [
+        "homepage-tests",
+        "catalog-and-product-detail-tests",
+        "cart-add-view-tests",
+        "checkout-form-visibility-tests",
+        "empty-cart-negative-tests"
+      ],
+      "validation_status": "planned",
+      "notes": [
+        "order-form-requires-payment-data is provisional until baseline behavior and final assertions are confirmed.",
+        "This scenario intentionally has a narrow signal and depends heavily on order-complete-happy-path.",
+        "Payment validation has date-sensitive logic, so tests should avoid relying on expiration edge cases."
+      ]
+    }
+  ]
+}
