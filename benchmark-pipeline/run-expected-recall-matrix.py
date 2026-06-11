@@ -14,7 +14,7 @@ from typing import Any, Iterable
 
 DEFAULT_ORACLE = "defect-oracle/online-boutique-defect-oracle.v2.json"
 DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-51.json"
-DEFAULT_QMIND_SELECTED = "qmind-test-library/online-boutique-playwright-11.json"
+DEFAULT_QMIND_SELECTED = DEFAULT_LIBRARY
 DEFAULT_SCENARIOS = "benchmark-pipeline/scenarios.json"
 EXPECTED_ORACLE_WARNING = (
     "These results use expected oracle data. They are useful for pipeline "

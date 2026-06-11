@@ -19,7 +19,7 @@ The helper writes Playwright reports under `benchmark-runs/baseline-validation` 
 Example:
 
 ```powershell
-python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected qmind-test-library/online-boutique-playwright-11.json --method qmind
+python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json --method qmind --use-validated
 ```
 
 The selected tests input can be a JSON object with `selected_tests`, a JSON array of test IDs, or a qmind-like object containing selected test objects with identifiers such as `id`, `test_id`, `name`, or `title`. Test identifiers are normalized to strings.
@@ -98,7 +98,7 @@ Example:
 python benchmark-pipeline/run-expected-recall-matrix.py `
   --oracle defect-oracle/online-boutique-defect-oracle.v2.json `
   --library qmind-test-library/online-boutique-playwright-51.json `
-  --qmind-selected qmind-test-library/online-boutique-playwright-11.json `
+  --qmind-selected benchmark-runs/qmind-online-boutique/selected-tests-51.json `
   --scenarios benchmark-pipeline/scenarios.json
 ```
 

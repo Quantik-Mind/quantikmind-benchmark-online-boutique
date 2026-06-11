@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-library_path = ROOT / "qmind-test-library" / "online-boutique-playwright-11.json"
+library_path = ROOT / "qmind-test-library" / "online-boutique-playwright-51.json"
 oracle_path = ROOT / "defect-oracle" / "online-boutique-defect-oracle.v1.json"
 selection_path = ROOT / "benchmark-runs" / "qmind-online-boutique" / "selected-tests.json"
 report_path = ROOT / "benchmark-runs" / "qmind-online-boutique" / "selection-report.json"

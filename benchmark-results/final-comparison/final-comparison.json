@@ -19,7 +19,7 @@
   "baseline_selection_size": {
     "tests": 11,
     "status": "provisional_comparator_size",
-    "reason": "The live Quantik Mind canonical 51-test selection artifact is pending. Existing QMind selection artifacts map correctly, but they belong to the historical 11-test library. Random and history/code-change baselines are provisional comparators until a 51-test QMind selection artifact exists."
+    "reason": "The live Quantik Mind canonical 51-test selection artifact is pending. Historical 11/22-test experiments are no longer part of active final benchmark scoring. Random and history/code-change baselines are provisional comparators until a 51-test QMind selection artifact exists."
   },
   "methods": [
     {
@@ -162,41 +162,23 @@
       "defects_detected": null,
       "full_suite_defects": 4,
       "defect_recall": null,
-      "reason": "Existing QMind selection artifacts map correctly, but they belong to the historical 11-test library. A new 51-test QMind selection artifact is required before the final comparison can be completed.",
-      "verified_mapping": {
-        "33686": "checkout-form-fields-visible",
-        "33685": "checkout-page-accessible-from-cart",
-        "33688": "order-complete-happy-path"
-      },
-      "historical_library_api": {
-        "path": "benchmark-runs/qmind-online-boutique/library-api.json",
-        "total": 11
-      },
+      "reason": "Historical 11/22-test QMind artifacts are no longer part of the active benchmark. Final scoring requires a new Quantik Mind selection generated from qmind-test-library/online-boutique-playwright-51.json.",
       "required_command_sequence": [
         "qmind sync library --file qmind-test-library/online-boutique-playwright-51.json",
         "qmind subset --framework playwright > benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
         "python benchmark-pipeline/normalize-qmind-selection.py benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt benchmark-runs/qmind-online-boutique/selected-tests-51.json",
         "python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json --method qmind --use-validated --output benchmark-results/final-comparison/qmind-51-evaluation.json"
       ],
-      "historical_11_test_artifacts_reviewed": [
-        "benchmark-runs/qmind-online-boutique/library-api.json",
-        "benchmark-runs/qmind-online-boutique/selected-tests.json",
-        "benchmark-runs/qmind-online-boutique/qmind-subset-raw.txt",
-        "benchmark-runs/qmind-online-boutique/qmind-subset-full-multisignal-002-raw.txt",
-        "benchmark-runs/qmind-online-boutique/qmind-subset-50-targeted-entanglement-raw.txt"
-      ],
+      "historical_artifacts_policy": "Old QMind raw outputs are historical only and must not be used for final scoring.",
       "detected_scenarios": [],
       "missed_scenarios": []
     }
   ],
-  "supporting_artifacts": [
-    "benchmark-results/final-comparison/expected-recall-matrix.json",
-    "benchmark-results/final-comparison/expected-recall-matrix.md"
-  ],
+  "supporting_artifacts": [],
   "limitations": [
     "This is a diagnostic pre-final comparison artifact, not the final investor/public benchmark result.",
     "Quantik Mind final recall is intentionally not reported until a live canonical 51-test selection artifact exists.",
-    "Random and history/code-change baselines use a provisional 11-test comparison size until the 51-test QMind artifact determines the final same-size comparison.",
-    "The expected recall matrix is retained only as a pipeline sanity check and is not the validated final comparison."
+    "Random and history/code-change baselines use a provisional comparison size until the 51-test QMind artifact determines the final same-size comparison.",
+    "Expected-matrix artifacts are not included in this final-comparison result set because no 51-test QMind selection artifact exists yet."
   ]
 }
