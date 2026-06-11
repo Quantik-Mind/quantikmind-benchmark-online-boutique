@@ -32,6 +32,16 @@ test('order-complete-happy-path', async ({ page }) => {
   await expect(page.locator('body')).toContainText(/order|complete|thank you/i);
 });
 
+test('payment-order-completion-confirms-success', async ({ page }) => {
+  await addFirstProductToCart(page);
+  await fillCheckoutForm(page);
+
+  await page.getByRole('button', { name: /Place Order/i }).click();
+
+  await expect(page.getByText(/Your order is complete/i)).toBeVisible();
+  await expect(page.locator('body')).not.toContainText(/transaction declined|authorization declined|payment.*declined/i);
+});
+
 test('order-form-requires-payment-data', async ({ page }) => {
   await addFirstProductToCart(page);
 
