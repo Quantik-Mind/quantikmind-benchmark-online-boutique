@@ -74,9 +74,34 @@ python benchmark-pipeline/select-history-code-change-approach.py --size 11 --sce
 python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/history-code-change-ob-001-selection.json --method history-code-change
 ```
 
+## Expected recall matrix runner
+
+`run-expected-recall-matrix.py` runs a single expected-oracle comparison matrix across the four benchmark methods: Traditional Approach (Full Suite), Random Approach, History + Code Change Approach, and Quantik Mind. It loads the canonical 50-test library, infers the Quantik Mind selection size from the selected-test file, builds deterministic baseline selections, and reports expected defect recall and execution reduction.
+
+This runner uses `expected_detecting_tests` from the oracle. OB-001 through OB-004 are still planned scenarios, so this output is useful for pipeline validation only and must not be presented as validated benchmark results.
+
+Example:
+
+```powershell
+python benchmark-pipeline/run-expected-recall-matrix.py `
+  --oracle defect-oracle/online-boutique-defect-oracle.v2.json `
+  --library qmind-test-library/online-boutique-playwright-50.json `
+  --qmind-selected qmind-test-library/online-boutique-playwright-11.json `
+  --scenarios benchmark-pipeline/scenarios.json
+```
+
+The script always prints the JSON summary to stdout. Use `--output-json` and `--output-md` to write JSON and Markdown summaries:
+
+```powershell
+python benchmark-pipeline/run-expected-recall-matrix.py --output-json benchmark-runs/expected-recall-matrix.json --output-md benchmark-runs/expected-recall-matrix.md
+```
+
+Validated benchmark results require real scenario branches, observed full-suite failures, and final oracle updates based on that failure validation.
+
 ### Validation
 
 ```powershell
 python -m py_compile benchmark-pipeline/select-random-approach.py
 python -m py_compile benchmark-pipeline/select-history-code-change-approach.py
+python -m py_compile benchmark-pipeline/run-expected-recall-matrix.py
 ```
