@@ -19,10 +19,34 @@ The helper writes Playwright reports under `benchmark-runs/baseline-validation` 
 Example:
 
 ```powershell
-python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json --method qmind --use-validated
+python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json --method qmind --use-validated --library-api benchmark-runs/qmind-online-boutique/library-api-51.json
 ```
 
-The selected tests input can be a JSON object with `selected_tests`, a JSON array of test IDs, or a qmind-like object containing selected test objects with identifiers such as `id`, `test_id`, `name`, or `title`. Test identifiers are normalized to strings.
+The selected tests input can be a JSON object with `selected_tests`, a JSON array of test IDs, or a qmind-like object containing selected test objects with identifiers such as `id`, `test_id`, `name`, or `title`. Test identifiers are normalized to strings. If selected tests are numeric qmind backend/API IDs, pass `--library-api` so the evaluator can map each numeric `id` to its canonical `test_id`; otherwise it fails with `Missing library API mapping for qmind numeric IDs.` rather than reporting a misleading 0% recall.
+
+### Normalizing qmind subset output
+
+`normalize-qmind-selection.py` converts raw qmind subset output into the canonical `selected_tests` JSON consumed by the benchmark comparator. It accepts JSON output and raw whitespace-separated numeric qmind IDs.
+
+```powershell
+python benchmark-pipeline/normalize-qmind-selection.py `
+  benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt `
+  benchmark-runs/qmind-online-boutique/selected-tests-51.json `
+  --library-api benchmark-runs/qmind-online-boutique/library-api-51.json
+```
+
+The library API/export mapping must contain entries with `id` and `test_id`, for example:
+
+```json
+{
+  "data": [
+    {
+      "id": 33686,
+      "test_id": "checkout-form-fields-visible"
+    }
+  ]
+}
+```
 
 Until scenario validation is completed, the evaluator uses `expected_detecting_tests` from the oracle by default. Pass `--use-validated` to evaluate against `validated_detecting_tests` once those fields have been populated.
 
@@ -116,4 +140,5 @@ Validated benchmark results require real scenario branches, observed full-suite 
 python -m py_compile benchmark-pipeline/select-random-approach.py
 python -m py_compile benchmark-pipeline/select-history-code-change-approach.py
 python -m py_compile benchmark-pipeline/run-expected-recall-matrix.py
+python -m py_compile benchmark-pipeline/normalize-qmind-selection.py benchmark-pipeline/evaluate-defect-recall.py
 ```

@@ -10,6 +10,7 @@ QMIND_API_URL="${QMIND_API_URL:-}"
 QMIND_API_KEY="${QMIND_API_KEY:-}"
 
 TEST_LIBRARY="${TEST_LIBRARY:-$ROOT_DIR/qmind-test-library/online-boutique-playwright-51.json}"
+LIBRARY_API="${LIBRARY_API:-$RUN_DIR/library-api-51.json}"
 OBSERVABILITY_CONFIG="$ROOT_DIR/qmind-config/observability-online-boutique.container.yaml"
 PROMETHEUS_URL="${PROMETHEUS_URL:-http://34.185.226.81:9090}"
 
@@ -24,6 +25,7 @@ echo "Root: $ROOT_DIR"
 echo "Run dir: $RUN_DIR"
 echo "Project name: $PROJECT_NAME"
 echo "Test library: $TEST_LIBRARY"
+echo "Library API mapping: $LIBRARY_API"
 echo "Prometheus: $PROMETHEUS_URL"
 echo
 
@@ -93,7 +95,8 @@ echo
 echo "== 8. normalize selected tests =="
 python3 "$ROOT_DIR/benchmark-pipeline/normalize-qmind-selection.py" \
   "$RUN_DIR/qmind-subset-raw.txt" \
-  "$RUN_DIR/selected-tests.json"
+  "$RUN_DIR/selected-tests.json" \
+  --library-api "$LIBRARY_API"
 echo
 
 echo "== 9. evaluate defect retention =="
