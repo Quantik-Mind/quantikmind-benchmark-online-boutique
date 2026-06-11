@@ -205,6 +205,20 @@ Expected failing tests:
 - `checkout-form-fields-visible`
 - `order-complete-happy-path`
 
+Validated failing tests:
+
+- `checkout-page-accessible-from-cart`
+- `checkout-form-fields-visible`
+- `order-complete-happy-path`
+- `order-form-requires-payment-data`
+- `cart-add-from-product-detail-keeps-price-context`
+
+Validation notes:
+
+- Validated on 2026-06-11 against the full 50-test Playwright suite: 5 failed, 45 passed.
+- Validated external scenario commit `f7bac607` against baseline commit `5096a85b`.
+- Only one direct cart assertion failed; several expected cart tests remained green, so broad/soft cart tests should not be treated as validated detecting tests.
+
 Expected unaffected tests:
 
 - Homepage tests.

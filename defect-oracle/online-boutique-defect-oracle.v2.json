@@ -53,19 +53,26 @@
         "checkout-form-fields-visible",
         "order-complete-happy-path"
       ],
-      "validated_detecting_tests": [],
+      "validated_detecting_tests": [
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data",
+        "cart-add-from-product-detail-keeps-price-context"
+      ],
       "expected_unaffected_tests": [
         "homepage-tests",
         "product-detail-tests-before-cart-mutation",
         "empty-cart-page-tests",
         "catalog-link-and-price-tests"
       ],
-      "validated_at": null,
-      "validation_status": "planned",
+      "validated_at": "2026-06-11",
+      "validation_status": "validated",
       "severity": "high",
       "notes": [
-        "This scenario is expected to have a medium-to-broad signal because checkout and order flows depend on cart state.",
-        "Final oracle should use observed full-suite failures from the scenario branch."
+        "Validated against the full 50-test Playwright suite: 5 failed, 45 passed.",
+        "Validated external scenario commit f7bac607 against baseline commit 5096a85b.",
+        "Only one direct cart assertion failed; several expected cart tests remained green, which indicates those tests are broad/soft and should not be treated as validated detecting tests."
       ]
     },
     {
