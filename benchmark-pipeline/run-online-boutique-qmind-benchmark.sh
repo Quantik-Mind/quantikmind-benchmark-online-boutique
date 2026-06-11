@@ -9,7 +9,7 @@ PROJECT_ID="${PROJECT_ID:-}"
 QMIND_API_URL="${QMIND_API_URL:-}"
 QMIND_API_KEY="${QMIND_API_KEY:-}"
 
-TEST_LIBRARY="$ROOT_DIR/qmind-test-library/online-boutique-playwright-11.json"
+TEST_LIBRARY="${TEST_LIBRARY:-$ROOT_DIR/qmind-test-library/online-boutique-playwright-51.json}"
 OBSERVABILITY_CONFIG="$ROOT_DIR/qmind-config/observability-online-boutique.container.yaml"
 PROMETHEUS_URL="${PROMETHEUS_URL:-http://34.185.226.81:9090}"
 
@@ -23,6 +23,7 @@ echo "== Quantik Mind Online Boutique benchmark =="
 echo "Root: $ROOT_DIR"
 echo "Run dir: $RUN_DIR"
 echo "Project name: $PROJECT_NAME"
+echo "Test library: $TEST_LIBRARY"
 echo "Prometheus: $PROMETHEUS_URL"
 echo
 

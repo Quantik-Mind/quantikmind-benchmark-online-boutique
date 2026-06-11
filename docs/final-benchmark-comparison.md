@@ -1,14 +1,17 @@
-# Final Benchmark Comparison Run 001
+# Blocked Final Benchmark Comparison Status
 
 ## Scope
 
-This run compares defect recall for the canonical Online Boutique 51-test Playwright library:
+This is a diagnostic pre-final comparison status, not the final investor/public benchmark result. The final comparison is blocked until a Quantik Mind selection is regenerated from the canonical 51-test library.
+
+Current benchmark scope:
 
 - Canonical library: `qmind-test-library/online-boutique-playwright-51.json`
 - Defect oracle: `defect-oracle/online-boutique-defect-oracle.v2.json`
 - Oracle mode: `validated_detecting_tests`
 - Defect universe: `OB-001`, `OB-002`, `OB-003`, `OB-004`
 - Primary KPI: `Defect Recall = Detected Defects / Full Suite Defects`
+- Comparison status: `blocked_pending_qmind_51_selection`
 
 The four validated scenarios are:
 
@@ -24,19 +27,34 @@ The four validated scenarios are:
 | Method | Status | Tests Executed | Execution Reduction | Defects Detected | Defect Recall |
 | --- | --- | ---: | ---: | ---: | ---: |
 | Traditional Approach / Full Suite | measured | 51 | 0.0% | 4 / 4 | 100.0% |
-| Random Approach | measured | 11 | 78.4% | 1 / 4 | 25.0% |
-| History + Code Change Approach | measured | 11 per scenario | 78.4% | 4 / 4 | 100.0% |
-| Quantik Mind | pending live selection artifact | pending | pending | pending | pending |
+| Random Approach | provisional comparator | 11 | 78.4% | 1 / 4 | 25.0% |
+| History + Code Change Approach | provisional comparator | 11 per scenario | 78.4% | 4 / 4 | 100.0% |
+| Quantik Mind | blocked pending 51-test selection | pending | pending | pending | pending |
 
 ## Methodology
 
 Traditional Approach / Full Suite executes all 51 canonical tests and is the recall baseline. It detected all four validated scenario defects.
 
-Random Approach uses `benchmark-pipeline/select-random-approach.py` against the canonical 51-test library with size `11` and seed `42`. The selected tests are recorded in `benchmark-results/final-comparison/random-selection.json`.
+Random Approach uses `benchmark-pipeline/select-random-approach.py` against the canonical 51-test library with size `11` and seed `42`. The selected tests are recorded in `benchmark-results/final-comparison/random-selection.json`. This row is provisional until the regenerated 51-test QMind selection determines the final same-size comparison.
 
-History + Code Change Approach uses `benchmark-pipeline/select-history-code-change-approach.py` with each scenario's changed-file and domain context from `benchmark-pipeline/scenarios.json`. This models the baseline as it would be used on a scenario branch where changed files are known. Each scenario uses an 11-test selection.
+History + Code Change Approach uses `benchmark-pipeline/select-history-code-change-approach.py` with each scenario's changed-file and domain context from `benchmark-pipeline/scenarios.json`. This models the baseline as it would be used on a scenario branch where changed files are known. Each scenario uses an 11-test selection. This row is also provisional until the regenerated 51-test QMind selection determines the final same-size comparison.
 
-Quantik Mind is not reported as measured in this run. Existing QMind raw files under `benchmark-runs/qmind-online-boutique/` contain numeric CLI IDs such as `33686`, `33685`, and `33688`; those IDs do not map to the canonical 51-test library test IDs. Reporting QMind recall from those artifacts would not be reproducible against the validated oracle.
+Quantik Mind is not reported as measured in this run. The existing QMind numeric IDs map correctly through `benchmark-runs/qmind-online-boutique/library-api.json`, but that API library belongs to the historical 11-test synced library. Reporting QMind recall from those artifacts would not be the current 51-test benchmark.
+
+## Verified Root Cause
+
+- Existing QMind selection artifact: `benchmark-runs/qmind-online-boutique/selected-tests.json`
+- Numeric API IDs: `33686`, `33685`, `33688`
+- Mapping source: `benchmark-runs/qmind-online-boutique/library-api.json`
+- Verified mappings:
+  - `33686` -> `checkout-form-fields-visible`
+  - `33685` -> `checkout-page-accessible-from-cart`
+  - `33688` -> `order-complete-happy-path`
+- `library-api.json` total: `11`
+- Historical local library: `qmind-test-library/online-boutique-playwright-11.json`
+- Current canonical library: `qmind-test-library/online-boutique-playwright-51.json`
+
+The issue is not ID mapping. The issue is that the existing QMind selection artifact belongs to the historical 11-test benchmark. A new 51-test QMind selection artifact is required before the final comparison can be completed.
 
 ## Per-Method Notes
 
@@ -71,17 +89,28 @@ This baseline is intentionally documented as a deterministic comparator, not as 
 
 ### Quantik Mind
 
-Status: pending live selection artifact.
+Status: blocked pending 51-test selection artifact.
 
-Required reproducibility flow:
+Required command sequence:
 
 ```bash
-bash benchmark-pipeline/run-online-boutique-qmind-benchmark.sh
-python benchmark-pipeline/normalize-qmind-selection.py <raw-qmind-output> <canonical-selected-tests.json>
-python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected <canonical-selected-tests.json> --method qmind --use-validated --output <qmind-evaluation.json>
+qmind sync library --file qmind-test-library/online-boutique-playwright-51.json
+
+qmind subset --framework playwright > benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt
+
+python benchmark-pipeline/normalize-qmind-selection.py \
+  benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt \
+  benchmark-runs/qmind-online-boutique/selected-tests-51.json
+
+python benchmark-pipeline/evaluate-defect-recall.py \
+  --oracle defect-oracle/online-boutique-defect-oracle.v2.json \
+  --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json \
+  --method qmind \
+  --use-validated \
+  --output benchmark-results/final-comparison/qmind-51-evaluation.json
 ```
 
-The final QMind row should be filled only after `<canonical-selected-tests.json>` contains test IDs from `qmind-test-library/online-boutique-playwright-51.json`.
+The final QMind row should be filled only after `benchmark-runs/qmind-online-boutique/selected-tests-51.json` contains test IDs from `qmind-test-library/online-boutique-playwright-51.json`.
 
 ## Reproducibility Commands
 
@@ -98,6 +127,7 @@ python benchmark-pipeline/run-expected-recall-matrix.py --oracle defect-oracle/o
 
 ## Limitations
 
+- This document is a blocked pre-final status report, not the final benchmark comparison.
 - Quantik Mind final performance is pending and not claimed in this report.
-- The random and history/code-change baselines use a provisional 11-test comparison size until the live QMind artifact determines the final same-size comparison.
+- The random and history/code-change baselines use a provisional 11-test comparison size until the regenerated 51-test QMind artifact determines the final same-size comparison.
 - `benchmark-results/final-comparison/expected-recall-matrix.json` is a pipeline sanity check that uses expected oracle data. It is not the validated final comparison.
