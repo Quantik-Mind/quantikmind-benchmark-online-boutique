@@ -141,6 +141,21 @@
       "avg_duration_ms": 1000
     },
     {
+      "test_id": "payment-order-completion-confirms-success",
+      "name": "payment-order-completion-confirms-success",
+      "framework": "playwright",
+      "service": "paymentservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/paymentservice/**/*",
+          "src/checkoutservice/**/*"
+        ]
+      },
+      "duration_ms": 1000,
+      "avg_duration_ms": 1000
+    },
+    {
       "test_id": "order-form-requires-payment-data",
       "name": "order-form-requires-payment-data",
       "framework": "playwright",
