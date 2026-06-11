@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "benchmark": "online-boutique-defect-recall",
+  "full_suite_size": 50,
+  "oracle_status": "expected_not_validated",
+  "scenarios": [
+    {
+      "id": "OB-001",
+      "name": "Checkout Regression",
+      "affected_domain": "Checkout page and checkout frontend flow",
+      "affected_service": "frontend",
+      "scenario_ref": "benchmark/scenario-ob001",
+      "expected_detecting_tests": [
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "validated_detecting_tests": [],
+      "expected_unaffected_tests": [
+        "homepage-smoke-tests",
+        "catalog-browsing-tests",
+        "product-detail-price-link-tests",
+        "empty-cart-tests",
+        "basic-cart-accessibility-tests"
+      ],
+      "validated_at": null,
+      "validation_status": "planned",
+      "severity": "high",
+      "notes": [
+        "order-form-requires-payment-data is provisional until baseline behavior is confirmed.",
+        "Final oracle should use observed full-suite failures from the scenario branch."
+      ]
+    },
+    {
+      "id": "OB-002",
+      "name": "Cart Regression",
+      "affected_domain": "Cart service and add-to-cart flow",
+      "affected_service": "cartservice",
+      "scenario_ref": "benchmark/scenario-ob002",
+      "expected_detecting_tests": [
+        "cart-add-product-from-detail-page",
+        "cart-add-product-and-view-cart",
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-add-from-product-detail-keeps-price-context",
+        "frontend-basic-user-journey-home-product-cart",
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path"
+      ],
+      "validated_detecting_tests": [],
+      "expected_unaffected_tests": [
+        "homepage-tests",
+        "product-detail-tests-before-cart-mutation",
+        "empty-cart-page-tests",
+        "catalog-link-and-price-tests"
+      ],
+      "validated_at": null,
+      "validation_status": "planned",
+      "severity": "high",
+      "notes": [
+        "This scenario is expected to have a medium-to-broad signal because checkout and order flows depend on cart state.",
+        "Final oracle should use observed full-suite failures from the scenario branch."
+      ]
+    },
+    {
+      "id": "OB-003",
+      "name": "Product Detail Regression",
+      "affected_domain": "Product catalog service and product detail pages",
+      "affected_service": "productcatalogservice",
+      "scenario_ref": "benchmark/scenario-ob003",
+      "expected_detecting_tests": [
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-has-price",
+        "product-detail-page-has-body-content",
+        "product-detail-allows-return-navigation",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-keeps-product-context",
+        "catalog-first-product-opens-detail-page",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-price",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-refresh-keeps-content",
+        "cart-add-tests-requiring-product-detail"
+      ],
+      "validated_detecting_tests": [],
+      "expected_unaffected_tests": [
+        "homepage-load-tests",
+        "product-links-visible-tests",
+        "multiple-products-visible-tests",
+        "homepage-price-tests-if-list-products-remains-intact",
+        "empty-cart-tests"
+      ],
+      "validated_at": null,
+      "validation_status": "planned",
+      "severity": "high",
+      "notes": [
+        "Expected signal assumes GetProduct is broken while ListProducts remains healthy.",
+        "Final oracle should use observed full-suite failures from the scenario branch."
+      ]
+    },
+    {
+      "id": "OB-004",
+      "name": "Payment Regression",
+      "affected_domain": "Payment authorization and checkout/payment integration",
+      "affected_service": "paymentservice",
+      "scenario_ref": "benchmark/scenario-ob004",
+      "expected_detecting_tests": [
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "validated_detecting_tests": [],
+      "expected_unaffected_tests": [
+        "homepage-tests",
+        "catalog-and-product-detail-tests",
+        "cart-add-view-tests",
+        "checkout-form-visibility-tests",
+        "empty-cart-negative-tests"
+      ],
+      "validated_at": null,
+      "validation_status": "planned",
+      "severity": "medium",
+      "notes": [
+        "order-form-requires-payment-data is provisional until baseline behavior and final assertions are confirmed.",
+        "Final oracle should use observed full-suite failures from the scenario branch."
+      ]
+    }
+  ]
+}
