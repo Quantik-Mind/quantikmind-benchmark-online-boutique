@@ -76,8 +76,11 @@
         "empty-cart-page-tests",
         "catalog-link-and-price-tests"
       ],
-      "validation_status": "planned",
+      "validation_status": "validated",
       "notes": [
+        "Validated against the full 50-test Playwright suite: 5 failed, 45 passed.",
+        "Validated external scenario commit f7bac607 against baseline commit 5096a85b.",
+        "Only one direct cart assertion failed; several expected cart tests remained green, which indicates those tests are broad/soft and should not be treated as validated detecting tests.",
         "A silent cart-state drop may not be detected by tests that only assert generic cart text.",
         "A service error gives a clearer detection signal but may create frontend error-page assertions in multiple tests.",
         "Checkout and order flows are expected to fail because they depend on cart state."
