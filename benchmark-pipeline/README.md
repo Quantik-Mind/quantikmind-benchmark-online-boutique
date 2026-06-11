@@ -2,7 +2,7 @@
 
 ## Baseline validation
 
-Baseline validation runs the full canonical 50-test Playwright suite against a clean Online Boutique deployment before defect scenarios are implemented. This verifies that the test harness and deployed application are stable before any scenario-specific failures are used as benchmark evidence.
+Baseline validation runs the full canonical 51-test Playwright suite against a clean Online Boutique deployment before defect scenarios are implemented. This verifies that the test harness and deployed application are stable before any scenario-specific failures are used as benchmark evidence.
 
 Example:
 
@@ -28,12 +28,12 @@ Until scenario validation is completed, the evaluator uses `expected_detecting_t
 
 ## Defect oracle sanity checker
 
-`check-defect-oracle.py` validates that the Online Boutique defect oracle references tests from the canonical 50-test qmind library before recall numbers are published.
+`check-defect-oracle.py` validates that the Online Boutique defect oracle references tests from the canonical 51-test qmind library before recall numbers are published.
 
 Example:
 
 ```powershell
-python benchmark-pipeline/check-defect-oracle.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --library qmind-test-library/online-boutique-playwright-50.json
+python benchmark-pipeline/check-defect-oracle.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --library qmind-test-library/online-boutique-playwright-51.json
 ```
 
 Missing `expected_detecting_tests` IDs are errors because defect recall depends on those exact identifiers. Unknown `expected_unaffected_tests` values are warnings by default because that field may contain broad group labels instead of concrete test IDs; pass `--strict` to make those warnings fail the check.
@@ -45,7 +45,7 @@ Run this checker before publishing benchmark results so placeholder or stale ora
 Use these four method names when publishing benchmark output:
 
 1. Traditional Approach (Full Suite)
-   - Executes the full 50-test suite.
+   - Executes the full 51-test suite.
    - Baseline for maximum defect recall and zero execution reduction.
 2. Random Approach
    - Selects the same number of tests as Quantik Mind, but randomly with a deterministic seed.
@@ -60,10 +60,10 @@ Machine-readable method slugs are `full-suite`, `random`, `history-code-change`,
 
 ### Random Approach selector
 
-`select-random-approach.py` selects a deterministic random subset from the canonical 50-test library. Pass `--size` directly, or use `--same-size-as` to match an existing selected-test JSON such as a Quantik Mind selection.
+`select-random-approach.py` selects a deterministic random subset from the canonical 51-test library. Pass `--size` directly, or use `--same-size-as` to match an existing selected-test JSON such as a Quantik Mind selection.
 
 ```powershell
-python benchmark-pipeline/select-random-approach.py --library qmind-test-library/online-boutique-playwright-50.json --size 11 --seed 42
+python benchmark-pipeline/select-random-approach.py --library qmind-test-library/online-boutique-playwright-51.json --size 11 --seed 42
 ```
 
 ### History + Code Change Approach selector
@@ -71,7 +71,7 @@ python benchmark-pipeline/select-random-approach.py --library qmind-test-library
 `select-history-code-change-approach.py` scores tests using transparent deterministic rules: high-risk ID keywords, historical criticality metadata, changed-code/domain matching, and optional scenario-specific boosts from the oracle and scenario metadata.
 
 ```powershell
-python benchmark-pipeline/select-history-code-change-approach.py --library qmind-test-library/online-boutique-playwright-50.json --oracle defect-oracle/online-boutique-defect-oracle.v2.json --scenarios benchmark-pipeline/scenarios.json --size 11 --scenario OB-001
+python benchmark-pipeline/select-history-code-change-approach.py --library qmind-test-library/online-boutique-playwright-51.json --oracle defect-oracle/online-boutique-defect-oracle.v2.json --scenarios benchmark-pipeline/scenarios.json --size 11 --scenario OB-001
 ```
 
 ### Evaluating selector output
@@ -88,7 +88,7 @@ python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/onlin
 
 ## Expected recall matrix runner
 
-`run-expected-recall-matrix.py` runs a single expected-oracle comparison matrix across the four benchmark methods: Traditional Approach (Full Suite), Random Approach, History + Code Change Approach, and Quantik Mind. It loads the canonical 50-test library, infers the Quantik Mind selection size from the selected-test file, builds deterministic baseline selections, and reports expected defect recall and execution reduction.
+`run-expected-recall-matrix.py` runs a single expected-oracle comparison matrix across the four benchmark methods: Traditional Approach (Full Suite), Random Approach, History + Code Change Approach, and Quantik Mind. It loads the canonical 51-test library, infers the Quantik Mind selection size from the selected-test file, builds deterministic baseline selections, and reports expected defect recall and execution reduction.
 
 This runner uses `expected_detecting_tests` from the oracle. OB-001 through OB-004 are still planned scenarios, so this output is useful for pipeline validation only and must not be presented as validated benchmark results.
 
@@ -97,7 +97,7 @@ Example:
 ```powershell
 python benchmark-pipeline/run-expected-recall-matrix.py `
   --oracle defect-oracle/online-boutique-defect-oracle.v2.json `
-  --library qmind-test-library/online-boutique-playwright-50.json `
+  --library qmind-test-library/online-boutique-playwright-51.json `
   --qmind-selected qmind-test-library/online-boutique-playwright-11.json `
   --scenarios benchmark-pipeline/scenarios.json
 ```

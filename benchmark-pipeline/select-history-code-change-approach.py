@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-50.json"
+DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-51.json"
 DEFAULT_ORACLE = "defect-oracle/online-boutique-defect-oracle.v2.json"
 DEFAULT_SCENARIOS = "benchmark-pipeline/scenarios.json"
 HIGH_RISK_KEYWORDS = (
