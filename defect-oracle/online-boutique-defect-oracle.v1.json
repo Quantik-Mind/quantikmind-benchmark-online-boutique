@@ -1,0 +1,70 @@
+{
+  "project": "google-online-boutique",
+  "version": "0.1.0",
+  "defects": [
+    {
+      "defect_id": "CATALOG-001",
+      "description": "Product detail page fails to render product information or price",
+      "affected_services": ["productcatalogservice", "frontend", "currencyservice"],
+      "severity": "high",
+      "detecting_tests": [
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-has-price",
+        "smoke-product-links-visible"
+      ]
+    },
+    {
+      "defect_id": "CART-001",
+      "description": "Product cannot be added to cart or cart state is not preserved",
+      "affected_services": ["cartservice", "frontend", "redis-cart"],
+      "severity": "critical",
+      "detecting_tests": [
+        "cart-add-product-from-detail-page",
+        "cart-page-is-accessible",
+        "checkout-page-accessible-from-cart"
+      ]
+    },
+    {
+      "defect_id": "CHECKOUT-001",
+      "description": "Checkout form or checkout transition is broken",
+      "affected_services": ["checkoutservice", "frontend", "cartservice"],
+      "severity": "critical",
+      "detecting_tests": [
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path"
+      ]
+    },
+    {
+      "defect_id": "PAYMENT-001",
+      "description": "Payment validation or payment authorization is broken",
+      "affected_services": ["paymentservice", "checkoutservice"],
+      "severity": "critical",
+      "detecting_tests": [
+        "checkout-form-fields-visible",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ]
+    },
+    {
+      "defect_id": "SHIPPING-001",
+      "description": "Shipping quote or shipping address handling is broken",
+      "affected_services": ["shippingservice", "checkoutservice"],
+      "severity": "high",
+      "detecting_tests": [
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path"
+      ]
+    },
+    {
+      "defect_id": "EMAIL-001",
+      "description": "Order confirmation email path is broken",
+      "affected_services": ["emailservice", "checkoutservice"],
+      "severity": "medium",
+      "detecting_tests": [
+        "order-complete-happy-path"
+      ]
+    }
+  ]
+}

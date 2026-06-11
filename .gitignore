@@ -1,0 +1,36 @@
+﻿# Dependencies
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+
+# Playwright outputs
+test-results/
+playwright-report/
+blob-report/
+
+# Benchmark generated runs
+benchmark-runs/
+runtime-snapshots/
+linkerd-debug/
+k8s-backup/
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local env
+.env
+.env.*
+qmind-home/
+
+# Local Git metadata backups
+.git_BACKUP*/
+
+# Upstream Google Online Boutique local clone
+microservices-demo/

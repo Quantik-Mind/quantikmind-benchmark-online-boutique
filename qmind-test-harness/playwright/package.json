@@ -1,0 +1,14 @@
+{
+  "name": "online-boutique-playwright-harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright E2E test harness for Quantik Mind Online Boutique benchmark",
+  "scripts": {
+    "test": "playwright test",
+    "test:junit": "playwright test",
+    "test:list": "playwright test --list"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.0"
+  }
+}

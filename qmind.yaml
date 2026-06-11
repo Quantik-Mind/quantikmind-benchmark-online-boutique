@@ -1,0 +1,15 @@
+project_id: 5d1cd73e-0f60-4d88-8894-465d2fd2f1d3
+framework: playwright
+test_dir: C:\Users\massi\QCE\quantikmind-benchmark-online-boutique\qmind-test-harness\playwright\tests
+results_dir: C:\Users\massi\QCE\quantikmind-benchmark-online-boutique\qmind-test-harness\playwright\test-results
+api_url: http://localhost:8000
+agent:
+  prometheus_url: ''
+  push_interval_seconds: 60
+project_name: google-online-boutique
+observability:
+  provider: prometheus
+  service_label: deployment
+  mode: file
+  selected_job: null
+  profile_ready: true

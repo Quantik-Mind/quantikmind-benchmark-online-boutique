@@ -1,0 +1,472 @@
+=== BASIC STRUCTURE ===
+/home/massi/quantikmind-benchmark-online-boutique/microservices-demo
+total 104
+drwxr-xr-x 15 massi massi  4096 Jun  8 08:25 .
+drwxr-xr-x  7 massi massi  4096 Jun  8 08:32 ..
+drwxr-xr-x  4 massi massi  4096 Jun  8 06:53 .deploystack
+-rw-r--r--  1 massi massi   401 Jun  8 06:53 .editorconfig
+drwxr-xr-x  7 massi massi  4096 Jun  8 06:53 .git
+-rw-r--r--  1 massi massi   201 Jun  8 06:53 .gitattributes
+drwxr-xr-x  6 massi massi  4096 Jun  8 06:53 .github
+-rw-r--r--  1 massi massi   310 Jun  8 06:53 .gitignore
+-rw-r--r--  1 massi massi 11358 Jun  8 06:53 LICENSE
+-rw-r--r--  1 massi massi 12225 Jun  8 06:53 README.md
+-rw-r--r--  1 massi massi  1490 Jun  8 06:53 cloudbuild.yaml
+drwxr-xr-x  4 massi massi  4096 Jun  8 06:53 docs
+drwxr-xr-x  3 massi massi  4096 Jun  8 06:53 helm-chart
+drwxr-xr-x  2 massi massi  4096 Jun  8 06:53 istio-manifests
+drwxr-xr-x  2 massi massi  4096 Jun  8 06:53 kubernetes-manifests
+drwxr-xr-x  5 massi massi  4096 Jun  8 06:53 kustomize
+drwxr-xr-x  3 massi massi  4096 Jun  8 06:53 protos
+drwxr-xr-x  2 massi massi  4096 Jun  8 08:26 qmind-config
+drwxr-xr-x  2 massi massi  4096 Jun  8 06:53 release
+-rw-r--r--  1 massi massi  3412 Jun  8 06:53 skaffold.yaml
+drwxr-xr-x 14 massi massi  4096 Jun  8 06:53 src
+drwxr-xr-x  2 massi massi  4096 Jun  8 06:53 terraform
+
+=== SRC STRUCTURE ===
+total 56
+drwxr-xr-x 14 massi massi 4096 Jun  8 06:53 .
+drwxr-xr-x 15 massi massi 4096 Jun  8 08:25 ..
+drwxr-xr-x  4 massi massi 4096 Jun  8 06:53 adservice
+drwxr-xr-x  4 massi massi 4096 Jun  8 06:53 cartservice
+drwxr-xr-x  4 massi massi 4096 Jun  8 06:53 checkoutservice
+drwxr-xr-x  4 massi massi 4096 Jun  8 06:53 currencyservice
+drwxr-xr-x  3 massi massi 4096 Jun  8 06:53 emailservice
+drwxr-xr-x  7 massi massi 4096 Jun  8 06:53 frontend
+drwxr-xr-x  2 massi massi 4096 Jun  8 06:53 loadgenerator
+drwxr-xr-x  3 massi massi 4096 Jun  8 06:53 paymentservice
+drwxr-xr-x  3 massi massi 4096 Jun  8 06:53 productcatalogservice
+drwxr-xr-x  2 massi massi 4096 Jun  8 06:53 recommendationservice
+drwxr-xr-x  3 massi massi 4096 Jun  8 06:53 shippingservice
+drwxr-xr-x  2 massi massi 4096 Jun  8 06:53 shoppingassistantservice
+
+=== TEST-LIKE FILES ===
+./.deploystack/test
+./.deploystack/test.yaml
+./kustomize/tests/README.md
+./kustomize/tests/memorystore-with-all-components/kustomization.yaml
+./kustomize/tests/service-mesh-istio-with-all-components/kustomization.yaml
+./kustomize/tests/spanner-with-all-components/kustomization.yaml
+./src/cartservice/tests/CartServiceTests.cs
+./src/cartservice/tests/cartservice.tests.csproj
+./src/checkoutservice/money/money_test.go
+./src/frontend/money/money_test.go
+./src/frontend/validator/validator_test.go
+./src/loadgenerator/locustfile.py
+./src/productcatalogservice/product_catalog_test.go
+./src/shippingservice/shippingservice_test.go
+
+=== CONFIG FILES ===
+./src/checkoutservice/go.mod
+./src/currencyservice/package.json
+./src/emailservice/requirements.txt
+./src/frontend/go.mod
+./src/loadgenerator/requirements.txt
+./src/paymentservice/package.json
+./src/productcatalogservice/go.mod
+./src/recommendationservice/requirements.txt
+./src/shippingservice/go.mod
+./src/shoppingassistantservice/requirements.txt
+
+=== TEST REFERENCES ===
+./terraform/providers.tf:12:# See the License for the specific language governing permissions and
+./terraform/output.tf:12:# See the License for the specific language governing permissions and
+./terraform/memorystore.tf:12:# See the License for the specific language governing permissions and
+./terraform/memorystore.tf:21:  # count specifies the number of instances to create;
+./terraform/memorystore.tf:40:  # count specifies the number of instances to create;
+./terraform/variables.tf:12:# See the License for the specific language governing permissions and
+./terraform/terraform.tfvars:12:# See the License for the specific language governing permissions and
+./terraform/README.md:12:See the License for the specific language governing permissions and
+./terraform/main.tf:12:# See the License for the specific language governing permissions and
+./protos/demo.proto:12:// See the License for the specific language governing permissions and
+./protos/grpc/health/v1/health.proto:12:// See the License for the specific language governing permissions and
+./helm-chart/Chart.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/cartservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/cartservice.yaml:35:spec:
+./helm-chart/templates/cartservice.yaml:49:    spec:
+./helm-chart/templates/cartservice.yaml:105:spec:
+./helm-chart/templates/cartservice.yaml:120:spec:
+./helm-chart/templates/cartservice.yaml:148:spec:
+./helm-chart/templates/cartservice.yaml:173:spec:
+./helm-chart/templates/cartservice.yaml:220:spec:
+./helm-chart/templates/cartservice.yaml:228:    spec:
+./helm-chart/templates/cartservice.yaml:288:spec:
+./helm-chart/templates/cartservice.yaml:303:spec:
+./helm-chart/templates/cartservice.yaml:328:spec:
+./helm-chart/templates/cartservice.yaml:343:spec:
+./helm-chart/templates/cartservice.yaml:377:spec:
+./helm-chart/templates/cartservice.yaml:391:spec:
+./helm-chart/templates/adservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/adservice.yaml:37:spec:
+./helm-chart/templates/adservice.yaml:45:    spec:
+./helm-chart/templates/adservice.yaml:98:spec:
+./helm-chart/templates/adservice.yaml:113:spec:
+./helm-chart/templates/adservice.yaml:138:spec:
+./helm-chart/templates/adservice.yaml:156:spec:
+./helm-chart/templates/emailservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/emailservice.yaml:37:spec:
+./helm-chart/templates/emailservice.yaml:45:    spec:
+./helm-chart/templates/emailservice.yaml:110:spec:
+./helm-chart/templates/emailservice.yaml:125:spec:
+./helm-chart/templates/emailservice.yaml:150:spec:
+./helm-chart/templates/emailservice.yaml:168:spec:
+./helm-chart/templates/common.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/common.yaml:21:spec:
+./helm-chart/templates/common.yaml:34:spec: {}
+./helm-chart/templates/loadgenerator.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/loadgenerator.yaml:37:spec:
+./helm-chart/templates/loadgenerator.yaml:48:    spec:
+./helm-chart/templates/loadgenerator.yaml:95:        image: busybox:latest@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
+./helm-chart/templates/loadgenerator.yaml:128:spec:
+./helm-chart/templates/loadgenerator.yaml:144:spec:
+./helm-chart/templates/currencyservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/currencyservice.yaml:37:spec:
+./helm-chart/templates/currencyservice.yaml:45:    spec:
+./helm-chart/templates/currencyservice.yaml:109:spec:
+./helm-chart/templates/currencyservice.yaml:124:spec:
+./helm-chart/templates/currencyservice.yaml:152:spec:
+./helm-chart/templates/currencyservice.yaml:170:spec:
+./helm-chart/templates/frontend.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/frontend.yaml:37:spec:
+./helm-chart/templates/frontend.yaml:47:    spec:
+./helm-chart/templates/frontend.yaml:143:spec:
+./helm-chart/templates/frontend.yaml:158:spec:
+./helm-chart/templates/frontend.yaml:174:spec:
+./helm-chart/templates/frontend.yaml:211:spec:
+./helm-chart/templates/frontend.yaml:236:spec:
+./helm-chart/templates/frontend.yaml:271:spec:
+./helm-chart/templates/shippingservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/shippingservice.yaml:37:spec:
+./helm-chart/templates/shippingservice.yaml:45:    spec:
+./helm-chart/templates/shippingservice.yaml:98:spec:
+./helm-chart/templates/shippingservice.yaml:113:spec:
+./helm-chart/templates/shippingservice.yaml:141:spec:
+./helm-chart/templates/shippingservice.yaml:159:spec:
+./helm-chart/templates/opentelemetry-collector.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/opentelemetry-collector.yaml:35:spec:
+./helm-chart/templates/opentelemetry-collector.yaml:44:    spec:
+./helm-chart/templates/opentelemetry-collector.yaml:74:        image: busybox:latest@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
+./helm-chart/templates/opentelemetry-collector.yaml:120:spec:
+./helm-chart/templates/opentelemetry-collector.yaml:164:spec:
+./helm-chart/templates/opentelemetry-collector.yaml:219:spec:
+./helm-chart/templates/opentelemetry-collector.yaml:234:spec:
+./helm-chart/templates/checkoutservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/checkoutservice.yaml:37:spec:
+./helm-chart/templates/checkoutservice.yaml:45:    spec:
+./helm-chart/templates/checkoutservice.yaml:119:spec:
+./helm-chart/templates/checkoutservice.yaml:134:spec:
+./helm-chart/templates/checkoutservice.yaml:159:spec:
+./helm-chart/templates/checkoutservice.yaml:183:spec:
+./helm-chart/templates/recommendationservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/recommendationservice.yaml:37:spec:
+./helm-chart/templates/recommendationservice.yaml:45:    spec:
+./helm-chart/templates/recommendationservice.yaml:112:spec:
+./helm-chart/templates/recommendationservice.yaml:127:spec:
+./helm-chart/templates/recommendationservice.yaml:152:spec:
+./helm-chart/templates/recommendationservice.yaml:171:spec:
+./helm-chart/templates/productcatalogservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/productcatalogservice.yaml:37:spec:
+./helm-chart/templates/productcatalogservice.yaml:45:    spec:
+./helm-chart/templates/productcatalogservice.yaml:110:spec:
+./helm-chart/templates/productcatalogservice.yaml:125:spec:
+./helm-chart/templates/productcatalogservice.yaml:156:spec:
+./helm-chart/templates/productcatalogservice.yaml:174:spec:
+./helm-chart/templates/paymentservice.yaml:12:# See the License for the specific language governing permissions and
+./helm-chart/templates/paymentservice.yaml:37:spec:
+./helm-chart/templates/paymentservice.yaml:45:    spec:
+./helm-chart/templates/paymentservice.yaml:108:spec:
+./helm-chart/templates/paymentservice.yaml:123:spec:
+./helm-chart/templates/paymentservice.yaml:148:spec:
+./helm-chart/templates/paymentservice.yaml:166:spec:
+./helm-chart/values.yaml:12:# See the License for the specific language governing permissions and
+./LICENSE:158:      liable to You for damages, including any direct, indirect, special,
+./LICENSE:201:   See the License for the specific language governing permissions and
+./qmind-config/observability-online-boutique.yaml:54:      test_domains: ["smoke", "navigation", "product", "checkout"]
+./qmind-config/observability-online-boutique.yaml:58:      test_domains: ["cart", "checkout"]
+./qmind-config/observability-online-boutique.yaml:62:      test_domains: ["checkout", "payment", "shipping", "email"]
+./qmind-config/observability-online-boutique.yaml:66:      test_domains: ["payment", "checkout"]
+./qmind-config/observability-online-boutique.yaml:70:      test_domains: ["catalog", "product"]
+./qmind-config/observability-online-boutique.yaml:74:      test_domains: ["currency", "price", "checkout"]
+./qmind-config/observability-online-boutique.yaml:78:      test_domains: ["shipping", "checkout"]
+./qmind-config/observability-online-boutique.yaml:82:      test_domains: ["recommendation", "product"]
+./qmind-config/observability-online-boutique.yaml:86:      test_domains: ["ads", "recommendation"]
+./qmind-config/observability-online-boutique.yaml:90:      test_domains: ["email", "checkout"]
+./qmind-config/observability-online-boutique.yaml:94:      test_domains: ["cart", "checkout"]
+./kubernetes-manifests/cartservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/cartservice.yaml:21:spec:
+./kubernetes-manifests/cartservice.yaml:29:    spec:
+./kubernetes-manifests/cartservice.yaml:75:spec:
+./kubernetes-manifests/cartservice.yaml:95:spec:
+./kubernetes-manifests/cartservice.yaml:103:    spec:
+./kubernetes-manifests/cartservice.yaml:149:spec:
+./kubernetes-manifests/adservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/adservice.yaml:21:spec:
+./kubernetes-manifests/adservice.yaml:29:    spec:
+./kubernetes-manifests/adservice.yaml:76:spec:
+./kubernetes-manifests/emailservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/emailservice.yaml:21:spec:
+./kubernetes-manifests/emailservice.yaml:29:    spec:
+./kubernetes-manifests/emailservice.yaml:76:spec:
+./kubernetes-manifests/loadgenerator.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/loadgenerator.yaml:20:spec:
+./kubernetes-manifests/loadgenerator.yaml:31:    spec:
+./kubernetes-manifests/loadgenerator.yaml:67:        image: busybox:latest
+./kubernetes-manifests/currencyservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/currencyservice.yaml:21:spec:
+./kubernetes-manifests/currencyservice.yaml:29:    spec:
+./kubernetes-manifests/currencyservice.yaml:75:spec:
+./kubernetes-manifests/frontend.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/frontend.yaml:21:spec:
+./kubernetes-manifests/frontend.yaml:31:    spec:
+./kubernetes-manifests/frontend.yaml:114:spec:
+./kubernetes-manifests/frontend.yaml:129:spec:
+./kubernetes-manifests/shippingservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/shippingservice.yaml:21:spec:
+./kubernetes-manifests/shippingservice.yaml:29:    spec:
+./kubernetes-manifests/shippingservice.yaml:74:spec:
+./kubernetes-manifests/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/checkoutservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/checkoutservice.yaml:21:spec:
+./kubernetes-manifests/checkoutservice.yaml:29:    spec:
+./kubernetes-manifests/checkoutservice.yaml:83:spec:
+./kubernetes-manifests/recommendationservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/recommendationservice.yaml:21:spec:
+./kubernetes-manifests/recommendationservice.yaml:29:    spec:
+./kubernetes-manifests/recommendationservice.yaml:78:spec:
+./kubernetes-manifests/productcatalogservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/productcatalogservice.yaml:21:spec:
+./kubernetes-manifests/productcatalogservice.yaml:29:    spec:
+./kubernetes-manifests/productcatalogservice.yaml:74:spec:
+./kubernetes-manifests/paymentservice.yaml:12:# See the License for the specific language governing permissions and
+./kubernetes-manifests/paymentservice.yaml:21:spec:
+./kubernetes-manifests/paymentservice.yaml:29:    spec:
+./kubernetes-manifests/paymentservice.yaml:74:spec:
+./kustomize/tests/service-mesh-istio-with-all-components/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/tests/memorystore-with-all-components/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/tests/README.md:1:This directory contains a list of scenarios (different combinations of Kustomize Components) used for testing.
+./kustomize/tests/spanner-with-all-components/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/cartservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/cartservice.yaml:21:spec:
+./kustomize/base/cartservice.yaml:29:    spec:
+./kustomize/base/cartservice.yaml:75:spec:
+./kustomize/base/cartservice.yaml:95:spec:
+./kustomize/base/cartservice.yaml:103:    spec:
+./kustomize/base/cartservice.yaml:149:spec:
+./kustomize/base/adservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/adservice.yaml:21:spec:
+./kustomize/base/adservice.yaml:29:    spec:
+./kustomize/base/adservice.yaml:76:spec:
+./kustomize/base/emailservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/emailservice.yaml:21:spec:
+./kustomize/base/emailservice.yaml:29:    spec:
+./kustomize/base/emailservice.yaml:76:spec:
+./kustomize/base/loadgenerator.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/loadgenerator.yaml:20:spec:
+./kustomize/base/loadgenerator.yaml:31:    spec:
+./kustomize/base/loadgenerator.yaml:67:        image: busybox:latest
+./kustomize/base/currencyservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/currencyservice.yaml:21:spec:
+./kustomize/base/currencyservice.yaml:29:    spec:
+./kustomize/base/currencyservice.yaml:75:spec:
+./kustomize/base/frontend.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/frontend.yaml:21:spec:
+./kustomize/base/frontend.yaml:31:    spec:
+./kustomize/base/frontend.yaml:114:spec:
+./kustomize/base/frontend.yaml:129:spec:
+./kustomize/base/shippingservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/shippingservice.yaml:21:spec:
+./kustomize/base/shippingservice.yaml:29:    spec:
+./kustomize/base/shippingservice.yaml:74:spec:
+./kustomize/base/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/checkoutservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/checkoutservice.yaml:21:spec:
+./kustomize/base/checkoutservice.yaml:29:    spec:
+./kustomize/base/checkoutservice.yaml:83:spec:
+./kustomize/base/recommendationservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/recommendationservice.yaml:21:spec:
+./kustomize/base/recommendationservice.yaml:29:    spec:
+./kustomize/base/recommendationservice.yaml:78:spec:
+./kustomize/base/productcatalogservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/productcatalogservice.yaml:21:spec:
+./kustomize/base/productcatalogservice.yaml:29:    spec:
+./kustomize/base/productcatalogservice.yaml:74:spec:
+./kustomize/base/paymentservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/base/paymentservice.yaml:21:spec:
+./kustomize/base/paymentservice.yaml:29:    spec:
+./kustomize/base/paymentservice.yaml:74:spec:
+./kustomize/components/container-images-tag/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/container-images-tag/README.md:3:By default, the Online Boutique apps are targeting the latest release version (see the list of versions [here](https://github.com/GoogleCloudPlatform/microservices-demo/releases)). You may need to change this image tag to target a specific version, this Kustomize variation will help you setting this up.
+./kustomize/components/container-images-tag/README.md:7:To automate the deployment of the Online Boutique apps with a specific container imag tag, you can leverage the following variation with [Kustomize](../..).
+./kustomize/components/container-images-tag/README.md:36:So for example here is the order respected:
+./kustomize/components/single-shared-session/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/single-shared-session/kustomization.yaml:24:    spec:
+./kustomize/components/single-shared-session/kustomization.yaml:26:        spec:
+./kustomize/components/google-cloud-operations/otel-collector.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/google-cloud-operations/otel-collector.yaml:20:spec:
+./kustomize/components/google-cloud-operations/otel-collector.yaml:29:    spec:
+./kustomize/components/google-cloud-operations/otel-collector.yaml:47:        image: busybox:latest@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
+./kustomize/components/google-cloud-operations/otel-collector.yaml:91:spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/google-cloud-operations/kustomization.yaml:27:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:29:        spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:47:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:49:        spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:67:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:69:        spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:87:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:89:        spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:107:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:109:        spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:127:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:129:        spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:147:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:149:        spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:167:    spec:
+./kustomize/components/google-cloud-operations/kustomization.yaml:169:        spec:
+./kustomize/components/google-cloud-operations/README.md:68:spec:
+./kustomize/components/google-cloud-operations/README.md:70:    spec:
+./kustomize/components/container-images-tag-suffix/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/container-images-tag-suffix/README.md:3:You may want to add a suffix to the Online Boutique container image tag to target a specific version.
+./kustomize/components/container-images-tag-suffix/README.md:42:So for example here is the order respected:
+./kustomize/components/without-loadgenerator/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/without-loadgenerator/README.md:7:Note: This Kustomize component has not been tested with [other Kustomize Components](/kustomize/components/) that rely on the loadgenerator.
+./kustomize/components/service-mesh-istio/frontend.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/service-mesh-istio/frontend.yaml:19:spec:
+./kustomize/components/service-mesh-istio/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/service-mesh-istio/README.md:127:   spec: {}
+./kustomize/components/service-mesh-istio/README.md:135:1. Alternatively you can install the open source version of Istio by following the [getting started guide](https://istio.io/latest/docs/setup/getting-started/).
+./kustomize/components/service-mesh-istio/README.md:296:- [Uninstall Istio via istioctl](https://istio.io/latest/docs/setup/install/istioctl/#uninstall-istio)
+./kustomize/components/service-mesh-istio/frontend-gateway.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/service-mesh-istio/frontend-gateway.yaml:19:spec:
+./kustomize/components/service-mesh-istio/frontend-gateway.yaml:33:spec:
+./kustomize/components/service-mesh-istio/allow-egress-googleapis.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/service-mesh-istio/allow-egress-googleapis.yaml:19:spec:
+./kustomize/components/service-mesh-istio/allow-egress-googleapis.yaml:35:spec:
+./kustomize/components/custom-base-url/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/custom-base-url/kustomization.yaml:23:      path: /spec/template/spec/containers/0/env/-
+./kustomize/components/custom-base-url/kustomization.yaml:28:      path: /spec/template/spec/containers/0/livenessProbe/httpGet/path
+./kustomize/components/custom-base-url/kustomization.yaml:31:      path: /spec/template/spec/containers/0/readinessProbe/httpGet/path
+./kustomize/components/memorystore/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/memorystore/kustomization.yaml:24:    spec:
+./kustomize/components/memorystore/kustomization.yaml:26:        spec:
+./kustomize/components/non-public-frontend/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/shopping-assistant/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/shopping-assistant/kustomization.yaml:25:    spec:
+./kustomize/components/shopping-assistant/kustomization.yaml:27:        spec:
+./kustomize/components/shopping-assistant/shoppingassistantservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/shopping-assistant/shoppingassistantservice.yaml:21:spec:
+./kustomize/components/shopping-assistant/shoppingassistantservice.yaml:29:    spec:
+./kustomize/components/shopping-assistant/shoppingassistantservice.yaml:81:spec:
+./kustomize/components/shopping-assistant/scripts/1_deploy_alloydb_infra.sh:14:# See the License for the specific language governing permissions and
+./kustomize/components/shopping-assistant/scripts/2_create_populate_alloydb_tables.sh:14:# See the License for the specific language governing permissions and
+./kustomize/components/shopping-assistant/scripts/generate_sql_from_products.py:12:# See the License for the specific language governing permissions and
+./kustomize/components/container-images-registry/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/cymbal-branding/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/cymbal-branding/kustomization.yaml:23:    spec:
+./kustomize/components/cymbal-branding/kustomization.yaml:25:        spec:
+./kustomize/components/cymbal-branding/README.md:13:spec:
+./kustomize/components/cymbal-branding/README.md:17:    spec:
+./kustomize/components/spanner/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/spanner/kustomization.yaml:24:    spec:
+./kustomize/components/spanner/kustomization.yaml:26:        spec:
+./kustomize/components/spanner/README.md:22:_Note: With latest version of `gcloud` we are creating a free Spanner instance._
+./kustomize/components/spanner/README.md:98:- `SPANNER_INSTANCE`: defaults to `onlineboutique`, unless specified.
+./kustomize/components/spanner/README.md:99:- `SPANNER_DATABASE`: defaults to `carts`, unless specified.
+./kustomize/components/alloydb/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/alloydb/kustomization.yaml:26:    spec:
+./kustomize/components/alloydb/kustomization.yaml:28:        spec:
+./kustomize/components/alloydb/kustomization.yaml:58:    spec:
+./kustomize/components/alloydb/kustomization.yaml:60:        spec:
+./kustomize/components/network-policies/network-policy-frontend.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-frontend.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-paymentservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-paymentservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-redis.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-redis.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-recommendationservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-recommendationservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-shippingservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-shippingservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-checkoutservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-checkoutservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-currencyservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-currencyservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-productcatalogservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-productcatalogservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-cartservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-cartservice.yaml:19:spec:
+./kustomize/components/network-policies/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-loadgenerator.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-loadgenerator.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-emailservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-emailservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-adservice.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-adservice.yaml:19:spec:
+./kustomize/components/network-policies/network-policy-deny-all.yaml:12:# See the License for the specific language governing permissions and
+./kustomize/components/network-policies/network-policy-deny-all.yaml:19:spec:
+./kustomize/kustomization.yaml:12:# See the License for the specific language governing permissions and
+./.github/terraform/variables.tf:13: * See the License for the specific language governing permissions and
+./.github/terraform/versions.tf:13: * See the License for the specific language governing permissions and
+./.github/terraform/main.tf:13: * See the License for the specific language governing permissions and
+./.github/snippet-bot.yml:13:# See the License for the specific language governing permissions and
+./.github/CODE_OF_CONDUCT.md:5:we pledge to respect all people who contribute through reporting issues,
+./.github/CODE_OF_CONDUCT.md:31:applying these principles to every aspect of managing this project.
+./.github/auto-approve.yml:12:# See the License for the specific language governing permissions and
+./.github/workflows/ci-pr.yaml:12:# See the License for the specific language governing permissions and
+./.github/workflows/ci-pr.yaml:35:  code-tests:
+./.github/workflows/ci-pr.yaml:53:          go test
+./.github/workflows/ci-pr.yaml:59:        dotnet test src/cartservice/
+./.github/workflows/ci-pr.yaml:61:  deployment-tests:
+./.github/workflows/ci-pr.yaml:63:    needs: code-tests
+./.github/workflows/ci-main.yaml:12:# See the License for the specific language governing permissions and
+./.github/workflows/ci-main.yaml:31:  code-tests:
+./.github/workflows/ci-main.yaml:47:          echo "testing $SERVICE..."
+./.github/workflows/ci-main.yaml:49:          go test
+./.github/workflows/ci-main.yaml:55:        dotnet test src/cartservice/
+./.github/workflows/ci-main.yaml:56:  deployment-tests:
+./.github/workflows/ci-main.yaml:58:    needs: code-tests
+./.github/workflows/cleanup.yaml:12:# See the License for the specific language governing permissions and
+./.github/workflows/kubevious-manifests-ci.yaml:12:# See the License for the specific language governing permissions and
+./.github/workflows/kubevious-manifests-ci.yaml:43:          skip_rules: container-latest-image
+./.github/workflows/kubevious-manifests-ci.yaml:56:          skip_rules: container-latest-image
+./.github/workflows/kustomize-build-ci.yaml:12:# See the License for the specific language governing permissions and
+./.github/workflows/kustomize-build-ci.yaml:36:      # Build the different combinations of Kustomize components found in kustomize/tests.
+./.github/workflows/kustomize-build-ci.yaml:37:      - name: kustomize build tests
+./.github/workflows/kustomize-build-ci.yaml:39:          cd kustomize/tests
+./.github/workflows/kustomize-build-ci.yaml:41:          for test in $KUSTOMIZE_TESTS_SUBFOLDERS;
+./.github/workflows/kustomize-build-ci.yaml:43:              echo "## kustomize build for " + $test
+./.github/workflows/kustomize-build-ci.yaml:44:              kustomize build $test
+./.github/workflows/install-dependencies.sh:13:# See the License for the specific language governing permissions and
+./.github/workflows/install-dependencies.sh:48:# install build-essential (gcc, used for go test)
+./.github/workflows/install-dependencies.sh:52:go install github.com/google/addlicense@latest
+./.github/workflows/install-dependencies.sh:55:# install build-essential (gcc, used for go test)
+./.github/workflows/install-dependencies.sh:59:curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && \
+./.github/workflows/README.md:7:The CI/CD pipelines for Online Boutique run in Github Actions, using a pool of two [self-hosted runners]((https://help.github.com/en/actions/automating-your-workflow-with-github-actions/about-self-hosted-runners)). These runners are GCE instances (virtual machines) that, for every open Pull Request in the repo, run the code test pipeline, deploy test pipeline, and (on main) deploy the latest version of the app to [cymbal-shops.retail.cymbal.dev](https://cymbal-shops.retail.cymbal.dev)
+./.github/workflows/README.md:9:We also host a test GKE cluster, which is where the deploy tests run. Every PR has its own namespace in the cluster.
+./.github/workflows/README.md:13:**Note**: In order for the current CI/CD setup to work on your pull request, you must branch directly off the repo (no forks). This is because the Github secrets necessary for these tests aren't copied over when you fork.
+./.github/workflows/README.md:17:These tests run on every commit for every open PR, as well as any commit to main / any release branch. Currently, this workflow runs only Go unit tests.
+./.github/workflows/README.md:22:These tests run on every commit for every open PR, as well as any commit to main / any release branch. This workflow:
+./.github/workflows/README.md:25:2. Uses `skaffold run` to build and push the images specific to that PR commit. Then skaffold deploys those images, via `kubernetes-manifests`, to the PR namespace in the test cluster.
+./.github/workflows/README.md:30:### Push and Deploy Latest - [push-deploy](push-deploy.yml)
+./.github/workflows/README.md:34:1. Builds the container images for every service, tagging as `latest`.
+./.github/workflows/README.md:41:This workflow runs when a PR closes, regardless of whether it was merged into main. This workflow deletes the PR-specific GKE namespace in the test cluster.
+./.github/workflows/README.md:51:3. Install project-specific dependencies, including go, docker, skaffold, and kubectl:
+./.github/workflows/terraform-validate-ci.yaml:12:# See the License for the specific language governing permissions and
+./.github/workflows/helm-chart-ci.yaml:12:# See the License for the specific language governing permissions and
+./.github/pull_request_template.md:13:<!-- If applicable, write how to test for reviewers-->
+./.github/header-checker-lint.yml:12:# See the License for the specific language governing permissions and
+./.github/release-cluster/frontend-config.yaml:12:# See the License for the specific language governing permissions and
+./.github/release-cluster/frontend-config.yaml:19:spec:
+./.github/release-cluster/backend-config.yaml:12:# See the License for the specific language governing permissions and
+./.github/release-cluster/backend-config.yaml:19:spec:
+./.github/release-cluster/frontend-service.yaml:12:# See the License for the specific language governing permissions and
+./.github/release-cluster/frontend-service.yaml:22:spec:
+./.github/release-cluster/frontend-ingress.yaml:12:# See the License for the specific language governing permissions and
+./.github/release-cluster/frontend-ingress.yaml:23:spec:
+./.github/release-cluster/managed-cert.yaml:12:# See the License for the specific language governing permissions and
+./.github/release-cluster/managed-cert.yaml:19:spec:
+./.deploystack/test.yaml:12:# See the License for the specific language governing permissions and
+./.deploystack/test.yaml:15:# DEPLOYSTACK - this file is the cloudbuild for running testing automatically
+./.deploystack/test.yaml:16:# in the testing rig
+./.deploystack/test.yaml:23:   - name: 'gcr.io/cloudshell-images/cloudshell:latest'

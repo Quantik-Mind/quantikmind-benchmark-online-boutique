@@ -1,0 +1,122 @@
+{
+  "project": "google-online-boutique",
+  "source": "upstream-discovery",
+  "version": "0.1.0",
+  "tests": [
+    {
+      "test_id": "cartservice-cart-service-unit",
+      "test_name": "Cart service unit tests",
+      "service": "cartservice",
+      "related_services": ["redis-cart"],
+      "business_criticality": "high",
+      "test_level": "unit",
+      "framework": "dotnet",
+      "command": "dotnet test src/cartservice/",
+      "tags": ["cart", "basket", "state", "unit"],
+      "code_mapping": [
+        "src/cartservice/src/**",
+        "src/cartservice/tests/**"
+      ],
+      "source_file": "src/cartservice/tests/CartServiceTests.cs"
+    },
+    {
+      "test_id": "checkoutservice-money-unit",
+      "test_name": "Checkout service money calculation unit tests",
+      "service": "checkoutservice",
+      "related_services": ["currencyservice", "paymentservice"],
+      "business_criticality": "critical",
+      "test_level": "unit",
+      "framework": "go",
+      "command": "cd src/checkoutservice && go test ./money",
+      "tags": ["checkout", "money", "price", "unit"],
+      "code_mapping": [
+        "src/checkoutservice/money/**"
+      ],
+      "source_file": "src/checkoutservice/money/money_test.go"
+    },
+    {
+      "test_id": "frontend-money-unit",
+      "test_name": "Frontend money formatting unit tests",
+      "service": "frontend",
+      "related_services": ["currencyservice", "productcatalogservice"],
+      "business_criticality": "medium",
+      "test_level": "unit",
+      "framework": "go",
+      "command": "cd src/frontend && go test ./money",
+      "tags": ["frontend", "money", "price", "unit"],
+      "code_mapping": [
+        "src/frontend/money/**"
+      ],
+      "source_file": "src/frontend/money/money_test.go"
+    },
+    {
+      "test_id": "frontend-validator-unit",
+      "test_name": "Frontend request validator unit tests",
+      "service": "frontend",
+      "related_services": ["checkoutservice", "cartservice"],
+      "business_criticality": "high",
+      "test_level": "unit",
+      "framework": "go",
+      "command": "cd src/frontend && go test ./validator",
+      "tags": ["frontend", "validation", "cart", "checkout", "unit"],
+      "code_mapping": [
+        "src/frontend/validator/**"
+      ],
+      "source_file": "src/frontend/validator/validator_test.go"
+    },
+    {
+      "test_id": "productcatalogservice-catalog-unit",
+      "test_name": "Product catalog service unit tests",
+      "service": "productcatalogservice",
+      "related_services": ["frontend", "recommendationservice"],
+      "business_criticality": "high",
+      "test_level": "unit",
+      "framework": "go",
+      "command": "cd src/productcatalogservice && go test ./...",
+      "tags": ["catalog", "product", "search", "unit"],
+      "code_mapping": [
+        "src/productcatalogservice/**"
+      ],
+      "source_file": "src/productcatalogservice/product_catalog_test.go"
+    },
+    {
+      "test_id": "shippingservice-shipping-unit",
+      "test_name": "Shipping service quote and tracking unit tests",
+      "service": "shippingservice",
+      "related_services": ["checkoutservice"],
+      "business_criticality": "high",
+      "test_level": "unit",
+      "framework": "go",
+      "command": "cd src/shippingservice && go test ./...",
+      "tags": ["shipping", "quote", "tracking", "checkout", "unit"],
+      "code_mapping": [
+        "src/shippingservice/**"
+      ],
+      "source_file": "src/shippingservice/shippingservice_test.go"
+    },
+    {
+      "test_id": "loadgenerator-user-journey-runtime",
+      "test_name": "Load generator synthetic user journey",
+      "service": "frontend",
+      "related_services": [
+        "productcatalogservice",
+        "cartservice",
+        "checkoutservice",
+        "paymentservice",
+        "shippingservice",
+        "currencyservice",
+        "recommendationservice",
+        "adservice"
+      ],
+      "business_criticality": "critical",
+      "test_level": "load",
+      "framework": "locust",
+      "command": "python src/loadgenerator/locustfile.py",
+      "tags": ["load", "runtime", "journey", "checkout", "catalog"],
+      "code_mapping": [
+        "src/loadgenerator/locustfile.py"
+      ],
+      "source_file": "src/loadgenerator/locustfile.py"
+    }
+  ]
+}

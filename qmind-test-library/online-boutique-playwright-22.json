@@ -1,0 +1,268 @@
+{
+  "tests": [
+    {
+      "test_id": "smoke-homepage-loads",
+      "name": "smoke-homepage-loads",
+      "framework": "playwright",
+      "service": "frontend",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/frontend/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "smoke-product-links-visible",
+      "name": "smoke-product-links-visible",
+      "framework": "playwright",
+      "service": "frontend",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/frontend/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "catalog-open-first-product-detail",
+      "name": "catalog-open-first-product-detail",
+      "framework": "playwright",
+      "service": "productcatalogservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/productcatalogservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "catalog-product-detail-has-price",
+      "name": "catalog-product-detail-has-price",
+      "framework": "playwright",
+      "service": "productcatalogservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/productcatalogservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "cart-add-product-from-detail-page",
+      "name": "cart-add-product-from-detail-page",
+      "framework": "playwright",
+      "service": "productcatalogservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/productcatalogservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "cart-page-is-accessible",
+      "name": "cart-page-is-accessible",
+      "framework": "playwright",
+      "service": "cartservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/cartservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "checkout-page-accessible-from-cart",
+      "name": "checkout-page-accessible-from-cart",
+      "framework": "playwright",
+      "service": "cartservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/cartservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "checkout-form-fields-visible",
+      "name": "checkout-form-fields-visible",
+      "framework": "playwright",
+      "service": "checkoutservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/checkoutservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "checkout-empty-cart-does-not-complete-order",
+      "name": "checkout-empty-cart-does-not-complete-order",
+      "framework": "playwright",
+      "service": "cartservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/cartservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "order-complete-happy-path",
+      "name": "order-complete-happy-path",
+      "framework": "playwright",
+      "service": "checkoutservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/checkoutservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "order-form-requires-payment-data",
+      "name": "order-form-requires-payment-data",
+      "framework": "playwright",
+      "service": "checkoutservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/checkoutservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "frontend-homepage-has-product-grid",
+      "name": "frontend-homepage-has-product-grid",
+      "framework": "playwright",
+      "service": "frontend",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/frontend/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "catalog-multiple-products-visible",
+      "name": "catalog-multiple-products-visible",
+      "framework": "playwright",
+      "service": "productcatalogservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/productcatalogservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "catalog-first-product-link-has-valid-href",
+      "name": "catalog-first-product-link-has-valid-href",
+      "framework": "playwright",
+      "service": "productcatalogservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/productcatalogservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "cart-empty-page-shows-cart-context",
+      "name": "cart-empty-page-shows-cart-context",
+      "framework": "playwright",
+      "service": "cartservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/cartservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "frontend-page-has-navigation-links",
+      "name": "frontend-page-has-navigation-links",
+      "framework": "playwright",
+      "service": "frontend",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/frontend/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "product-detail-page-has-body-content",
+      "name": "product-detail-page-has-body-content",
+      "framework": "playwright",
+      "service": "productcatalogservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/productcatalogservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "homepage-shows-google-cloud-branding",
+      "name": "homepage-shows-google-cloud-branding",
+      "framework": "playwright",
+      "service": "frontend",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/frontend/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "product-detail-allows-return-navigation",
+      "name": "product-detail-allows-return-navigation",
+      "framework": "playwright",
+      "service": "productcatalogservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/productcatalogservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "cart-link-is-reachable-from-homepage",
+      "name": "cart-link-is-reachable-from-homepage",
+      "framework": "playwright",
+      "service": "cartservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/cartservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "checkout-page-does-not-crash-with-empty-cart",
+      "name": "checkout-page-does-not-crash-with-empty-cart",
+      "framework": "playwright",
+      "service": "cartservice",
+      "criticality": "high",
+      "code_mapping": {
+        "file_globs": [
+          "src/cartservice/**/*"
+        ]
+      }
+    },
+    {
+      "test_id": "homepage-has-visible-text-content",
+      "name": "homepage-has-visible-text-content",
+      "framework": "playwright",
+      "service": "frontend",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/frontend/**/*"
+        ]
+      }
+    }
+  ]
+}

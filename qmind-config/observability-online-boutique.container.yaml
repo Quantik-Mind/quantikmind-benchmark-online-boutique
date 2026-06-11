@@ -1,0 +1,83 @@
+observability:
+  provider: prometheus
+  profile_name: online-boutique-linkerd
+  url: "http://192.168.1.43:19090"
+  namespace: default
+  service_label: deployment
+
+  signals:
+    request_rate:
+      unit: rps
+      query: |
+        sum by (deployment) (
+          rate(inbound_http_requests_total{namespace="default"}[2m])
+        )
+
+    latency_p95:
+      unit: seconds
+      query: |
+        histogram_quantile(
+          0.95,
+          sum by (deployment, le) (
+            rate(inbound_http_response_duration_seconds_bucket{namespace="default"}[2m])
+          )
+        )
+
+    error_rate:
+      unit: ratio
+      query: |
+        1 -
+        (
+          sum by (deployment) (
+            rate(inbound_http_statuses_total{namespace="default",status=~"2..|3.."}[2m])
+          )
+          /
+          sum by (deployment) (
+            rate(inbound_http_statuses_total{namespace="default"}[2m])
+          )
+        )
+
+  services:
+    frontend:
+      test_domains: ["smoke", "navigation", "product", "checkout"]
+      criticality: high
+
+    cartservice:
+      test_domains: ["cart", "checkout"]
+      criticality: critical
+
+    checkoutservice:
+      test_domains: ["checkout", "payment", "shipping", "email"]
+      criticality: critical
+
+    paymentservice:
+      test_domains: ["payment", "checkout"]
+      criticality: critical
+
+    productcatalogservice:
+      test_domains: ["catalog", "product"]
+      criticality: high
+
+    currencyservice:
+      test_domains: ["currency", "price", "checkout"]
+      criticality: medium
+
+    shippingservice:
+      test_domains: ["shipping", "checkout"]
+      criticality: high
+
+    recommendationservice:
+      test_domains: ["recommendation", "product"]
+      criticality: medium
+
+    adservice:
+      test_domains: ["ads", "recommendation"]
+      criticality: low
+
+    emailservice:
+      test_domains: ["email", "checkout"]
+      criticality: medium
+
+    redis-cart:
+      test_domains: ["cart", "checkout"]
+      criticality: critical

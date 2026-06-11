@@ -1,0 +1,15 @@
+{
+  "commit_sha": "benchmark-payment-checkout-001",
+  "branch": "benchmark/online-boutique",
+  "message": "Change payment validation and checkout order handling",
+  "changed_files": [
+    "src/paymentservice/charge.js",
+    "src/paymentservice/server.js",
+    "src/checkoutservice/main.go"
+  ],
+  "changed_services": [
+    "paymentservice",
+    "checkoutservice"
+  ],
+  "risk_hint": "critical checkout/payment path changed"
+}

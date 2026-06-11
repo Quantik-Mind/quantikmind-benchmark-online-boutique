@@ -1,0 +1,13 @@
+services:
+  qmind-runner:
+    build:
+      context: .
+      dockerfile: benchmark-runners/qmind/Dockerfile
+    volumes:
+      - .:/workspace
+      - ./qmind-home:/root/.qmind
+      - /mnt/c/Users/massi/QCE/quantikmind-platform/quantikmind-cli:/opt/quantikmind-cli:ro
+    working_dir: /workspace
+    entrypoint: ["/workspace/benchmark-pipeline/run-with-qmind.sh"]
+    environment:
+      QMIND_HOME: /root/.qmind

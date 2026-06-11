@@ -1,0 +1,285 @@
+{
+    "project":  "google-online-boutique",
+    "version":  "0.2.0",
+    "source":  "playwright-e2e",
+    "tests":  [
+                  {
+                      "test_id":  "smoke-homepage-loads",
+                      "test_name":  "Homepage loads successfully",
+                      "service":  "frontend",
+                      "related_services":  [
+                                               "productcatalogservice",
+                                               "currencyservice",
+                                               "recommendationservice",
+                                               "adservice"
+                                           ],
+                      "business_criticality":  "high",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "smoke",
+                                   "frontend",
+                                   "navigation"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "smoke-product-links-visible",
+                      "test_name":  "Product links are visible on homepage",
+                      "service":  "frontend",
+                      "related_services":  [
+                                               "productcatalogservice"
+                                           ],
+                      "business_criticality":  "high",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "smoke",
+                                   "catalog",
+                                   "product"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/frontend/**",
+                                                              "src/productcatalogservice/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "catalog-open-first-product-detail",
+                      "test_name":  "Open first product detail page",
+                      "service":  "productcatalogservice",
+                      "related_services":  [
+                                               "frontend",
+                                               "currencyservice",
+                                               "recommendationservice"
+                                           ],
+                      "business_criticality":  "high",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "catalog",
+                                   "product",
+                                   "detail"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/productcatalogservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "catalog-product-detail-has-price",
+                      "test_name":  "Product detail page renders price",
+                      "service":  "currencyservice",
+                      "related_services":  [
+                                               "frontend",
+                                               "productcatalogservice"
+                                           ],
+                      "business_criticality":  "high",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "catalog",
+                                   "price",
+                                   "currency"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/currencyservice/**",
+                                                              "src/productcatalogservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "cart-add-product-from-detail-page",
+                      "test_name":  "Add product to cart from detail page",
+                      "service":  "cartservice",
+                      "related_services":  [
+                                               "frontend",
+                                               "productcatalogservice",
+                                               "redis-cart"
+                                           ],
+                      "business_criticality":  "critical",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "cart",
+                                   "product",
+                                   "critical"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/cartservice/**",
+                                                              "src/frontend/**",
+                                                              "src/productcatalogservice/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "cart-page-is-accessible",
+                      "test_name":  "Cart page is accessible",
+                      "service":  "cartservice",
+                      "related_services":  [
+                                               "frontend",
+                                               "redis-cart"
+                                           ],
+                      "business_criticality":  "high",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "cart",
+                                   "navigation"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/cartservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "checkout-page-accessible-from-cart",
+                      "test_name":  "Checkout area is accessible from cart",
+                      "service":  "checkoutservice",
+                      "related_services":  [
+                                               "frontend",
+                                               "cartservice",
+                                               "shippingservice",
+                                               "paymentservice",
+                                               "currencyservice"
+                                           ],
+                      "business_criticality":  "critical",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "checkout",
+                                   "cart",
+                                   "critical"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/checkoutservice/**",
+                                                              "src/cartservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "checkout-form-fields-visible",
+                      "test_name":  "Checkout form fields are visible",
+                      "service":  "checkoutservice",
+                      "related_services":  [
+                                               "frontend",
+                                               "paymentservice",
+                                               "shippingservice"
+                                           ],
+                      "business_criticality":  "critical",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "checkout",
+                                   "payment",
+                                   "shipping",
+                                   "critical"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/checkoutservice/**",
+                                                              "src/paymentservice/**",
+                                                              "src/shippingservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "checkout-empty-cart-does-not-complete-order",
+                      "test_name":  "Empty cart does not complete order",
+                      "service":  "checkoutservice",
+                      "related_services":  [
+                                               "cartservice",
+                                               "frontend"
+                                           ],
+                      "business_criticality":  "high",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "checkout",
+                                   "negative",
+                                   "cart"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/checkoutservice/**",
+                                                              "src/cartservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "order-complete-happy-path",
+                      "test_name":  "Complete order happy path",
+                      "service":  "checkoutservice",
+                      "related_services":  [
+                                               "cartservice",
+                                               "paymentservice",
+                                               "shippingservice",
+                                               "emailservice",
+                                               "currencyservice",
+                                               "frontend"
+                                           ],
+                      "business_criticality":  "critical",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "order",
+                                   "checkout",
+                                   "payment",
+                                   "shipping",
+                                   "email",
+                                   "critical"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/checkoutservice/**",
+                                                              "src/paymentservice/**",
+                                                              "src/shippingservice/**",
+                                                              "src/emailservice/**",
+                                                              "src/cartservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  },
+                  {
+                      "test_id":  "order-form-requires-payment-data",
+                      "test_name":  "Order form requires payment data",
+                      "service":  "paymentservice",
+                      "related_services":  [
+                                               "checkoutservice",
+                                               "frontend"
+                                           ],
+                      "business_criticality":  "critical",
+                      "test_level":  "e2e",
+                      "framework":  "playwright",
+                      "tags":  [
+                                   "order",
+                                   "payment",
+                                   "negative",
+                                   "critical"
+                               ],
+                      "code_mapping":  {
+                                           "file_globs":  [
+                                                              "src/paymentservice/**",
+                                                              "src/checkoutservice/**",
+                                                              "src/frontend/**"
+                                                          ]
+                                       }
+                  }
+              ]
+}
