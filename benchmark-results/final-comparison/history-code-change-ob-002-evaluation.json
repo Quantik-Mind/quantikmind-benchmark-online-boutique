@@ -1,8 +1,8 @@
 {
   "method": "history-code-change-OB-002",
   "full_suite_size": 51,
-  "selected_test_count": 11,
-  "execution_reduction": 0.7843137254901961,
+  "selected_test_count": 22,
+  "execution_reduction": 0.5686274509803921,
   "total_scenarios": 4,
   "detected_scenarios_count": 3,
   "missed_scenarios_count": 1,
@@ -53,10 +53,13 @@
         "cart-add-from-product-detail-shows-cart-context",
         "cart-add-product-and-view-cart",
         "cart-add-product-from-detail-page",
+        "cart-survives-home-navigation",
+        "catalog-product-detail-keeps-product-context",
         "checkout-form-fields-visible",
         "checkout-page-accessible-from-cart",
         "frontend-basic-user-journey-home-product-cart",
-        "order-complete-happy-path"
+        "order-complete-happy-path",
+        "product-detail-page-has-add-to-cart-button"
       ],
       "detecting_tests_used": [
         "cart-add-from-product-detail-keeps-price-context",

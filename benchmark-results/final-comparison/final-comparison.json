@@ -1,14 +1,82 @@
 {
   "benchmark": "online-boutique-defect-recall",
-  "run_id": "final-comparison-001",
-  "comparison_status": "blocked_pending_qmind_51_selection",
-  "artifact_status": "diagnostic_pre_final_comparison",
-  "public_result_status": "not_final_not_investor_ready",
+  "run_id": "final-comparison-002",
+  "comparison_status": "qmind_scoring_blocked_normalization_error",
+  "artifact_status": "final_comparison_with_qmind_normalization_error",
+  "public_result_status": "qmind_recall_not_claimed",
   "created_at": "2026-06-11",
   "oracle": "defect-oracle/online-boutique-defect-oracle.v2.json",
   "oracle_mode": "validated_detecting_tests",
   "canonical_library": "qmind-test-library/online-boutique-playwright-51.json",
   "full_suite_size": 51,
+  "qmind_selection": {
+    "status": "selection_executed_successfully",
+    "raw_artifact": "benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
+    "selected_tests": 22,
+    "library_size": 51,
+    "message": "QMind selection executed successfully: 22/51 tests selected. QMind scoring blocked by normalization mapping, not by selection failure. No QMind recall is claimed.",
+    "normalization": {
+      "status": "normalization_error",
+      "numeric_ids_present": true,
+      "selected_numeric_ids": [
+        "33723",
+        "33693",
+        "33698",
+        "33721",
+        "33684",
+        "33707",
+        "33687",
+        "33686",
+        "33685",
+        "33699",
+        "33728",
+        "33690",
+        "33701",
+        "33694",
+        "33712",
+        "33700",
+        "33688",
+        "33708",
+        "33689",
+        "33717",
+        "33679",
+        "33680"
+      ],
+      "selected_test_count": 22,
+      "mapped_numeric_ids_count": 8,
+      "mapped_numeric_ids": [
+        "33679",
+        "33680",
+        "33684",
+        "33685",
+        "33686",
+        "33687",
+        "33688",
+        "33689"
+      ],
+      "unmapped_numeric_ids_count": 14,
+      "unmapped_numeric_ids": [
+        "33690",
+        "33693",
+        "33694",
+        "33698",
+        "33699",
+        "33700",
+        "33701",
+        "33707",
+        "33708",
+        "33712",
+        "33717",
+        "33721",
+        "33723",
+        "33728"
+      ],
+      "mapping_artifacts_checked": [
+        "benchmark-runs/qmind-online-boutique/library-api.json"
+      ],
+      "error": "Missing library API mapping for qmind numeric IDs: 33690, 33693, 33694, 33698, 33699, 33700, 33701, 33707, 33708, 33712, 33717, 33721, 33723, 33728"
+    }
+  },
   "defect_universe": [
     "OB-001",
     "OB-002",
@@ -16,10 +84,9 @@
     "OB-004"
   ],
   "primary_kpi": "Defect Recall = Detected Defects / Full Suite Defects",
-  "baseline_selection_size": {
-    "tests": 11,
-    "status": "provisional_comparator_size",
-    "reason": "The live Quantik Mind canonical 51-test selection artifact is pending. Historical 11/22-test experiments are no longer part of active final benchmark scoring. Random and history/code-change baselines are provisional comparators until a 51-test QMind selection artifact exists."
+  "comparison_selection_size": {
+    "tests": 22,
+    "basis": "real qmind subset size from qmind-subset-51-raw.txt"
   },
   "methods": [
     {
@@ -28,11 +95,15 @@
       "status": "measured",
       "tests_executed": 51,
       "execution_reduction": 0.0,
+      "execution_reduction_percent": 0.0,
       "defects_detected": 4,
       "full_suite_defects": 4,
       "defect_recall": 1.0,
       "selection_artifact": "qmind-test-library/online-boutique-playwright-51.json",
       "evaluation_artifact": "benchmark-results/final-comparison/full-suite-evaluation.json",
+      "normalization": {
+        "status": "canonical_test_ids"
+      },
       "detected_scenarios": [
         "OB-001",
         "OB-002",
@@ -45,44 +116,58 @@
       "method": "random",
       "method_label": "Random Approach",
       "status": "measured",
-      "tests_executed": 11,
-      "execution_reduction": 0.7843137254901961,
-      "execution_reduction_percent": 78.43137254901961,
-      "defects_detected": 1,
+      "tests_executed": 22,
+      "execution_reduction": 0.5686274509803921,
+      "execution_reduction_percent": 56.9,
+      "defects_detected": 2,
       "full_suite_defects": 4,
-      "defect_recall": 0.25,
+      "defect_recall": 0.5,
       "random_seed": 42,
       "selection_artifact": "benchmark-results/final-comparison/random-selection.json",
       "evaluation_artifact": "benchmark-results/final-comparison/random-evaluation.json",
       "selected_tests": [
         "cart-add-from-product-detail-shows-cart-context",
+        "cart-add-product-and-view-cart",
         "cart-link-is-reachable-from-homepage",
         "cart-page-has-cart-context",
         "cart-page-is-accessible",
         "cart-page-loads-without-product",
+        "catalog-open-first-product-detail",
         "catalog-product-detail-can-be-opened-twice",
         "catalog-product-detail-has-price",
         "catalog-product-link-href-starts-with-product",
+        "frontend-page-loads-under-basic-navigation",
+        "homepage-has-at-least-one-product-link",
         "homepage-has-visible-text-content",
+        "homepage-title-is-available",
+        "navigation-cart-to-home",
         "order-flow-does-not-complete-with-empty-data",
-        "product-detail-page-has-price"
+        "payment-order-completion-confirms-success",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-page-has-price",
+        "product-detail-refresh-keeps-content",
+        "smoke-product-links-visible"
       ],
+      "normalization": {
+        "status": "canonical_test_ids"
+      },
       "detected_scenarios": [
-        "OB-003"
+        "OB-003",
+        "OB-004"
       ],
       "missed_scenarios": [
         "OB-001",
-        "OB-002",
-        "OB-004"
+        "OB-002"
       ]
     },
     {
       "method": "history-code-change",
-      "method_label": "History + Code Change Approach",
+      "method_label": "History + Code Change",
       "status": "measured",
-      "tests_executed": 11,
-      "execution_reduction": 0.7843137254901961,
-      "execution_reduction_percent": 78.43137254901961,
+      "tests_executed": 22,
+      "execution_reduction": 0.5686274509803921,
+      "execution_reduction_percent": 56.9,
       "defects_detected": 4,
       "full_suite_defects": 4,
       "defect_recall": 1.0,
@@ -98,6 +183,9 @@
         "OB-002": "benchmark-results/final-comparison/history-code-change-ob-002-evaluation.json",
         "OB-003": "benchmark-results/final-comparison/history-code-change-ob-003-evaluation.json",
         "OB-004": "benchmark-results/final-comparison/history-code-change-ob-004-evaluation.json"
+      },
+      "normalization": {
+        "status": "canonical_test_ids"
       },
       "per_scenario": [
         {
@@ -134,7 +222,10 @@
             "catalog-product-detail-has-price",
             "catalog-product-detail-keeps-product-context",
             "frontend-basic-user-journey-home-product-cart",
-            "product-detail-page-has-add-to-cart-button"
+            "product-detail-page-has-add-to-cart-button",
+            "product-detail-page-has-non-empty-body",
+            "product-detail-page-has-price",
+            "product-detail-refresh-keeps-content"
           ]
         },
         {
@@ -156,29 +247,101 @@
     {
       "method": "qmind",
       "method_label": "Quantik Mind",
-      "status": "blocked_pending_qmind_51_selection",
+      "status": "normalization_error",
+      "selection_status": "selection_executed_successfully",
+      "tests_selected": 22,
       "tests_executed": null,
       "execution_reduction": null,
+      "execution_reduction_percent": null,
       "defects_detected": null,
       "full_suite_defects": 4,
       "defect_recall": null,
-      "reason": "Historical 11/22-test QMind artifacts are no longer part of the active benchmark. Final scoring requires a new Quantik Mind selection generated from qmind-test-library/online-boutique-playwright-51.json.",
-      "required_command_sequence": [
-        "qmind sync library --file qmind-test-library/online-boutique-playwright-51.json",
-        "qmind subset --framework playwright > benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
-        "python benchmark-pipeline/normalize-qmind-selection.py benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt benchmark-runs/qmind-online-boutique/selected-tests-51.json",
-        "python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json --method qmind --use-validated --output benchmark-results/final-comparison/qmind-51-evaluation.json"
-      ],
-      "historical_artifacts_policy": "Old QMind raw outputs are historical only and must not be used for final scoring.",
-      "detected_scenarios": [],
-      "missed_scenarios": []
+      "raw_selection_artifact": "benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
+      "selection_artifact": "benchmark-runs/qmind-online-boutique/selected-tests-51.json",
+      "evaluation_artifact": "benchmark-results/final-comparison/qmind-51-evaluation.json",
+      "message": "QMind selection executed successfully: 22/51 tests selected. QMind scoring blocked by normalization mapping, not by selection failure. No QMind recall is claimed.",
+      "normalization": {
+        "status": "normalization_error",
+        "numeric_ids_present": true,
+        "selected_numeric_ids": [
+          "33723",
+          "33693",
+          "33698",
+          "33721",
+          "33684",
+          "33707",
+          "33687",
+          "33686",
+          "33685",
+          "33699",
+          "33728",
+          "33690",
+          "33701",
+          "33694",
+          "33712",
+          "33700",
+          "33688",
+          "33708",
+          "33689",
+          "33717",
+          "33679",
+          "33680"
+        ],
+        "selected_test_count": 22,
+        "mapped_numeric_ids_count": 8,
+        "mapped_numeric_ids": [
+          "33679",
+          "33680",
+          "33684",
+          "33685",
+          "33686",
+          "33687",
+          "33688",
+          "33689"
+        ],
+        "unmapped_numeric_ids_count": 14,
+        "unmapped_numeric_ids": [
+          "33690",
+          "33693",
+          "33694",
+          "33698",
+          "33699",
+          "33700",
+          "33701",
+          "33707",
+          "33708",
+          "33712",
+          "33717",
+          "33721",
+          "33723",
+          "33728"
+        ],
+        "mapping_artifacts_checked": [
+          "benchmark-runs/qmind-online-boutique/library-api.json"
+        ],
+        "error": "Missing library API mapping for qmind numeric IDs: 33690, 33693, 33694, 33698, 33699, 33700, 33701, 33707, 33708, 33712, 33717, 33721, 33723, 33728"
+      },
+      "detected_scenarios": null,
+      "missed_scenarios": null
     }
   ],
-  "supporting_artifacts": [],
+  "supporting_artifacts": [
+    "benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
+    "benchmark-results/final-comparison/full-suite-evaluation.json",
+    "benchmark-results/final-comparison/random-selection.json",
+    "benchmark-results/final-comparison/random-evaluation.json",
+    "benchmark-results/final-comparison/history-code-change-ob-001-selection.json",
+    "benchmark-results/final-comparison/history-code-change-ob-001-evaluation.json",
+    "benchmark-results/final-comparison/history-code-change-ob-002-selection.json",
+    "benchmark-results/final-comparison/history-code-change-ob-002-evaluation.json",
+    "benchmark-results/final-comparison/history-code-change-ob-003-selection.json",
+    "benchmark-results/final-comparison/history-code-change-ob-003-evaluation.json",
+    "benchmark-results/final-comparison/history-code-change-ob-004-selection.json",
+    "benchmark-results/final-comparison/history-code-change-ob-004-evaluation.json"
+  ],
   "limitations": [
-    "This is a diagnostic pre-final comparison artifact, not the final investor/public benchmark result.",
-    "Quantik Mind final recall is intentionally not reported until a live canonical 51-test selection artifact exists.",
-    "Random and history/code-change baselines use a provisional comparison size until the 51-test QMind artifact determines the final same-size comparison.",
-    "Expected-matrix artifacts are not included in this final-comparison result set because no 51-test QMind selection artifact exists yet."
+    "QMind recall is not claimed because the real qmind subset output contains backend numeric IDs that cannot all be resolved with the available mapping artifact.",
+    "Unmapped QMind numeric IDs are reported as a normalization error, not as missed defects.",
+    "No qmind, oracle, history logic, or canonical library behavior was changed for this comparison run."
   ]
 }
