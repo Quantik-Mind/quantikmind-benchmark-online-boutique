@@ -32,9 +32,10 @@
         "empty-cart-tests",
         "basic-cart-accessibility-tests"
       ],
-      "validation_status": "planned",
+      "validation_status": "validated",
       "notes": [
-        "order-form-requires-payment-data is provisional until baseline behavior is confirmed.",
+        "Validated against the full 50-test Playwright suite: 4 failed, 46 passed.",
+        "Validated external scenario commit e5234240 against baseline commit 5096a85b.",
         "Renaming only one label may make the signal too narrow.",
         "Service crashes may broaden the signal through HTTP 500s or slow recovery."
       ]

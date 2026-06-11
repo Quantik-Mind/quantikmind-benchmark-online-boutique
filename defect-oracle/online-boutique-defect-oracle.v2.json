@@ -16,7 +16,12 @@
         "order-complete-happy-path",
         "order-form-requires-payment-data"
       ],
-      "validated_detecting_tests": [],
+      "validated_detecting_tests": [
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
       "expected_unaffected_tests": [
         "homepage-smoke-tests",
         "catalog-browsing-tests",
@@ -24,12 +29,12 @@
         "empty-cart-tests",
         "basic-cart-accessibility-tests"
       ],
-      "validated_at": null,
-      "validation_status": "planned",
+      "validated_at": "2026-06-11",
+      "validation_status": "validated",
       "severity": "high",
       "notes": [
-        "order-form-requires-payment-data is provisional until baseline behavior is confirmed.",
-        "Final oracle should use observed full-suite failures from the scenario branch."
+        "Validated against the full 50-test Playwright suite: 4 failed, 46 passed.",
+        "Validated external scenario commit e5234240 against baseline commit 5096a85b."
       ]
     },
     {

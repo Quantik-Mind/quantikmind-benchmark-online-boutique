@@ -144,10 +144,9 @@ Target domain:
 
 - Checkout page and checkout frontend flow.
 
-Expected upstream files to modify later:
+Validated upstream file:
 
 - `src/frontend/templates/cart.html`
-- Optional: `src/frontend/handlers.go`
 
 Defect behavior:
 
@@ -160,7 +159,7 @@ Expected failing tests:
 - `checkout-page-accessible-from-cart`
 - `checkout-form-fields-visible`
 - `order-complete-happy-path`
-- Potentially `order-form-requires-payment-data`, depending on baseline behavior.
+- `order-form-requires-payment-data`
 
 Expected unaffected tests:
 
@@ -172,9 +171,10 @@ Expected unaffected tests:
 
 Risk notes:
 
+- Validated on 2026-06-11 against the full 50-test Playwright suite: 4 failed, 46 passed.
+- Validated external scenario commit `e5234240` against baseline commit `5096a85b`.
 - If implemented by renaming only one label, the signal may be too narrow.
 - If implemented as a service crash, unrelated tests may fail through HTTP 500s or slow recovery.
-- Baseline should confirm whether `order-form-requires-payment-data` is stable before it is included in the oracle.
 
 ### OB-002 Cart Regression
 
