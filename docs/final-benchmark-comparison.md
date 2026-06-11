@@ -102,17 +102,19 @@ qmind subset --framework playwright > benchmark-runs/qmind-online-boutique/qmind
 
 python benchmark-pipeline/normalize-qmind-selection.py \
   benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt \
-  benchmark-runs/qmind-online-boutique/selected-tests-51.json
+  benchmark-runs/qmind-online-boutique/selected-tests-51.json \
+  --library-api benchmark-runs/qmind-online-boutique/library-api-51.json
 
 python benchmark-pipeline/evaluate-defect-recall.py \
   --oracle defect-oracle/online-boutique-defect-oracle.v2.json \
   --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json \
   --method qmind \
   --use-validated \
+  --library-api benchmark-runs/qmind-online-boutique/library-api-51.json \
   --output benchmark-results/final-comparison/qmind-51-evaluation.json
 ```
 
-The final QMind row should be filled only after `benchmark-runs/qmind-online-boutique/selected-tests-51.json` contains test IDs from `qmind-test-library/online-boutique-playwright-51.json`.
+The final QMind row should be filled only after `benchmark-runs/qmind-online-boutique/selected-tests-51.json` contains test IDs from `qmind-test-library/online-boutique-playwright-51.json`. If qmind subset returns backend/API numeric IDs, normalize them through `benchmark-runs/qmind-online-boutique/library-api-51.json`, whose entries must include `id` and `test_id`.
 
 ## Reproducibility Commands
 

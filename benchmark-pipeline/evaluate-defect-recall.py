@@ -5,13 +5,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Iterable
 
 
 DEFAULT_ORACLE = "defect-oracle/online-boutique-defect-oracle.v2.json"
-TEST_ID_KEYS = ("id", "test_id", "name", "title")
+NUMERIC_ID_PATTERN = re.compile(r"^\d+$")
+TEST_ID_KEYS = ("test_id", "id", "name", "title")
 SELECTION_FIELDS = (
     "selected_tests",
     "selectedTests",
@@ -52,6 +54,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         help="Optional path to write the JSON report.",
+    )
+    parser.add_argument(
+        "--library-api",
+        help=(
+            "Optional qmind library API/export JSON used to map numeric qmind "
+            "backend/API IDs to canonical test IDs."
+        ),
     )
     return parser.parse_args()
 
@@ -144,6 +153,57 @@ def load_selected_tests(path: Path) -> list[str]:
     return selected
 
 
+def mapping_items(data: Any) -> Iterable[Any]:
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        for field in ("data", "tests", "items", "results"):
+            value = data.get(field)
+            if isinstance(value, list):
+                return value
+    return []
+
+
+def load_library_api_mapping(path: Path) -> dict[str, str]:
+    if not path.exists() or not path.is_file():
+        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+
+    data = load_json(path, "Library API mapping")
+    mapping: dict[str, str] = {}
+    for item in mapping_items(data):
+        if not isinstance(item, dict):
+            continue
+        raw_id = item.get("id")
+        test_id = item.get("test_id")
+        if raw_id is None or not isinstance(test_id, str) or not test_id.strip():
+            continue
+        mapping[str(raw_id).strip()] = test_id.strip()
+
+    if not mapping:
+        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+    return mapping
+
+
+def normalize_numeric_selected_tests(
+    selected_tests: list[str], library_api: str | None
+) -> list[str]:
+    numeric_ids = [
+        test_id for test_id in selected_tests if NUMERIC_ID_PATTERN.fullmatch(test_id)
+    ]
+    if not numeric_ids:
+        return selected_tests
+
+    if not library_api:
+        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+
+    mapping = load_library_api_mapping(Path(library_api))
+    missing = sorted(set(numeric_ids) - set(mapping))
+    if missing:
+        raise SystemExit("Missing library API mapping for qmind numeric IDs.")
+
+    return sorted(set(mapping.get(test_id, test_id) for test_id in selected_tests))
+
+
 def load_oracle(path: Path) -> dict[str, Any]:
     data = load_json(path, "Oracle")
     if not isinstance(data, dict):
@@ -216,6 +276,7 @@ def main() -> int:
     args = parse_args()
     oracle = load_oracle(Path(args.oracle))
     selected_tests = load_selected_tests(Path(args.selected))
+    selected_tests = normalize_numeric_selected_tests(selected_tests, args.library_api)
     report = evaluate(oracle, selected_tests, args.method, args.use_validated)
     payload = json.dumps(report, indent=2)
 
