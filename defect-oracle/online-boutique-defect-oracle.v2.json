@@ -99,7 +99,28 @@
         "cart-add-from-product-detail-keeps-price-context",
         "frontend-basic-user-journey-home-product-cart"
       ],
-      "validated_detecting_tests": [],
+      "validated_detecting_tests": [
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-has-price",
+        "cart-add-product-from-detail-page",
+        "checkout-page-accessible-from-cart",
+        "checkout-form-fields-visible",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-keeps-product-context",
+        "cart-add-product-and-view-cart",
+        "cart-survives-home-navigation",
+        "catalog-first-product-opens-detail-page",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-price",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-refresh-keeps-content",
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-add-from-product-detail-keeps-price-context",
+        "navigation-home-to-product-to-home",
+        "frontend-basic-user-journey-home-product-cart"
+      ],
       "expected_unaffected_tests": [
         "homepage-load-tests",
         "product-links-visible-tests",
@@ -107,12 +128,14 @@
         "homepage-price-tests-if-list-products-remains-intact",
         "empty-cart-tests"
       ],
-      "validated_at": null,
-      "validation_status": "planned",
+      "validated_at": "2026-06-11",
+      "validation_status": "validated",
       "severity": "high",
       "notes": [
-        "Expected signal assumes GetProduct is broken while ListProducts remains healthy.",
-        "Final oracle should use observed full-suite failures from the scenario branch."
+        "Validated against the full 50-test Playwright suite: 20 failed, 30 passed.",
+        "External scenario commit 381043a6 on benchmark/scenario-ob003; baseline commit 5096a85b.",
+        "Failure scope is product detail and downstream flows depending on product detail.",
+        "Homepage/catalog listing remained sufficiently healthy because 30 tests passed."
       ]
     },
     {

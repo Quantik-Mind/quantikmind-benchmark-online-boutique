@@ -127,11 +127,12 @@
         "homepage-price-tests-if-list-products-remains-intact",
         "empty-cart-tests"
       ],
-      "validation_status": "planned",
+      "validation_status": "validated",
       "notes": [
-        "Breaking product data globally may also break homepage tests and make the scenario too broad.",
-        "Changing only product template text may create a frontend-only scenario rather than a product catalog scenario.",
-        "The cleanest signal is a deterministic GetProduct regression with product listing preserved."
+        "Validated against the full 50-test Playwright suite: 20 failed, 30 passed.",
+        "External scenario commit 381043a6 on benchmark/scenario-ob003; baseline commit 5096a85b.",
+        "Failure scope is product detail and downstream flows depending on product detail.",
+        "Homepage/catalog listing remained sufficiently healthy because 30 tests passed."
       ]
     },
     {

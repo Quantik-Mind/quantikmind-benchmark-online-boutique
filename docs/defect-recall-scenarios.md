@@ -254,16 +254,24 @@ Expected failing tests:
 
 - `catalog-open-first-product-detail`
 - `catalog-product-detail-has-price`
-- `product-detail-page-has-body-content`
-- `product-detail-allows-return-navigation`
+- `cart-add-product-from-detail-page`
+- `checkout-page-accessible-from-cart`
+- `checkout-form-fields-visible`
+- `order-complete-happy-path`
+- `order-form-requires-payment-data`
 - `catalog-product-detail-can-be-opened-twice`
 - `catalog-product-detail-keeps-product-context`
+- `cart-add-product-and-view-cart`
+- `cart-survives-home-navigation`
 - `catalog-first-product-opens-detail-page`
 - `product-detail-page-has-add-to-cart-button`
 - `product-detail-page-has-price`
 - `product-detail-page-has-non-empty-body`
 - `product-detail-refresh-keeps-content`
-- Cart add tests that require opening a product detail page first.
+- `cart-add-from-product-detail-shows-cart-context`
+- `cart-add-from-product-detail-keeps-price-context`
+- `navigation-home-to-product-to-home`
+- `frontend-basic-user-journey-home-product-cart`
 
 Expected unaffected tests:
 
@@ -278,6 +286,12 @@ Risk notes:
 - Breaking product data globally may also break homepage tests and make the scenario too broad.
 - Changing only product template text may create a frontend-only scenario rather than a product catalog scenario.
 - The cleanest signal is a deterministic `GetProduct` regression with product listing preserved.
+
+Validation notes:
+
+- Validated on 2026-06-11 against the full 50-test Playwright suite: 20 failed, 30 passed.
+- External scenario commit `381043a6`; baseline commit `5096a85b`.
+- Failure scope is product detail and downstream flows depending on product detail; homepage/catalog listing remained sufficiently healthy because 30 tests passed.
 
 ### OB-004 Payment Regression
 
