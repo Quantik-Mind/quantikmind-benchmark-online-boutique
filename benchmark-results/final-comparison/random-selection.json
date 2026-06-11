@@ -1,0 +1,20 @@
+{
+  "method": "random",
+  "method_label": "Random Approach",
+  "selection_size": 11,
+  "seed": 42,
+  "source_library": "qmind-test-library\\online-boutique-playwright-51.json",
+  "selected_tests": [
+    "cart-add-from-product-detail-shows-cart-context",
+    "cart-link-is-reachable-from-homepage",
+    "cart-page-has-cart-context",
+    "cart-page-is-accessible",
+    "cart-page-loads-without-product",
+    "catalog-product-detail-can-be-opened-twice",
+    "catalog-product-detail-has-price",
+    "catalog-product-link-href-starts-with-product",
+    "homepage-has-visible-text-content",
+    "order-flow-does-not-complete-with-empty-data",
+    "product-detail-page-has-price"
+  ]
+}

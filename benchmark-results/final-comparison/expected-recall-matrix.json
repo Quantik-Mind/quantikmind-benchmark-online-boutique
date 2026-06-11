@@ -1,0 +1,209 @@
+{
+  "benchmark": "online-boutique-defect-recall",
+  "oracle_mode": "expected",
+  "warning": "These results use expected oracle data. They are useful for pipeline validation only and must not be presented as validated defect-recall results.",
+  "full_suite_size": 51,
+  "qmind_selection_size": 11,
+  "methods": [
+    {
+      "method": "full-suite",
+      "method_label": "Traditional Approach (Full Suite)",
+      "selected_test_count": 51,
+      "execution_reduction": 0.0,
+      "defect_recall": 1.0,
+      "detected_scenarios_count": 4,
+      "missed_scenarios_count": 0,
+      "detected_scenarios": [
+        "OB-001 Checkout Regression",
+        "OB-002 Cart Regression",
+        "OB-003 Product Detail Regression",
+        "OB-004 Payment Regression"
+      ],
+      "missed_scenarios": [],
+      "selected_tests": [
+        "cart-add-from-product-detail-keeps-price-context",
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-add-product-and-view-cart",
+        "cart-add-product-from-detail-page",
+        "cart-empty-page-shows-cart-context",
+        "cart-link-is-reachable-from-homepage",
+        "cart-page-has-cart-context",
+        "cart-page-is-accessible",
+        "cart-page-loads-without-product",
+        "cart-survives-home-navigation",
+        "catalog-first-product-link-has-valid-href",
+        "catalog-first-product-opens-detail-page",
+        "catalog-multiple-products-visible",
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-has-price",
+        "catalog-product-detail-keeps-product-context",
+        "catalog-product-link-href-starts-with-product",
+        "catalog-two-product-links-visible-if-present",
+        "checkout-empty-cart-does-not-complete-order",
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "checkout-page-does-not-crash-with-empty-cart",
+        "frontend-basic-user-journey-home-product-cart",
+        "frontend-homepage-has-product-grid",
+        "frontend-logo-or-home-link-visible",
+        "frontend-page-has-navigation-links",
+        "frontend-page-loads-under-basic-navigation",
+        "frontend-products-have-prices",
+        "frontend-static-assets-do-not-break-homepage",
+        "homepage-body-is-not-empty",
+        "homepage-contains-product-price",
+        "homepage-has-at-least-one-product-link",
+        "homepage-has-multiple-links",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-title-is-available",
+        "navigation-cart-to-home",
+        "navigation-home-to-product-to-home",
+        "order-complete-happy-path",
+        "order-flow-does-not-complete-with-empty-data",
+        "order-form-requires-payment-data",
+        "payment-order-completion-confirms-success",
+        "product-detail-allows-return-navigation",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-body-content",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-page-has-price",
+        "product-detail-refresh-keeps-content",
+        "smoke-homepage-loads",
+        "smoke-product-links-visible"
+      ]
+    },
+    {
+      "method": "random",
+      "method_label": "Random Approach",
+      "selected_test_count": 11,
+      "execution_reduction": 0.7843137254901961,
+      "defect_recall": 0.5,
+      "detected_scenarios_count": 2,
+      "missed_scenarios_count": 2,
+      "detected_scenarios": [
+        "OB-002 Cart Regression",
+        "OB-003 Product Detail Regression"
+      ],
+      "missed_scenarios": [
+        "OB-001 Checkout Regression",
+        "OB-004 Payment Regression"
+      ],
+      "random_seed": 42,
+      "selected_tests": [
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-link-is-reachable-from-homepage",
+        "cart-page-has-cart-context",
+        "cart-page-is-accessible",
+        "cart-page-loads-without-product",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-has-price",
+        "catalog-product-link-href-starts-with-product",
+        "homepage-has-visible-text-content",
+        "order-flow-does-not-complete-with-empty-data",
+        "product-detail-page-has-price"
+      ]
+    },
+    {
+      "method": "history-code-change",
+      "method_label": "History + Code Change Approach",
+      "selected_test_count": 11,
+      "execution_reduction": 0.7843137254901961,
+      "defect_recall": 1.0,
+      "detected_scenarios_count": 4,
+      "missed_scenarios_count": 0,
+      "detected_scenarios": [
+        "OB-001 Checkout Regression",
+        "OB-002 Cart Regression",
+        "OB-003 Product Detail Regression",
+        "OB-004 Payment Regression"
+      ],
+      "missed_scenarios": [],
+      "scenario_selections": {
+        "OB-001": [
+          "checkout-page-accessible-from-cart",
+          "checkout-form-fields-visible",
+          "order-form-requires-payment-data",
+          "frontend-basic-user-journey-home-product-cart",
+          "order-complete-happy-path",
+          "frontend-homepage-has-product-grid",
+          "checkout-empty-cart-does-not-complete-order",
+          "checkout-page-does-not-crash-with-empty-cart",
+          "frontend-products-have-prices",
+          "frontend-static-assets-do-not-break-homepage",
+          "cart-add-from-product-detail-keeps-price-context"
+        ],
+        "OB-002": [
+          "frontend-basic-user-journey-home-product-cart",
+          "cart-add-from-product-detail-keeps-price-context",
+          "cart-add-from-product-detail-shows-cart-context",
+          "cart-add-product-and-view-cart",
+          "cart-add-product-from-detail-page",
+          "checkout-page-accessible-from-cart",
+          "checkout-empty-cart-does-not-complete-order",
+          "checkout-form-fields-visible",
+          "order-complete-happy-path",
+          "cart-empty-page-shows-cart-context",
+          "checkout-page-does-not-crash-with-empty-cart"
+        ],
+        "OB-003": [
+          "catalog-first-product-opens-detail-page",
+          "catalog-open-first-product-detail",
+          "catalog-product-detail-can-be-opened-twice",
+          "catalog-product-detail-has-price",
+          "catalog-product-detail-keeps-product-context",
+          "frontend-basic-user-journey-home-product-cart",
+          "cart-add-from-product-detail-keeps-price-context",
+          "cart-add-from-product-detail-shows-cart-context",
+          "cart-add-product-from-detail-page",
+          "product-detail-page-has-add-to-cart-button",
+          "cart-add-product-and-view-cart"
+        ],
+        "OB-004": [
+          "payment-order-completion-confirms-success",
+          "checkout-empty-cart-does-not-complete-order",
+          "frontend-basic-user-journey-home-product-cart",
+          "order-form-requires-payment-data",
+          "checkout-page-accessible-from-cart",
+          "checkout-page-does-not-crash-with-empty-cart",
+          "cart-add-from-product-detail-keeps-price-context",
+          "cart-add-from-product-detail-shows-cart-context",
+          "cart-add-product-and-view-cart",
+          "cart-add-product-from-detail-page",
+          "cart-page-loads-without-product"
+        ]
+      }
+    },
+    {
+      "method": "qmind",
+      "method_label": "Quantik Mind",
+      "selected_test_count": 11,
+      "execution_reduction": 0.7843137254901961,
+      "defect_recall": 0.75,
+      "detected_scenarios_count": 3,
+      "missed_scenarios_count": 1,
+      "detected_scenarios": [
+        "OB-001 Checkout Regression",
+        "OB-002 Cart Regression",
+        "OB-003 Product Detail Regression"
+      ],
+      "missed_scenarios": [
+        "OB-004 Payment Regression"
+      ],
+      "selected_tests": [
+        "cart-add-product-from-detail-page",
+        "cart-page-is-accessible",
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-has-price",
+        "checkout-empty-cart-does-not-complete-order",
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data",
+        "smoke-homepage-loads",
+        "smoke-product-links-visible"
+      ]
+    }
+  ]
+}

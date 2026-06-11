@@ -1,0 +1,183 @@
+{
+  "benchmark": "online-boutique-defect-recall",
+  "run_id": "final-comparison-001",
+  "created_at": "2026-06-11",
+  "oracle": "defect-oracle/online-boutique-defect-oracle.v2.json",
+  "oracle_mode": "validated_detecting_tests",
+  "canonical_library": "qmind-test-library/online-boutique-playwright-51.json",
+  "full_suite_size": 51,
+  "defect_universe": [
+    "OB-001",
+    "OB-002",
+    "OB-003",
+    "OB-004"
+  ],
+  "primary_kpi": "Defect Recall = Detected Defects / Full Suite Defects",
+  "baseline_selection_size": {
+    "tests": 11,
+    "status": "provisional_comparator_size",
+    "reason": "The live Quantik Mind canonical 51-test selection artifact is pending. Existing benchmark examples use an 11-test comparison size, so random and history/code-change baselines were generated at size 11 for the first comparison structure."
+  },
+  "methods": [
+    {
+      "method": "full-suite",
+      "method_label": "Traditional Approach / Full Suite",
+      "status": "measured",
+      "tests_executed": 51,
+      "execution_reduction": 0.0,
+      "defects_detected": 4,
+      "full_suite_defects": 4,
+      "defect_recall": 1.0,
+      "selection_artifact": "qmind-test-library/online-boutique-playwright-51.json",
+      "evaluation_artifact": "benchmark-results/final-comparison/full-suite-evaluation.json",
+      "detected_scenarios": [
+        "OB-001",
+        "OB-002",
+        "OB-003",
+        "OB-004"
+      ],
+      "missed_scenarios": []
+    },
+    {
+      "method": "random",
+      "method_label": "Random Approach",
+      "status": "measured",
+      "tests_executed": 11,
+      "execution_reduction": 0.7843137254901961,
+      "execution_reduction_percent": 78.43137254901961,
+      "defects_detected": 1,
+      "full_suite_defects": 4,
+      "defect_recall": 0.25,
+      "random_seed": 42,
+      "selection_artifact": "benchmark-results/final-comparison/random-selection.json",
+      "evaluation_artifact": "benchmark-results/final-comparison/random-evaluation.json",
+      "selected_tests": [
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-link-is-reachable-from-homepage",
+        "cart-page-has-cart-context",
+        "cart-page-is-accessible",
+        "cart-page-loads-without-product",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-has-price",
+        "catalog-product-link-href-starts-with-product",
+        "homepage-has-visible-text-content",
+        "order-flow-does-not-complete-with-empty-data",
+        "product-detail-page-has-price"
+      ],
+      "detected_scenarios": [
+        "OB-003"
+      ],
+      "missed_scenarios": [
+        "OB-001",
+        "OB-002",
+        "OB-004"
+      ]
+    },
+    {
+      "method": "history-code-change",
+      "method_label": "History + Code Change Approach",
+      "status": "measured",
+      "tests_executed": 11,
+      "execution_reduction": 0.7843137254901961,
+      "execution_reduction_percent": 78.43137254901961,
+      "defects_detected": 4,
+      "full_suite_defects": 4,
+      "defect_recall": 1.0,
+      "selection_model": "per-scenario changed-file/domain context using benchmark-pipeline/select-history-code-change-approach.py",
+      "selection_artifacts": {
+        "OB-001": "benchmark-results/final-comparison/history-code-change-ob-001-selection.json",
+        "OB-002": "benchmark-results/final-comparison/history-code-change-ob-002-selection.json",
+        "OB-003": "benchmark-results/final-comparison/history-code-change-ob-003-selection.json",
+        "OB-004": "benchmark-results/final-comparison/history-code-change-ob-004-selection.json"
+      },
+      "evaluation_artifacts": {
+        "OB-001": "benchmark-results/final-comparison/history-code-change-ob-001-evaluation.json",
+        "OB-002": "benchmark-results/final-comparison/history-code-change-ob-002-evaluation.json",
+        "OB-003": "benchmark-results/final-comparison/history-code-change-ob-003-evaluation.json",
+        "OB-004": "benchmark-results/final-comparison/history-code-change-ob-004-evaluation.json"
+      },
+      "per_scenario": [
+        {
+          "scenario": "OB-001",
+          "detected": true,
+          "selected_detecting_tests": [
+            "checkout-form-fields-visible",
+            "checkout-page-accessible-from-cart",
+            "order-complete-happy-path",
+            "order-form-requires-payment-data"
+          ]
+        },
+        {
+          "scenario": "OB-002",
+          "detected": true,
+          "selected_detecting_tests": [
+            "cart-add-from-product-detail-keeps-price-context",
+            "checkout-form-fields-visible",
+            "checkout-page-accessible-from-cart",
+            "order-complete-happy-path"
+          ]
+        },
+        {
+          "scenario": "OB-003",
+          "detected": true,
+          "selected_detecting_tests": [
+            "cart-add-from-product-detail-keeps-price-context",
+            "cart-add-from-product-detail-shows-cart-context",
+            "cart-add-product-and-view-cart",
+            "cart-add-product-from-detail-page",
+            "catalog-first-product-opens-detail-page",
+            "catalog-open-first-product-detail",
+            "catalog-product-detail-can-be-opened-twice",
+            "catalog-product-detail-has-price",
+            "catalog-product-detail-keeps-product-context",
+            "frontend-basic-user-journey-home-product-cart",
+            "product-detail-page-has-add-to-cart-button"
+          ]
+        },
+        {
+          "scenario": "OB-004",
+          "detected": true,
+          "selected_detecting_tests": [
+            "payment-order-completion-confirms-success"
+          ]
+        }
+      ],
+      "detected_scenarios": [
+        "OB-001",
+        "OB-002",
+        "OB-003",
+        "OB-004"
+      ],
+      "missed_scenarios": []
+    },
+    {
+      "method": "qmind",
+      "method_label": "Quantik Mind",
+      "status": "pending_live_selection_artifact",
+      "tests_executed": null,
+      "execution_reduction": null,
+      "defects_detected": null,
+      "full_suite_defects": 4,
+      "defect_recall": null,
+      "reason": "Existing benchmark-runs/qmind-online-boutique raw outputs contain numeric CLI IDs that do not map to qmind-test-library/online-boutique-playwright-51.json test_id values. No validated canonical 51-test Quantik Mind selection artifact is available in the repository.",
+      "required_command": "bash benchmark-pipeline/run-online-boutique-qmind-benchmark.sh, then python benchmark-pipeline/normalize-qmind-selection.py <raw-qmind-output> <canonical-selected-tests.json>, then python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected <canonical-selected-tests.json> --method qmind --use-validated --output <qmind-evaluation.json>",
+      "invalid_or_noncanonical_artifacts_reviewed": [
+        "benchmark-runs/qmind-online-boutique/selected-tests.json",
+        "benchmark-runs/qmind-online-boutique/qmind-subset-raw.txt",
+        "benchmark-runs/qmind-online-boutique/qmind-subset-full-multisignal-002-raw.txt",
+        "benchmark-runs/qmind-online-boutique/qmind-subset-50-targeted-entanglement-raw.txt"
+      ],
+      "detected_scenarios": [],
+      "missed_scenarios": []
+    }
+  ],
+  "supporting_artifacts": [
+    "benchmark-results/final-comparison/expected-recall-matrix.json",
+    "benchmark-results/final-comparison/expected-recall-matrix.md"
+  ],
+  "limitations": [
+    "Quantik Mind final recall is intentionally not reported until a live canonical 51-test selection artifact exists.",
+    "Random and history/code-change baselines use a provisional 11-test comparison size for the first final comparison structure.",
+    "The expected recall matrix is retained only as a pipeline sanity check and is not the validated final comparison."
+  ]
+}
