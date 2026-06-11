@@ -1,5 +1,17 @@
 # Benchmark Pipeline
 
+## Baseline validation
+
+Baseline validation runs the full canonical 50-test Playwright suite against a clean Online Boutique deployment before defect scenarios are implemented. This verifies that the test harness and deployed application are stable before any scenario-specific failures are used as benchmark evidence.
+
+Example:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File benchmark-pipeline/run-baseline-validation.ps1 -FrontendUrl "http://34.185.198.67/" -Workers 2
+```
+
+The helper writes Playwright reports under `benchmark-runs/baseline-validation` by default. It uses 2 Playwright workers by default for Online Boutique benchmark stability, and generated outputs under `benchmark-runs/` are ignored by git.
+
 ## Scenario-aware defect recall evaluator
 
 `evaluate-defect-recall.py` evaluates whether a selected test set detects the benchmark defect scenarios described by the defect oracle. It reports defect recall, execution reduction, and per-scenario detection details.
