@@ -1,9 +1,9 @@
 {
   "benchmark": "online-boutique-defect-recall",
   "run_id": "final-comparison-002",
-  "comparison_status": "qmind_scoring_blocked_normalization_error",
-  "artifact_status": "final_comparison_with_qmind_normalization_error",
-  "public_result_status": "qmind_recall_not_claimed",
+  "comparison_status": "measured",
+  "artifact_status": "final_comparison_measured",
+  "public_result_status": "qmind_recall_claimed",
   "created_at": "2026-06-11",
   "oracle": "defect-oracle/online-boutique-defect-oracle.v2.json",
   "oracle_mode": "validated_detecting_tests",
@@ -11,70 +11,12 @@
   "full_suite_size": 51,
   "qmind_selection": {
     "status": "selection_executed_successfully",
-    "raw_artifact": "benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
-    "selected_tests": 22,
+    "selection_artifact": "benchmark-runs/qmind-online-boutique/qmind-current-selection.json",
+    "selected_tests": 15,
     "library_size": 51,
-    "message": "QMind selection executed successfully: 22/51 tests selected. QMind scoring blocked by normalization mapping, not by selection failure. No QMind recall is claimed.",
+    "message": "QMind selected 15/51 tests and detected all 4 validated defect scenarios.",
     "normalization": {
-      "status": "normalization_error",
-      "numeric_ids_present": true,
-      "selected_numeric_ids": [
-        "33723",
-        "33693",
-        "33698",
-        "33721",
-        "33684",
-        "33707",
-        "33687",
-        "33686",
-        "33685",
-        "33699",
-        "33728",
-        "33690",
-        "33701",
-        "33694",
-        "33712",
-        "33700",
-        "33688",
-        "33708",
-        "33689",
-        "33717",
-        "33679",
-        "33680"
-      ],
-      "selected_test_count": 22,
-      "mapped_numeric_ids_count": 8,
-      "mapped_numeric_ids": [
-        "33679",
-        "33680",
-        "33684",
-        "33685",
-        "33686",
-        "33687",
-        "33688",
-        "33689"
-      ],
-      "unmapped_numeric_ids_count": 14,
-      "unmapped_numeric_ids": [
-        "33690",
-        "33693",
-        "33694",
-        "33698",
-        "33699",
-        "33700",
-        "33701",
-        "33707",
-        "33708",
-        "33712",
-        "33717",
-        "33721",
-        "33723",
-        "33728"
-      ],
-      "mapping_artifacts_checked": [
-        "benchmark-runs/qmind-online-boutique/library-api.json"
-      ],
-      "error": "Missing library API mapping for qmind numeric IDs: 33690, 33693, 33694, 33698, 33699, 33700, 33701, 33707, 33708, 33712, 33717, 33721, 33723, 33728"
+      "status": "canonical_test_ids"
     }
   },
   "defect_universe": [
@@ -85,8 +27,8 @@
   ],
   "primary_kpi": "Defect Recall = Detected Defects / Full Suite Defects",
   "comparison_selection_size": {
-    "tests": 22,
-    "basis": "real qmind subset size from qmind-subset-51-raw.txt"
+    "tests": 15,
+    "basis": "current qmind measured selection size from qmind-current-selection.json"
   },
   "methods": [
     {
@@ -247,86 +189,33 @@
     {
       "method": "qmind",
       "method_label": "Quantik Mind",
-      "status": "normalization_error",
+      "status": "measured",
       "selection_status": "selection_executed_successfully",
-      "tests_selected": 22,
-      "tests_executed": null,
-      "execution_reduction": null,
-      "execution_reduction_percent": null,
-      "defects_detected": null,
+      "tests_selected": 15,
+      "tests_executed": 15,
+      "execution_reduction": 0.7058823529411764,
+      "execution_reduction_percent": 70.6,
+      "defects_detected": 4,
       "full_suite_defects": 4,
-      "defect_recall": null,
-      "raw_selection_artifact": "benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
-      "selection_artifact": "benchmark-runs/qmind-online-boutique/selected-tests-51.json",
-      "evaluation_artifact": "benchmark-results/final-comparison/qmind-51-evaluation.json",
-      "message": "QMind selection executed successfully: 22/51 tests selected. QMind scoring blocked by normalization mapping, not by selection failure. No QMind recall is claimed.",
+      "defect_recall": 1.0,
+      "selection_artifact": "benchmark-runs/qmind-online-boutique/qmind-current-selection.json",
+      "evaluation_artifact": "benchmark-results/final-comparison/qmind-current-evaluation.json",
+      "message": "QMind selected 15/51 tests and detected all 4 validated defect scenarios.",
       "normalization": {
-        "status": "normalization_error",
-        "numeric_ids_present": true,
-        "selected_numeric_ids": [
-          "33723",
-          "33693",
-          "33698",
-          "33721",
-          "33684",
-          "33707",
-          "33687",
-          "33686",
-          "33685",
-          "33699",
-          "33728",
-          "33690",
-          "33701",
-          "33694",
-          "33712",
-          "33700",
-          "33688",
-          "33708",
-          "33689",
-          "33717",
-          "33679",
-          "33680"
-        ],
-        "selected_test_count": 22,
-        "mapped_numeric_ids_count": 8,
-        "mapped_numeric_ids": [
-          "33679",
-          "33680",
-          "33684",
-          "33685",
-          "33686",
-          "33687",
-          "33688",
-          "33689"
-        ],
-        "unmapped_numeric_ids_count": 14,
-        "unmapped_numeric_ids": [
-          "33690",
-          "33693",
-          "33694",
-          "33698",
-          "33699",
-          "33700",
-          "33701",
-          "33707",
-          "33708",
-          "33712",
-          "33717",
-          "33721",
-          "33723",
-          "33728"
-        ],
-        "mapping_artifacts_checked": [
-          "benchmark-runs/qmind-online-boutique/library-api.json"
-        ],
-        "error": "Missing library API mapping for qmind numeric IDs: 33690, 33693, 33694, 33698, 33699, 33700, 33701, 33707, 33708, 33712, 33717, 33721, 33723, 33728"
+        "status": "canonical_test_ids"
       },
-      "detected_scenarios": null,
-      "missed_scenarios": null
+      "detected_scenarios": [
+        "OB-001",
+        "OB-002",
+        "OB-003",
+        "OB-004"
+      ],
+      "missed_scenarios": []
     }
   ],
   "supporting_artifacts": [
-    "benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt",
+    "benchmark-runs/qmind-online-boutique/qmind-current-selection.json",
+    "benchmark-results/final-comparison/qmind-current-evaluation.json",
     "benchmark-results/final-comparison/full-suite-evaluation.json",
     "benchmark-results/final-comparison/random-selection.json",
     "benchmark-results/final-comparison/random-evaluation.json",
@@ -340,8 +229,7 @@
     "benchmark-results/final-comparison/history-code-change-ob-004-evaluation.json"
   ],
   "limitations": [
-    "QMind recall is not claimed because the real qmind subset output contains backend numeric IDs that cannot all be resolved with the available mapping artifact.",
-    "Unmapped QMind numeric IDs are reported as a normalization error, not as missed defects.",
+    "This comparison uses canonical test IDs from qmind-current-selection.json, not backend numeric IDs.",
     "No qmind, oracle, history logic, or canonical library behavior was changed for this comparison run."
   ]
 }
