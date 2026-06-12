@@ -1,12 +1,12 @@
 {
   "method": "random",
   "full_suite_size": 51,
-  "selected_test_count": 22,
-  "execution_reduction": 0.5686274509803921,
+  "selected_test_count": 15,
+  "execution_reduction": 0.7058823529411764,
   "total_scenarios": 4,
-  "detected_scenarios_count": 2,
-  "missed_scenarios_count": 2,
-  "defect_recall": 0.5,
+  "detected_scenarios_count": 1,
+  "missed_scenarios_count": 3,
+  "defect_recall": 0.25,
   "per_scenario": [
     {
       "id": "OB-001",
@@ -42,11 +42,8 @@
       "selected_detecting_tests": [
         "cart-add-from-product-detail-shows-cart-context",
         "cart-add-product-and-view-cart",
-        "catalog-open-first-product-detail",
         "catalog-product-detail-can-be-opened-twice",
         "catalog-product-detail-has-price",
-        "product-detail-page-has-add-to-cart-button",
-        "product-detail-page-has-non-empty-body",
         "product-detail-page-has-price",
         "product-detail-refresh-keeps-content"
       ],
@@ -77,10 +74,8 @@
     {
       "id": "OB-004",
       "name": "Payment Regression",
-      "detected": true,
-      "selected_detecting_tests": [
-        "payment-order-completion-confirms-success"
-      ],
+      "detected": false,
+      "selected_detecting_tests": [],
       "detecting_tests_used": [
         "payment-order-completion-confirms-success"
       ],

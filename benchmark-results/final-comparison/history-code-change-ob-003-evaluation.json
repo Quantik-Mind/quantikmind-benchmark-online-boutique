@@ -1,8 +1,8 @@
 {
-  "method": "history-code-change-OB-003",
+  "method": "history-code-change",
   "full_suite_size": 51,
-  "selected_test_count": 22,
-  "execution_reduction": 0.5686274509803921,
+  "selected_test_count": 15,
+  "execution_reduction": 0.7058823529411764,
   "total_scenarios": 4,
   "detected_scenarios_count": 2,
   "missed_scenarios_count": 2,
@@ -54,8 +54,7 @@
         "frontend-basic-user-journey-home-product-cart",
         "product-detail-page-has-add-to-cart-button",
         "product-detail-page-has-non-empty-body",
-        "product-detail-page-has-price",
-        "product-detail-refresh-keeps-content"
+        "product-detail-page-has-price"
       ],
       "detecting_tests_used": [
         "cart-add-from-product-detail-keeps-price-context",
