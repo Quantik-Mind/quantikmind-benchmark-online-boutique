@@ -35,6 +35,25 @@ The defect oracle uses minimal direct validated detecting tests for each benchma
 | History + Code Change | 15 | 70.6% | 4/5 | 80.0% |
 | Quantik Mind | 16.4 | 67.8% | 5/5 | 100.0% |
 
+## Recall-vs-Saving Trade-off
+
+The aggregate result should not be read as "lowest test count wins." The benchmark should be read in this order:
+
+1. recall first
+2. execution reduction second
+3. category breakdown always shown
+
+History + Code Change is slightly more aggressive: it runs 15 tests on average, gives 70.6% execution reduction, and detects 4/5 cases. Quantik Mind is slightly more conservative: it runs 16.4 tests on average, gives 67.8% execution reduction, and detects 5/5 cases.
+
+| Method | Recall | Avg tests | Execution reduction | Interpretation |
+|---|---:|---:|---:|---|
+| H+CC | 4/5 | 15 | 70.6% | More aggressive, misses runtime-aware defect |
+| QMind | 5/5 | 16.4 | 67.8% | Slightly more conservative, preserves full recall |
+
+Quantik Mind spends +1.4 tests on average compared with History + Code Change. That is a 2.8 percentage-point reduction trade-off. In exchange, it recovers one additional benchmark case: OB-005 Runtime Aware. Quantik Mind spends 1.4 extra tests on average to recover a defect class that History + Code Change misses entirely.
+
+In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 1/1 vs 0/1. Overall, QMind preserves full recall at still-high execution reduction. The value claim is not "QMind always runs fewer tests." The value claim is "QMind keeps execution reduction high while avoiding blind spots from code-change-only selection."
+
 ## Per-Scenario Results
 
 | Scenario | Category | Changed files | Full Suite result | Random result | History + Code Change result | Quantik Mind result |
@@ -106,6 +125,10 @@ History + Code Change uses the canonical test library, history-oriented test met
 Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by `benchmark-pipeline/run-qmind-subset.ps1` in normal mode. The aggregate QMind result averages 16.4 selected tests, gives 67.8% average execution reduction, and detects 5/5 cases. OB-005 demonstrates a class of defect that code-change analysis structurally cannot reach. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime signals are required.
 
 ## Hostile-Review Defense
+
+Reviewer challenge: "H+CC has better savings."
+
+Response: "Yes, but it achieves that by missing OB-005. The meaningful comparison is not saving alone; it is recall at a given execution budget. QMind trades 1.4 additional tests on average for one additional detected scenario."
 
 - OB-001 through OB-004 functional definitions and oracle detecting tests were not modified.
 - OB-005 uses the real committed file `src/currencyservice/data/currency_conversion.json`.

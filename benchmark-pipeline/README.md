@@ -125,6 +125,8 @@ It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/fina
 
 The generator treats OB-001 through OB-005 as benchmark cases. OB-001 through OB-004 are code-change controls; OB-005 is runtime-aware. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
 
+Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report: History + Code Change gets 4/5 recall with 15 average tests and 70.6% execution reduction, while QMind gets 5/5 recall with 16.4 average tests and 67.8% execution reduction. Quantik Mind spends 1.4 extra tests on average to recover a defect class that History + Code Change misses entirely.
+
 QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates:
 
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json`

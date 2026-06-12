@@ -119,6 +119,15 @@ The aggregate result for each method is:
 - average selected tests
 - average execution reduction
 
+The aggregate should be interpreted as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" comparison. After OB-005, History + Code Change is slightly more aggressive at 15 average tests, 70.6% execution reduction, and 4/5 recall. Quantik Mind is slightly more conservative at 16.4 average tests, 67.8% execution reduction, and 5/5 recall.
+
+| Method | Recall | Avg tests | Execution reduction | Interpretation |
+|---|---:|---:|---:|---|
+| H+CC | 4/5 | 15 | 70.6% | More aggressive, misses runtime-aware defect |
+| QMind | 5/5 | 16.4 | 67.8% | Slightly more conservative, preserves full recall |
+
+Quantik Mind spends 1.4 extra tests on average to recover a defect class that History + Code Change misses entirely. In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 1/1 vs 0/1. The value claim is not "QMind always runs fewer tests"; it is that QMind keeps execution reduction high while avoiding blind spots from code-change-only selection.
+
 Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all five benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the five per-case QMind artifacts before scoring them.
 
 ## Benchmark Limitations
@@ -160,3 +169,5 @@ This makes the comparison more defensible:
 - per-case results are auditable
 - aggregate recall is computed from case outcomes
 - generated artifacts can be regenerated from committed inputs with one script
+
+If a reviewer argues that H+CC has better savings, the response is: yes, but it achieves that by missing OB-005. The meaningful comparison is not saving alone; it is recall at a given execution budget. QMind trades 1.4 additional tests on average for one additional detected scenario.
