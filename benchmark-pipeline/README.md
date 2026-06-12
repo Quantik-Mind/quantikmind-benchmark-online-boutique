@@ -35,6 +35,7 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 .\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-002 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json
 .\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-003 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json
 .\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-004 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-005 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-005.json
 ```
 
 It writes normalized canonical IDs without a UTF-8 BOM and validates them against `qmind-test-library/online-boutique-playwright-51.json`. For OB-004 it fails if `payment-order-completion-confirms-success` is missing.
@@ -120,9 +121,9 @@ Machine-readable method slugs are `full-suite`, `random`, `history-code-change`,
 .\benchmark-pipeline\generate-final-comparison.ps1
 ```
 
-It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/final-benchmark-comparison.md`, aggregate method evaluations, and per-case Full Suite, Random, History + Code Change, and QMind scoring artifacts for OB-001 through OB-004.
+It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/final-benchmark-comparison.md`, aggregate method evaluations, and per-case Full Suite, Random, History + Code Change, and QMind scoring artifacts for OB-001 through OB-005.
 
-The generator treats OB-001 through OB-004 as benchmark cases. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
+The generator treats OB-001 through OB-005 as benchmark cases. OB-001 through OB-004 are code-change controls; OB-005 is runtime-aware. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
 
 QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates:
 
@@ -130,6 +131,7 @@ QMind is also evaluated per benchmark case. Normal mode calls the live QMind sub
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json`
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json`
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json`
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-005.json`
 
 It fails clearly if QMind configuration is missing, the CLI is unavailable, the API is unreachable, observability is not configured, or the library/project state is not synced. It also fails if a QMind selection contains non-canonical test IDs, or if the OB-004 QMind selection does not include `payment-order-completion-confirms-success`.
 
@@ -139,7 +141,7 @@ To reuse previously generated per-case QMind selections instead of calling live 
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
 ```
 
-That mode requires all four per-case QMind artifacts to exist and validate.
+That mode requires all five per-case QMind artifacts to exist and validate.
 
 ### Random Approach selector
 
@@ -173,7 +175,7 @@ python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/onlin
 
 `run-expected-recall-matrix.py` runs a single expected-oracle comparison matrix across the four benchmark methods: Traditional Approach (Full Suite), Random Approach, History + Code Change Approach, and Quantik Mind. It loads the canonical 51-test library, infers the Quantik Mind selection size from the selected-test file, builds deterministic baseline selections, and reports expected defect recall and execution reduction.
 
-This runner uses `expected_detecting_tests` from the oracle. OB-001 through OB-004 are still planned scenarios, so this output is useful for pipeline validation only and must not be presented as validated benchmark results.
+This runner uses `expected_detecting_tests` from the oracle. The final comparison path uses per-case validated oracle entries for OB-001 through OB-005; the expected runner is retained for pipeline validation only and must not be presented as the final benchmark result.
 
 Example:
 

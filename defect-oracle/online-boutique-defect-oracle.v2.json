@@ -7,6 +7,8 @@
     {
       "id": "OB-001",
       "name": "Checkout Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "affected_domain": "Checkout page and checkout frontend flow",
       "affected_service": "frontend",
       "scenario_ref": "benchmark/scenario-ob001",
@@ -36,6 +38,8 @@
     {
       "id": "OB-002",
       "name": "Cart Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "affected_domain": "Cart service and add-to-cart flow",
       "affected_service": "cartservice",
       "scenario_ref": "benchmark/scenario-ob002",
@@ -63,6 +67,8 @@
     {
       "id": "OB-003",
       "name": "Product Detail Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "affected_domain": "Product catalog service and product detail pages",
       "affected_service": "productcatalogservice",
       "scenario_ref": "benchmark/scenario-ob003",
@@ -108,6 +114,8 @@
     {
       "id": "OB-004",
       "name": "Payment Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "affected_domain": "Payment authorization and checkout/payment integration",
       "affected_service": "paymentservice",
       "scenario_ref": "benchmark/scenario-ob004",
@@ -133,6 +141,47 @@
         "External scenario commit b7ecc963 on benchmark/scenario-ob004.",
         "The implementation changes src/paymentservice/charge.js so paymentservice Charge always fails.",
         "The previous benchmark suite exposed a real coverage gap: payment failures could occur without an assertion confirming successful payment completion."
+      ]
+    },
+    {
+      "id": "OB-005",
+      "name": "Currency Data Corruption",
+      "category": "runtime-aware",
+      "signal_type": "runtime",
+      "affected_domain": "Currency service conversion and homepage price rendering",
+      "affected_service": "currencyservice",
+      "scenario_ref": "runtime-scenarios/ob-005-currency-data-corruption",
+      "expected_detecting_tests": [
+        "smoke-homepage-loads",
+        "homepage-body-is-not-empty",
+        "homepage-title-is-available",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-has-multiple-links"
+      ],
+      "validated_detecting_tests": [
+        "smoke-homepage-loads",
+        "homepage-body-is-not-empty",
+        "homepage-title-is-available",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-has-multiple-links"
+      ],
+      "expected_unaffected_tests": [
+        "checkout-tests-without-homepage-rendering",
+        "cart-tests-without-homepage-rendering",
+        "payment-tests-without-homepage-rendering",
+        "product-detail-tests-opened-directly"
+      ],
+      "validated_at": "2026-06-12",
+      "validation_status": "validated-runtime-oracle",
+      "severity": "high",
+      "notes": [
+        "The defect corrupts the real committed file src/currencyservice/data/currency_conversion.json.",
+        "The changed file is data, not application code.",
+        "The direct oracle contains only homepage tests that observe failed or invalid homepage rendering.",
+        "History + Code Change has no runtime input and scores these homepage tests from frontend mapping plus medium criticality only.",
+        "QMind detection for this scenario must come from runtime observability, especially elevated currencyservice and frontend error rates under standard traffic."
       ]
     }
   ]

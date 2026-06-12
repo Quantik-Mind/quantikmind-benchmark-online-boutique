@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 if (-not [string]::IsNullOrWhiteSpace($Scenario)) {
     $caseId = $Scenario.ToUpperInvariant()
     if ($caseId -notmatch "^OB-\d{3}$") {
-        throw "Scenario must look like OB-001, OB-002, OB-003, or OB-004. Found: $Scenario"
+        throw "Scenario must look like OB-001 through OB-005. Found: $Scenario"
     }
     $caseLower = $caseId.ToLowerInvariant()
     if ([string]::IsNullOrWhiteSpace($Selection)) {
@@ -22,7 +22,7 @@ if (-not [string]::IsNullOrWhiteSpace($Scenario)) {
     }
 } else {
     if ([string]::IsNullOrWhiteSpace($Selection)) {
-        throw "Selection is required when Scenario is not provided. Prefer -Scenario OB-001 through OB-004 for benchmark-case evaluation."
+        throw "Selection is required when Scenario is not provided. Prefer -Scenario OB-001 through OB-005 for benchmark-case evaluation."
     }
     if ([string]::IsNullOrWhiteSpace($Output)) {
         throw "Output is required when Scenario is not provided."

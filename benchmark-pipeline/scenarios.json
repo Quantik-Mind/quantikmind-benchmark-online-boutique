@@ -3,6 +3,8 @@
     {
       "id": "OB-001",
       "name": "Checkout Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "description": "Checkout form rendering regresses after a product is added to the cart while homepage, catalog, product detail, and basic cart access remain healthy.",
       "target_domain": "Checkout page and checkout frontend flow",
       "target_service": "frontend",
@@ -43,6 +45,8 @@
     {
       "id": "OB-002",
       "name": "Cart Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "description": "Adding a product to the cart fails deterministically, creating a cart-centered signal that also affects checkout and order flows dependent on cart state.",
       "target_domain": "Cart service and add-to-cart flow",
       "target_service": "cartservice",
@@ -89,6 +93,8 @@
     {
       "id": "OB-003",
       "name": "Product Detail Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "description": "Product detail lookup for valid product IDs fails or returns unusable data while homepage product listing remains intact.",
       "target_domain": "Product catalog service and product detail pages",
       "target_service": "productcatalogservice",
@@ -138,6 +144,8 @@
     {
       "id": "OB-004",
       "name": "Payment Regression",
+      "category": "code-change",
+      "signal_type": "code-change",
       "description": "Valid Visa or Mastercard payments are rejected while cart, checkout form rendering, shipping quote, and product browsing remain healthy.",
       "target_domain": "Payment authorization and checkout/payment integration",
       "target_service": "paymentservice",
@@ -172,6 +180,53 @@
         "Implementation changed src/paymentservice/charge.js so paymentservice Charge always fails.",
         "This scenario intentionally has a narrow signal and depends heavily on a payment-aware successful order assertion.",
         "Payment validation has date-sensitive logic, so tests should avoid relying on expiration edge cases."
+      ]
+    },
+    {
+      "id": "OB-005",
+      "name": "Currency Data Corruption",
+      "category": "runtime-aware",
+      "signal_type": "runtime",
+      "description": "Currency conversion data is corrupted so homepage price rendering fails under standard traffic while the code-change context points only at currencyservice data.",
+      "target_domain": "Currency service conversion and homepage price rendering",
+      "target_service": "currencyservice",
+      "external_repo": "microservices-demo",
+      "baseline_ref": "benchmark-baseline",
+      "scenario_ref": "runtime-scenarios/ob-005-currency-data-corruption",
+      "expected_changed_files": [
+        "src/currencyservice/data/currency_conversion.json"
+      ],
+      "defect_behavior": [
+        "The USD exchange rate is corrupted or zeroed in src/currencyservice/data/currency_conversion.json.",
+        "currencyservice conversion fails or returns invalid output for homepage price rendering.",
+        "frontend homepage rendering fails or returns an invalid page under standard traffic."
+      ],
+      "signal_breadth": "runtime-cross-service",
+      "expected_runtime_effect": [
+        "currencyservice error rate increases under standard traffic.",
+        "frontend error rate increases under standard traffic."
+      ],
+      "expected_user_visible_effect": "Homepage fails to load correctly.",
+      "expected_detecting_tests": [
+        "smoke-homepage-loads",
+        "homepage-body-is-not-empty",
+        "homepage-title-is-available",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-has-multiple-links"
+      ],
+      "expected_unaffected_tests": [
+        "checkout-tests-without-homepage-rendering",
+        "cart-tests-without-homepage-rendering",
+        "payment-tests-without-homepage-rendering",
+        "product-detail-tests-opened-directly"
+      ],
+      "validation_status": "validated-runtime-oracle",
+      "notes": [
+        "OB-005 is the first runtime-aware scenario and uses the real committed Online Boutique file src/currencyservice/data/currency_conversion.json.",
+        "History + Code Change receives only the currency data changed-file context; it does not receive runtime metrics or oracle detecting tests.",
+        "The oracle uses direct homepage tests only.",
+        "QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates, not from oracle leakage."
       ]
     }
   ]

@@ -129,7 +129,7 @@ $caseId = $null
 if (-not [string]::IsNullOrWhiteSpace($BenchmarkCase)) {
     $caseId = $BenchmarkCase.ToUpperInvariant()
     if ($caseId -notmatch "^OB-\d{3}$") {
-        throw "BenchmarkCase must look like OB-001, OB-002, OB-003, or OB-004. Found: $BenchmarkCase"
+        throw "BenchmarkCase must look like OB-001 through OB-005. Found: $BenchmarkCase"
     }
     if (-not (Test-Path -LiteralPath $Scenarios -PathType Leaf)) {
         throw "Missing scenarios file: $Scenarios"
@@ -158,11 +158,11 @@ if (-not [string]::IsNullOrWhiteSpace($BenchmarkCase)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($SelectionOutput)) {
-    throw "SelectionOutput is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-004 for benchmark reproduction."
+    throw "SelectionOutput is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-005 for benchmark reproduction."
 }
 
 if ([string]::IsNullOrWhiteSpace($ChangedFilesFile)) {
-    throw "ChangedFilesFile is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-004 for benchmark reproduction."
+    throw "ChangedFilesFile is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-005 for benchmark reproduction."
 }
 
 $envValues = Read-DotEnv -Path $EnvFile
