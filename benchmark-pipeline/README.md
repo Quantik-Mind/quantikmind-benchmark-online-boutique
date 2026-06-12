@@ -9,8 +9,7 @@ Run these scripts from the repository root after copying `.env.example` to `.env
 .\benchmark-pipeline\sync-library.ps1
 .\benchmark-pipeline\import-history.ps1
 .\benchmark-pipeline\configure-observability.ps1
-.\benchmark-pipeline\run-qmind-subset.ps1
-.\benchmark-pipeline\evaluate-qmind.ps1
+.\benchmark-pipeline\generate-final-comparison.ps1
 ```
 
 `setup-qmind.ps1` writes `qmind.yaml` from `qmind.example.yaml` with environment placeholders preserved, so secrets stay in `.env` and are not committed. The setup command prints the API key as `<redacted>`.
@@ -27,19 +26,20 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 
 `configure-observability.ps1` applies `qmind-config/observability-online-boutique.example.yaml` with Prometheus and runs `qmind observability status`.
 
-`run-qmind-subset.ps1` executes:
+`generate-final-comparison.ps1` is the main benchmark entry point. In normal mode it invokes `run-qmind-subset.ps1` once per benchmark case, derives changed files from `benchmark-pipeline/scenarios.json`, writes per-case QMind selections, evaluates every method against the matching case oracle, and regenerates the final comparison artifacts.
+
+`run-qmind-subset.ps1` can also be run directly for debugging a single QMind changed-files subset:
 
 ```powershell
-qmind subset --changed-files-file benchmark-runs/scenario-ob004-changed-files.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-001 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-002 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-003 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-004 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json
 ```
 
-It writes normalized canonical IDs to `benchmark-runs/qmind-online-boutique/qmind-current-selection.json` without a UTF-8 BOM and fails if `payment-order-completion-confirms-success` is missing.
+It writes normalized canonical IDs without a UTF-8 BOM and validates them against `qmind-test-library/online-boutique-playwright-51.json`. For OB-004 it fails if `payment-order-completion-confirms-success` is missing.
 
-`evaluate-qmind.ps1` writes `benchmark-results/final-comparison/qmind-current-evaluation.json` and validates:
-
-- `selected_test_count = 15`
-- `defect_recall = 1.0`
-- `detected_scenarios_count = 4`
+`evaluate-qmind.ps1` writes a QMind evaluation JSON. Pass `-Scenario OB-001` to evaluate one benchmark case.
 
 Use `-DryRun` on the QMind-facing scripts to inspect the command path without contacting the API. Dry runs warn when `.env` still contains placeholders.
 
@@ -57,7 +57,7 @@ The helper writes Playwright reports under `benchmark-runs/baseline-validation` 
 
 ## Scenario-aware defect recall evaluator
 
-`evaluate-defect-recall.py` evaluates whether a selected test set detects the benchmark defect scenarios described by the defect oracle. It reports defect recall, execution reduction, and per-scenario detection details.
+`evaluate-defect-recall.py` evaluates whether a selected test set detects the benchmark defect scenarios described by the defect oracle. It reports defect recall, execution reduction, and per-scenario detection details. Pass `--scenario OB-001` to score one benchmark case at a time after selection.
 
 Example:
 
@@ -65,30 +65,17 @@ Example:
 python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/qmind-online-boutique/selected-tests-51.json --method qmind --use-validated --library-api benchmark-runs/qmind-online-boutique/library-api-51.json
 ```
 
-The selected tests input can be a JSON object with `selected_tests`, a JSON array of test IDs, or a qmind-like object containing selected test objects with identifiers such as `id`, `test_id`, `name`, or `title`. Test identifiers are normalized to strings. If selected tests are numeric qmind backend/API IDs, pass `--library-api` so the evaluator can map each numeric `id` to its canonical `test_id`; otherwise it fails with `Missing library API mapping for qmind numeric IDs.` rather than reporting a misleading 0% recall.
+The selected tests input can be a JSON object with `selected_tests`, a JSON array of test IDs, or a qmind-like object containing selected test objects with identifiers such as `id`, `test_id`, `name`, or `title`. Test identifiers are normalized to canonical strings before scoring.
 
 ### Normalizing qmind subset output
 
-`normalize-qmind-selection.py` converts raw qmind subset output into the canonical `selected_tests` JSON consumed by the benchmark comparator. It accepts JSON output and raw whitespace-separated numeric qmind IDs.
+`normalize-qmind-selection.py` converts raw qmind subset output into the canonical `selected_tests` JSON consumed by the benchmark comparator.
 
 ```powershell
 python benchmark-pipeline/normalize-qmind-selection.py `
   benchmark-runs/qmind-online-boutique/qmind-subset-51-raw.txt `
   benchmark-runs/qmind-online-boutique/selected-tests-51.json `
   --library-api benchmark-runs/qmind-online-boutique/library-api-51.json
-```
-
-The library API/export mapping must contain entries with `id` and `test_id`, for example:
-
-```json
-{
-  "data": [
-    {
-      "id": 33686,
-      "test_id": "checkout-form-fields-visible"
-    }
-  ]
-}
 ```
 
 Until scenario validation is completed, the evaluator uses `expected_detecting_tests` from the oracle by default. Pass `--use-validated` to evaluate against `validated_detecting_tests` once those fields have been populated.
@@ -115,10 +102,10 @@ Use these four method names when publishing benchmark output:
    - Executes the full 51-test suite.
    - Baseline for maximum defect recall and zero execution reduction.
 2. Random Approach
-   - Selects the same number of tests as Quantik Mind, but randomly with a deterministic seed.
+   - Selects 26 tests, approximately 50% of the 51-test suite, with deterministic seed 42.
    - Used as placebo/control.
 3. History + Code Change Approach
-   - Deterministic baseline based on historical risk and changed-code/domain matching.
+   - Deterministic baseline based on historical risk metadata and changed-file matching.
    - Represents classic test intelligence without runtime signals or adaptive entanglement.
 4. Quantik Mind
    - Uses history, code change context, runtime signals, and adaptive entanglement.
@@ -133,9 +120,26 @@ Machine-readable method slugs are `full-suite`, `random`, `history-code-change`,
 .\benchmark-pipeline\generate-final-comparison.ps1
 ```
 
-It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/final-benchmark-comparison.md`, the full-suite evaluation, the deterministic random baseline, the per-scenario History + Code Change selections/evaluations for OB-001 through OB-004, and the QMind evaluation from `benchmark-runs/qmind-online-boutique/qmind-current-selection.json`.
+It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/final-benchmark-comparison.md`, aggregate method evaluations, and per-case Full Suite, Random, History + Code Change, and QMind scoring artifacts for OB-001 through OB-004.
 
-The generator uses the current QMind selection size as the comparison size for random and History + Code Change baselines. It fails if expected artifacts are missing or if the QMind evaluation is not exactly 15 selected tests, 4 detected scenarios, and 100.0% defect recall.
+The generator treats OB-001 through OB-004 as benchmark cases. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
+
+QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates:
+
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json`
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json`
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json`
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json`
+
+It fails clearly if QMind configuration is missing, the CLI is unavailable, the API is unreachable, observability is not configured, or the library/project state is not synced. It also fails if a QMind selection contains non-canonical test IDs, or if the OB-004 QMind selection does not include `payment-order-completion-confirms-success`.
+
+To reuse previously generated per-case QMind selections instead of calling live QMind:
+
+```powershell
+.\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
+```
+
+That mode requires all four per-case QMind artifacts to exist and validate.
 
 ### Random Approach selector
 
@@ -147,10 +151,10 @@ python benchmark-pipeline/select-random-approach.py --library qmind-test-library
 
 ### History + Code Change Approach selector
 
-`select-history-code-change-approach.py` scores tests using transparent deterministic rules: high-risk ID keywords, historical criticality metadata, changed-code/domain matching, and optional scenario-specific boosts from the oracle and scenario metadata.
+`select-history-code-change-approach.py` scores tests using transparent deterministic rules: high-risk ID keywords, historical criticality metadata, changed-file tokens, and code-mapping overlap. It does not read the defect oracle; the `--oracle` option is retained only as deprecated compatibility input and is ignored.
 
 ```powershell
-python benchmark-pipeline/select-history-code-change-approach.py --library qmind-test-library/online-boutique-playwright-51.json --oracle defect-oracle/online-boutique-defect-oracle.v2.json --scenarios benchmark-pipeline/scenarios.json --size 11 --scenario OB-001
+python benchmark-pipeline/select-history-code-change-approach.py --library qmind-test-library/online-boutique-playwright-51.json --scenarios benchmark-pipeline/scenarios.json --size 15 --scenario OB-001
 ```
 
 ### Evaluating selector output
@@ -158,11 +162,11 @@ python benchmark-pipeline/select-history-code-change-approach.py --library qmind
 Write selector output to a file with `--output`, then pass that file to `evaluate-defect-recall.py`.
 
 ```powershell
-python benchmark-pipeline/select-random-approach.py --size 11 --seed 42 --output benchmark-runs/random-selection.json
-python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/random-selection.json --method random
+python benchmark-pipeline/select-random-approach.py --size 26 --seed 42 --benchmark-case OB-001 --output benchmark-runs/random-ob-001-selection.json
+python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/random-ob-001-selection.json --method random --scenario OB-001 --use-validated
 
 python benchmark-pipeline/select-history-code-change-approach.py --size 11 --scenario OB-001 --output benchmark-runs/history-code-change-ob-001-selection.json
-python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/history-code-change-ob-001-selection.json --method history-code-change
+python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/online-boutique-defect-oracle.v2.json --selected benchmark-runs/history-code-change-ob-001-selection.json --method history-code-change --scenario OB-001 --use-validated
 ```
 
 ## Expected recall matrix runner

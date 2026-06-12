@@ -1,0 +1,43 @@
+{
+  "method": "random",
+  "method_label": "Random Approach",
+  "selection_size": 26,
+  "seed": 42,
+  "benchmark_case": "OB-001",
+  "source_library": "qmind-test-library\\online-boutique-playwright-51.json",
+  "selector_inputs": {
+    "uses_test_library": true,
+    "uses_history": false,
+    "uses_changed_files": false,
+    "uses_oracle": false,
+    "uses_runtime": false
+  },
+  "selected_tests": [
+    "cart-add-from-product-detail-shows-cart-context",
+    "cart-add-product-and-view-cart",
+    "cart-link-is-reachable-from-homepage",
+    "cart-page-has-cart-context",
+    "cart-page-is-accessible",
+    "cart-page-loads-without-product",
+    "catalog-open-first-product-detail",
+    "catalog-product-detail-can-be-opened-twice",
+    "catalog-product-detail-has-price",
+    "catalog-product-link-href-starts-with-product",
+    "checkout-form-fields-visible",
+    "checkout-page-does-not-crash-with-empty-cart",
+    "frontend-page-loads-under-basic-navigation",
+    "frontend-products-have-prices",
+    "homepage-body-is-not-empty",
+    "homepage-has-at-least-one-product-link",
+    "homepage-has-visible-text-content",
+    "homepage-title-is-available",
+    "navigation-cart-to-home",
+    "order-flow-does-not-complete-with-empty-data",
+    "payment-order-completion-confirms-success",
+    "product-detail-page-has-add-to-cart-button",
+    "product-detail-page-has-non-empty-body",
+    "product-detail-page-has-price",
+    "product-detail-refresh-keeps-content",
+    "smoke-product-links-visible"
+  ]
+}

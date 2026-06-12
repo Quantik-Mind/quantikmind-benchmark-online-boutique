@@ -1,8 +1,11 @@
 param(
     [string]$EnvFile = ".env",
-    [string]$ChangedFilesFile = "benchmark-runs/scenario-ob004-changed-files.json",
+    [string]$BenchmarkCase,
+    [string]$Scenarios = "benchmark-pipeline/scenarios.json",
+    [string]$ChangedFilesFile,
     [string]$RunDir = "benchmark-runs/qmind-online-boutique",
-    [string]$SelectionOutput = "benchmark-runs/qmind-online-boutique/qmind-current-selection.json",
+    [string]$SelectionOutput,
+    [string]$Library = "qmind-test-library/online-boutique-playwright-51.json",
     [string]$LibraryApi,
     [switch]$DryRun
 )
@@ -56,12 +59,119 @@ function Write-TextUtf8NoBom {
     [System.IO.File]::WriteAllText((Join-Path (Get-Location) $Path), $Text, $encoding)
 }
 
+function Assert-ChangedFilesArray {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing changed-files file after write: $Path"
+    }
+
+    try {
+        $raw = Get-Content -LiteralPath $Path -Raw
+        $parsed = $raw | ConvertFrom-Json
+    } catch {
+        throw "Changed files file must contain valid JSON: $Path"
+    }
+
+    if ($null -eq $parsed) {
+        throw "Changed files file must contain a JSON array of paths: $Path"
+    }
+
+    if ($parsed -is [System.Management.Automation.PSCustomObject]) {
+        throw "Changed files file must contain a JSON array of paths, not an object: $Path"
+    }
+
+    $items = @($parsed)
+
+    if ($items.Count -eq 0) {
+        throw "Changed files file must contain at least one path: $Path"
+    }
+
+    foreach ($item in $items) {
+        if ($item -isnot [string] -or [string]::IsNullOrWhiteSpace($item)) {
+            throw "Changed files file must contain only non-empty string paths: $Path"
+        }
+    }
+}
+
+function Get-TestId {
+    param([object]$Test)
+
+    foreach ($key in @("test_id", "id", "name", "title")) {
+        if ($null -ne $Test.$key -and -not [string]::IsNullOrWhiteSpace([string]$Test.$key)) {
+            return [string]$Test.$key
+        }
+    }
+    return $null
+}
+
+function Get-CanonicalLibraryIds {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Missing canonical test library for QMind validation: $Path"
+    }
+
+    $libraryData = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+    $tests = @($libraryData.tests)
+    if ($tests.Count -eq 0) {
+        throw "Canonical test library has no tests: $Path"
+    }
+
+    $ids = @($tests | ForEach-Object { Get-TestId $_ } | Where-Object { $_ } | Sort-Object -Unique)
+    if ($ids.Count -eq 0) {
+        throw "Canonical test library has no canonical test IDs: $Path"
+    }
+    return $ids
+}
+
+$caseId = $null
+if (-not [string]::IsNullOrWhiteSpace($BenchmarkCase)) {
+    $caseId = $BenchmarkCase.ToUpperInvariant()
+    if ($caseId -notmatch "^OB-\d{3}$") {
+        throw "BenchmarkCase must look like OB-001, OB-002, OB-003, or OB-004. Found: $BenchmarkCase"
+    }
+    if (-not (Test-Path -LiteralPath $Scenarios -PathType Leaf)) {
+        throw "Missing scenarios file: $Scenarios"
+    }
+
+    $scenarioData = Get-Content -LiteralPath $Scenarios -Raw | ConvertFrom-Json
+    $scenario = @($scenarioData.scenarios | Where-Object { [string]$_.id -eq $caseId })
+    if ($scenario.Count -ne 1) {
+        throw "Benchmark case $caseId not found in $Scenarios"
+    }
+
+    $changedFiles = @($scenario[0].expected_changed_files | ForEach-Object { [string]$_ })
+    if ($changedFiles.Count -eq 0) {
+        throw "Benchmark case $caseId has no expected_changed_files in $Scenarios"
+    }
+
+    $caseSlug = $caseId.ToLowerInvariant()
+    $ChangedFilesFile = "benchmark-runs/scenario-$caseSlug-changed-files.json"
+    if ([string]::IsNullOrWhiteSpace($SelectionOutput)) {
+        $SelectionOutput = Join-Path $RunDir "qmind-selection-$caseSlug.json"
+    }
+
+    $changedFilesPayload = ConvertTo-Json -InputObject @($changedFiles) -Depth 5
+    Write-TextUtf8NoBom -Path $ChangedFilesFile -Text ($changedFilesPayload + [Environment]::NewLine)
+    Assert-ChangedFilesArray -Path $ChangedFilesFile
+}
+
+if ([string]::IsNullOrWhiteSpace($SelectionOutput)) {
+    throw "SelectionOutput is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-004 for benchmark reproduction."
+}
+
+if ([string]::IsNullOrWhiteSpace($ChangedFilesFile)) {
+    throw "ChangedFilesFile is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-004 for benchmark reproduction."
+}
+
 $envValues = Read-DotEnv -Path $EnvFile
 Assert-QmindConfig -Values $envValues
 
 if (-not (Test-Path -LiteralPath $ChangedFilesFile -PathType Leaf)) {
     throw "Missing changed-files scenario input: $ChangedFilesFile"
 }
+Assert-ChangedFilesArray -Path $ChangedFilesFile
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
 $rawOutput = Join-Path $RunDir "qmind-subset-current.txt"
 $args = @("subset", "--changed-files-file", $ChangedFilesFile)
@@ -76,8 +186,13 @@ if (-not (Get-Command qmind -ErrorAction SilentlyContinue)) {
     throw "qmind CLI was not found on PATH. Install or activate the Quantik Mind CLI, then rerun this script."
 }
 
+$ErrorActionPreferenceBefore = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+
 $output = & qmind @args 2>&1
 $exitCode = $LASTEXITCODE
+
+$ErrorActionPreference = $ErrorActionPreferenceBefore
 $text = ($output | Out-String)
 Write-TextUtf8NoBom -Path $rawOutput -Text $text
 Write-Host $text
@@ -107,13 +222,24 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $selection = Get-Content -LiteralPath $SelectionOutput -Raw | ConvertFrom-Json
-if ($selection.selected_tests -notcontains "payment-order-completion-confirms-success") {
+$canonicalIds = @(Get-CanonicalLibraryIds $Library)
+$selectedTests = @($selection.selected_tests | ForEach-Object { [string]$_ })
+if ($selectedTests.Count -eq 0) {
+    throw "QMind selection did not contain selected_tests after normalization: $SelectionOutput"
+}
+$unknown = @($selectedTests | Where-Object { $canonicalIds -notcontains $_ })
+if ($unknown.Count -gt 0) {
+    throw "QMind selection contains non-canonical test IDs: $($unknown -join ', ')"
+}
+if ($caseId -eq "OB-004" -and $selection.selected_tests -notcontains "payment-order-completion-confirms-success") {
     throw "QMind selection is missing required detector: payment-order-completion-confirms-success"
 }
 
 $canonicalPayload = @{
     method = "qmind"
-    selected_tests = @($selection.selected_tests | Sort-Object)
+    benchmark_case = $caseId
+    changed_files_file = $ChangedFilesFile
+    selected_tests = @($selectedTests | Sort-Object)
 } | ConvertTo-Json -Depth 5
 Write-TextUtf8NoBom -Path $SelectionOutput -Text ($canonicalPayload + [Environment]::NewLine)
 

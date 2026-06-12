@@ -1,0 +1,23 @@
+{
+  "method": "random",
+  "benchmark_case": "OB-002",
+  "full_suite_size": 51,
+  "selected_test_count": 26,
+  "execution_reduction": 0.4901960784313726,
+  "total_scenarios": 1,
+  "detected_scenarios_count": 0,
+  "missed_scenarios_count": 1,
+  "defect_recall": 0.0,
+  "per_scenario": [
+    {
+      "id": "OB-002",
+      "name": "Cart Regression",
+      "detected": false,
+      "selected_detecting_tests": [],
+      "detecting_tests_used": [
+        "cart-add-from-product-detail-keeps-price-context"
+      ],
+      "validation_status": "validated"
+    }
+  ]
+}

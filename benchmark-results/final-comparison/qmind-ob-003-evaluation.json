@@ -1,5 +1,5 @@
 {
-  "method": "history-code-change",
+  "method": "qmind",
   "benchmark_case": "OB-003",
   "full_suite_size": 51,
   "selected_test_count": 15,
@@ -16,9 +16,9 @@
       "selected_detecting_tests": [
         "catalog-first-product-opens-detail-page",
         "catalog-open-first-product-detail",
-        "catalog-product-detail-can-be-opened-twice",
-        "catalog-product-detail-has-price",
-        "catalog-product-detail-keeps-product-context"
+        "catalog-product-detail-keeps-product-context",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-price"
       ],
       "detecting_tests_used": [
         "catalog-first-product-opens-detail-page",

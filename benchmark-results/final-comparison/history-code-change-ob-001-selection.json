@@ -2,22 +2,35 @@
   "method": "history-code-change",
   "method_label": "History + Code Change Approach",
   "selection_size": 15,
-  "scenario": "OB-001",
+  "benchmark_case": "OB-001",
   "source_library": "qmind-test-library\\online-boutique-playwright-51.json",
-  "source_oracle": "defect-oracle\\online-boutique-defect-oracle.v2.json",
   "source_scenarios": "benchmark-pipeline\\scenarios.json",
+  "selector_inputs": {
+    "uses_test_library": true,
+    "uses_history": true,
+    "uses_changed_files": true,
+    "uses_oracle": false,
+    "uses_runtime": false
+  },
+  "case_context": {
+    "id": "OB-001",
+    "expected_changed_files": [
+      "src/frontend/templates/cart.html",
+      "src/frontend/handlers.go"
+    ]
+  },
   "selected_tests": [
-    "checkout-page-accessible-from-cart",
-    "checkout-form-fields-visible",
-    "order-form-requires-payment-data",
     "frontend-basic-user-journey-home-product-cart",
-    "order-complete-happy-path",
-    "frontend-homepage-has-product-grid",
-    "checkout-empty-cart-does-not-complete-order",
-    "checkout-page-does-not-crash-with-empty-cart",
-    "frontend-products-have-prices",
-    "frontend-static-assets-do-not-break-homepage",
     "cart-add-from-product-detail-keeps-price-context",
+    "checkout-empty-cart-does-not-complete-order",
+    "frontend-homepage-has-product-grid",
+    "frontend-products-have-prices",
+    "checkout-page-accessible-from-cart",
+    "checkout-page-does-not-crash-with-empty-cart",
+    "frontend-logo-or-home-link-visible",
+    "frontend-page-has-navigation-links",
+    "frontend-page-loads-under-basic-navigation",
+    "frontend-static-assets-do-not-break-homepage",
     "cart-add-from-product-detail-shows-cart-context",
     "cart-add-product-and-view-cart",
     "cart-add-product-from-detail-page",
@@ -25,302 +38,77 @@
   ],
   "scores": [
     {
-      "test_id": "checkout-page-accessible-from-cart",
-      "score": 225,
-      "reasons": [
-        "high-risk id keyword match: cart, checkout",
-        "historical risk criticality: high",
-        "scenario oracle expected detecting test",
-        "scenario id token match: access, cart, checkout",
-        "scenario metadata token match: access, cart, checkout, service"
-      ]
-    },
-    {
-      "test_id": "checkout-form-fields-visible",
-      "score": 205,
-      "reasons": [
-        "high-risk id keyword match: checkout",
-        "historical risk criticality: high",
-        "scenario oracle expected detecting test",
-        "scenario id token match: checkout, fields, form",
-        "scenario metadata token match: checkout, fields, form, service"
-      ]
-    },
-    {
-      "test_id": "order-form-requires-payment-data",
-      "score": 190,
-      "reasons": [
-        "high-risk id keyword match: order, payment",
-        "historical risk criticality: high",
-        "scenario oracle expected detecting test",
-        "scenario id token match: form",
-        "scenario metadata token match: checkout, form, service"
-      ]
-    },
-    {
       "test_id": "frontend-basic-user-journey-home-product-cart",
-      "score": 175,
+      "score": 135,
       "reasons": [
         "high-risk id keyword match: cart, frontend, product",
         "historical risk criticality: medium",
-        "scenario id token match: basic, cart, frontend, product",
-        "scenario metadata token match: basic, cart, frontend, product",
-        "changed-code mapping match: frontend"
-      ]
-    },
-    {
-      "test_id": "order-complete-happy-path",
-      "score": 150,
-      "reasons": [
-        "high-risk id keyword match: order",
-        "historical risk criticality: high",
-        "scenario oracle expected detecting test",
-        "scenario metadata token match: checkout, service"
-      ]
-    },
-    {
-      "test_id": "frontend-homepage-has-product-grid",
-      "score": 135,
-      "reasons": [
-        "high-risk id keyword match: frontend, product",
-        "historical risk criticality: medium",
-        "scenario id token match: frontend, homepage, product",
-        "scenario metadata token match: frontend, homepage, product",
-        "changed-code mapping match: frontend"
-      ]
-    },
-    {
-      "test_id": "checkout-empty-cart-does-not-complete-order",
-      "score": 125,
-      "reasons": [
-        "high-risk id keyword match: cart, checkout, order",
-        "historical risk criticality: high",
-        "scenario id token match: cart, checkout",
-        "scenario metadata token match: cart, checkout, service"
-      ]
-    },
-    {
-      "test_id": "checkout-page-does-not-crash-with-empty-cart",
-      "score": 125,
-      "reasons": [
-        "high-risk id keyword match: cart, checkout",
-        "historical risk criticality: high",
-        "scenario id token match: cart, checkout, crash",
-        "scenario metadata token match: cart, checkout, crash, service"
-      ]
-    },
-    {
-      "test_id": "frontend-products-have-prices",
-      "score": 115,
-      "reasons": [
-        "high-risk id keyword match: frontend, product",
-        "historical risk criticality: medium",
-        "scenario id token match: frontend, product",
-        "scenario metadata token match: frontend, product",
-        "changed-code mapping match: frontend"
-      ]
-    },
-    {
-      "test_id": "frontend-static-assets-do-not-break-homepage",
-      "score": 115,
-      "reasons": [
-        "high-risk id keyword match: frontend",
-        "historical risk criticality: medium",
-        "scenario id token match: break, frontend, homepage",
-        "scenario metadata token match: break, frontend, homepage",
+        "scenario id token match: cart, frontend",
+        "scenario metadata token match: cart, frontend",
         "changed-code mapping match: frontend"
       ]
     },
     {
       "test_id": "cart-add-from-product-detail-keeps-price-context",
-      "score": 95,
+      "score": 100,
       "reasons": [
         "high-risk id keyword match: cart, product",
         "historical risk criticality: medium",
-        "scenario id token match: cart, product",
-        "scenario metadata token match: cart, product, service"
-      ]
-    },
-    {
-      "test_id": "cart-add-from-product-detail-shows-cart-context",
-      "score": 95,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium",
-        "scenario id token match: cart, product",
-        "scenario metadata token match: cart, product, service"
-      ]
-    },
-    {
-      "test_id": "cart-add-product-and-view-cart",
-      "score": 95,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium",
-        "scenario id token match: cart, product",
-        "scenario metadata token match: cart, product, service"
-      ]
-    },
-    {
-      "test_id": "cart-add-product-from-detail-page",
-      "score": 95,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium",
-        "scenario id token match: cart, product",
-        "scenario metadata token match: cart, product, service"
-      ]
-    },
-    {
-      "test_id": "cart-page-loads-without-product",
-      "score": 95,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium",
-        "scenario id token match: cart, product",
-        "scenario metadata token match: cart, product, service"
-      ]
-    },
-    {
-      "test_id": "frontend-page-loads-under-basic-navigation",
-      "score": 95,
-      "reasons": [
-        "high-risk id keyword match: frontend",
-        "historical risk criticality: medium",
-        "scenario id token match: basic, frontend",
-        "scenario metadata token match: basic, frontend",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart, frontend",
         "changed-code mapping match: frontend"
       ]
     },
     {
-      "test_id": "product-detail-page-has-add-to-cart-button",
+      "test_id": "checkout-empty-cart-does-not-complete-order",
+      "score": 100,
+      "reasons": [
+        "high-risk id keyword match: cart, checkout, order",
+        "historical risk criticality: high",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
+      ]
+    },
+    {
+      "test_id": "frontend-homepage-has-product-grid",
       "score": 95,
       "reasons": [
-        "high-risk id keyword match: cart, product",
+        "high-risk id keyword match: frontend, product",
         "historical risk criticality: medium",
-        "scenario id token match: cart, product",
-        "scenario metadata token match: cart, product, service"
+        "scenario id token match: frontend",
+        "scenario metadata token match: frontend",
+        "changed-code mapping match: frontend"
       ]
     },
     {
-      "test_id": "cart-link-is-reachable-from-homepage",
-      "score": 85,
+      "test_id": "frontend-products-have-prices",
+      "score": 95,
       "reasons": [
-        "high-risk id keyword match: cart",
-        "historical risk criticality: high",
-        "scenario id token match: cart, homepage",
-        "scenario metadata token match: cart, homepage, service"
+        "high-risk id keyword match: frontend, product",
+        "historical risk criticality: medium",
+        "scenario id token match: frontend",
+        "scenario metadata token match: frontend",
+        "changed-code mapping match: frontend"
       ]
     },
     {
-      "test_id": "cart-page-is-accessible",
-      "score": 85,
-      "reasons": [
-        "high-risk id keyword match: cart",
-        "historical risk criticality: high",
-        "scenario id token match: access, cart",
-        "scenario metadata token match: access, cart, service"
-      ]
-    },
-    {
-      "test_id": "smoke-product-links-visible",
+      "test_id": "checkout-page-accessible-from-cart",
       "score": 80,
       "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: frontend, product",
-        "changed-code mapping match: frontend"
+        "high-risk id keyword match: cart, checkout",
+        "historical risk criticality: high",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
       ]
     },
     {
-      "test_id": "catalog-first-product-link-has-valid-href",
-      "score": 75,
+      "test_id": "checkout-page-does-not-crash-with-empty-cart",
+      "score": 80,
       "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-first-product-opens-detail-page",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-multiple-products-visible",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-open-first-product-detail",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-product-detail-can-be-opened-twice",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-product-detail-has-price",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-product-detail-keeps-product-context",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-product-link-href-starts-with-product",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
-      ]
-    },
-    {
-      "test_id": "catalog-two-product-links-visible-if-present",
-      "score": 75,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
+        "high-risk id keyword match: cart, checkout",
+        "historical risk criticality: high",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
       ]
     },
     {
@@ -346,202 +134,375 @@
       ]
     },
     {
-      "test_id": "homepage-contains-product-price",
+      "test_id": "frontend-page-loads-under-basic-navigation",
       "score": 75,
       "reasons": [
-        "high-risk id keyword match: product",
+        "high-risk id keyword match: frontend",
         "historical risk criticality: medium",
-        "scenario id token match: homepage, product",
-        "scenario metadata token match: homepage, product, service"
+        "scenario id token match: frontend",
+        "scenario metadata token match: frontend",
+        "changed-code mapping match: frontend"
       ]
     },
     {
-      "test_id": "homepage-has-at-least-one-product-link",
+      "test_id": "frontend-static-assets-do-not-break-homepage",
       "score": 75,
       "reasons": [
-        "high-risk id keyword match: product",
+        "high-risk id keyword match: frontend",
         "historical risk criticality: medium",
-        "scenario id token match: homepage, product",
-        "scenario metadata token match: homepage, product, service"
+        "scenario id token match: frontend",
+        "scenario metadata token match: frontend",
+        "changed-code mapping match: frontend"
       ]
     },
     {
-      "test_id": "order-flow-does-not-complete-with-empty-data",
+      "test_id": "cart-add-from-product-detail-shows-cart-context",
       "score": 70,
       "reasons": [
-        "high-risk id keyword match: order",
-        "historical risk criticality: high",
-        "scenario id token match: flow",
-        "scenario metadata token match: checkout, flow, service"
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
       ]
     },
     {
-      "test_id": "payment-order-completion-confirms-success",
+      "test_id": "cart-add-product-and-view-cart",
       "score": 70,
       "reasons": [
-        "high-risk id keyword match: order, payment",
-        "historical risk criticality: high",
-        "scenario metadata token match: checkout, service"
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
+      ]
+    },
+    {
+      "test_id": "cart-add-product-from-detail-page",
+      "score": 70,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
+      ]
+    },
+    {
+      "test_id": "cart-page-loads-without-product",
+      "score": 70,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
+      ]
+    },
+    {
+      "test_id": "product-detail-page-has-add-to-cart-button",
+      "score": 70,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
       ]
     },
     {
       "test_id": "cart-empty-page-shows-cart-context",
-      "score": 65,
+      "score": 60,
       "reasons": [
         "high-risk id keyword match: cart",
         "historical risk criticality: high",
         "scenario id token match: cart",
-        "scenario metadata token match: cart, service"
+        "scenario metadata token match: cart"
+      ]
+    },
+    {
+      "test_id": "cart-link-is-reachable-from-homepage",
+      "score": 60,
+      "reasons": [
+        "high-risk id keyword match: cart",
+        "historical risk criticality: high",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
       ]
     },
     {
       "test_id": "cart-page-has-cart-context",
-      "score": 65,
+      "score": 60,
       "reasons": [
         "high-risk id keyword match: cart",
         "historical risk criticality: high",
         "scenario id token match: cart",
-        "scenario metadata token match: cart, service"
+        "scenario metadata token match: cart"
+      ]
+    },
+    {
+      "test_id": "cart-page-is-accessible",
+      "score": 60,
+      "reasons": [
+        "high-risk id keyword match: cart",
+        "historical risk criticality: high",
+        "scenario id token match: cart",
+        "scenario metadata token match: cart"
       ]
     },
     {
       "test_id": "cart-survives-home-navigation",
-      "score": 65,
+      "score": 60,
       "reasons": [
         "high-risk id keyword match: cart",
         "historical risk criticality: high",
         "scenario id token match: cart",
-        "scenario metadata token match: cart, service"
+        "scenario metadata token match: cart"
       ]
     },
     {
       "test_id": "navigation-cart-to-home",
-      "score": 65,
+      "score": 60,
       "reasons": [
         "high-risk id keyword match: cart",
         "historical risk criticality: high",
         "scenario id token match: cart",
-        "scenario metadata token match: cart, service"
+        "scenario metadata token match: cart"
+      ]
+    },
+    {
+      "test_id": "order-form-requires-payment-data",
+      "score": 60,
+      "reasons": [
+        "high-risk id keyword match: order, payment",
+        "historical risk criticality: high"
+      ]
+    },
+    {
+      "test_id": "payment-order-completion-confirms-success",
+      "score": 60,
+      "reasons": [
+        "high-risk id keyword match: order, payment",
+        "historical risk criticality: high"
+      ]
+    },
+    {
+      "test_id": "smoke-product-links-visible",
+      "score": 60,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario metadata token match: frontend",
+        "changed-code mapping match: frontend"
+      ]
+    },
+    {
+      "test_id": "catalog-first-product-link-has-valid-href",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-first-product-opens-detail-page",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-multiple-products-visible",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-open-first-product-detail",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-product-detail-can-be-opened-twice",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-product-detail-has-price",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-product-detail-keeps-product-context",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-product-link-href-starts-with-product",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "catalog-two-product-links-visible-if-present",
+      "score": 50,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "checkout-form-fields-visible",
+      "score": 40,
+      "reasons": [
+        "high-risk id keyword match: checkout",
+        "historical risk criticality: high"
       ]
     },
     {
       "test_id": "homepage-body-is-not-empty",
-      "score": 60,
+      "score": 40,
       "reasons": [
         "historical risk criticality: medium",
-        "scenario id token match: homepage",
-        "scenario metadata token match: frontend, homepage",
+        "scenario metadata token match: frontend",
         "changed-code mapping match: frontend"
       ]
     },
     {
       "test_id": "homepage-has-multiple-links",
-      "score": 60,
+      "score": 40,
       "reasons": [
         "historical risk criticality: medium",
-        "scenario id token match: homepage",
-        "scenario metadata token match: frontend, homepage",
+        "scenario metadata token match: frontend",
         "changed-code mapping match: frontend"
       ]
     },
     {
       "test_id": "homepage-has-visible-text-content",
-      "score": 60,
+      "score": 40,
       "reasons": [
         "historical risk criticality: medium",
-        "scenario id token match: homepage",
-        "scenario metadata token match: frontend, homepage",
+        "scenario metadata token match: frontend",
         "changed-code mapping match: frontend"
       ]
     },
     {
       "test_id": "homepage-shows-google-cloud-branding",
-      "score": 60,
+      "score": 40,
       "reasons": [
         "historical risk criticality: medium",
-        "scenario id token match: homepage",
-        "scenario metadata token match: frontend, homepage",
+        "scenario metadata token match: frontend",
         "changed-code mapping match: frontend"
       ]
     },
     {
       "test_id": "homepage-title-is-available",
-      "score": 60,
+      "score": 40,
       "reasons": [
         "historical risk criticality: medium",
-        "scenario id token match: homepage",
-        "scenario metadata token match: frontend, homepage",
+        "scenario metadata token match: frontend",
         "changed-code mapping match: frontend"
+      ]
+    },
+    {
+      "test_id": "order-complete-happy-path",
+      "score": 40,
+      "reasons": [
+        "high-risk id keyword match: order",
+        "historical risk criticality: high"
+      ]
+    },
+    {
+      "test_id": "order-flow-does-not-complete-with-empty-data",
+      "score": 40,
+      "reasons": [
+        "high-risk id keyword match: order",
+        "historical risk criticality: high"
       ]
     },
     {
       "test_id": "smoke-homepage-loads",
-      "score": 60,
+      "score": 40,
       "reasons": [
         "historical risk criticality: medium",
-        "scenario id token match: homepage",
-        "scenario metadata token match: frontend, homepage",
+        "scenario metadata token match: frontend",
         "changed-code mapping match: frontend"
       ]
     },
     {
-      "test_id": "navigation-home-to-product-to-home",
-      "score": 55,
+      "test_id": "homepage-contains-product-price",
+      "score": 30,
       "reasons": [
         "high-risk id keyword match: product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "homepage-has-at-least-one-product-link",
+      "score": 30,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "navigation-home-to-product-to-home",
+      "score": 30,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium"
       ]
     },
     {
       "test_id": "product-detail-allows-return-navigation",
-      "score": 55,
+      "score": 30,
       "reasons": [
         "high-risk id keyword match: product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
+        "historical risk criticality: medium"
       ]
     },
     {
       "test_id": "product-detail-page-has-body-content",
-      "score": 55,
+      "score": 30,
       "reasons": [
         "high-risk id keyword match: product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
+        "historical risk criticality: medium"
       ]
     },
     {
       "test_id": "product-detail-page-has-non-empty-body",
-      "score": 55,
+      "score": 30,
       "reasons": [
         "high-risk id keyword match: product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
+        "historical risk criticality: medium"
       ]
     },
     {
       "test_id": "product-detail-page-has-price",
-      "score": 55,
+      "score": 30,
       "reasons": [
         "high-risk id keyword match: product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
+        "historical risk criticality: medium"
       ]
     },
     {
       "test_id": "product-detail-refresh-keeps-content",
-      "score": 55,
+      "score": 30,
       "reasons": [
         "high-risk id keyword match: product",
-        "historical risk criticality: medium",
-        "scenario id token match: product",
-        "scenario metadata token match: product, service"
+        "historical risk criticality: medium"
       ]
     }
   ]

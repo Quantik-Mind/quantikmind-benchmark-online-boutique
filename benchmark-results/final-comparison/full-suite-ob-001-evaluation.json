@@ -1,9 +1,9 @@
 {
-  "method": "history-code-change",
+  "method": "full-suite",
   "benchmark_case": "OB-001",
   "full_suite_size": 51,
-  "selected_test_count": 15,
-  "execution_reduction": 0.7058823529411764,
+  "selected_test_count": 51,
+  "execution_reduction": 0.0,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
@@ -14,6 +14,7 @@
       "name": "Checkout Regression",
       "detected": true,
       "selected_detecting_tests": [
+        "checkout-form-fields-visible",
         "checkout-page-accessible-from-cart"
       ],
       "detecting_tests_used": [

@@ -1,5 +1,6 @@
 {
   "method": "full-suite",
+  "benchmark_case": null,
   "full_suite_size": 51,
   "selected_test_count": 51,
   "execution_reduction": 0.0,
@@ -14,15 +15,11 @@
       "detected": true,
       "selected_detecting_tests": [
         "checkout-form-fields-visible",
-        "checkout-page-accessible-from-cart",
-        "order-complete-happy-path",
-        "order-form-requires-payment-data"
+        "checkout-page-accessible-from-cart"
       ],
       "detecting_tests_used": [
         "checkout-form-fields-visible",
-        "checkout-page-accessible-from-cart",
-        "order-complete-happy-path",
-        "order-form-requires-payment-data"
+        "checkout-page-accessible-from-cart"
       ],
       "validation_status": "validated"
     },
@@ -31,18 +28,10 @@
       "name": "Cart Regression",
       "detected": true,
       "selected_detecting_tests": [
-        "cart-add-from-product-detail-keeps-price-context",
-        "checkout-form-fields-visible",
-        "checkout-page-accessible-from-cart",
-        "order-complete-happy-path",
-        "order-form-requires-payment-data"
+        "cart-add-from-product-detail-keeps-price-context"
       ],
       "detecting_tests_used": [
-        "cart-add-from-product-detail-keeps-price-context",
-        "checkout-form-fields-visible",
-        "checkout-page-accessible-from-cart",
-        "order-complete-happy-path",
-        "order-form-requires-payment-data"
+        "cart-add-from-product-detail-keeps-price-context"
       ],
       "validation_status": "validated"
     },
@@ -51,44 +40,22 @@
       "name": "Product Detail Regression",
       "detected": true,
       "selected_detecting_tests": [
-        "cart-add-from-product-detail-keeps-price-context",
-        "cart-add-from-product-detail-shows-cart-context",
-        "cart-add-product-and-view-cart",
-        "cart-add-product-from-detail-page",
-        "cart-survives-home-navigation",
         "catalog-first-product-opens-detail-page",
         "catalog-open-first-product-detail",
         "catalog-product-detail-can-be-opened-twice",
         "catalog-product-detail-has-price",
         "catalog-product-detail-keeps-product-context",
-        "checkout-form-fields-visible",
-        "checkout-page-accessible-from-cart",
-        "frontend-basic-user-journey-home-product-cart",
-        "navigation-home-to-product-to-home",
-        "order-complete-happy-path",
-        "order-form-requires-payment-data",
         "product-detail-page-has-add-to-cart-button",
         "product-detail-page-has-non-empty-body",
         "product-detail-page-has-price",
         "product-detail-refresh-keeps-content"
       ],
       "detecting_tests_used": [
-        "cart-add-from-product-detail-keeps-price-context",
-        "cart-add-from-product-detail-shows-cart-context",
-        "cart-add-product-and-view-cart",
-        "cart-add-product-from-detail-page",
-        "cart-survives-home-navigation",
         "catalog-first-product-opens-detail-page",
         "catalog-open-first-product-detail",
         "catalog-product-detail-can-be-opened-twice",
         "catalog-product-detail-has-price",
         "catalog-product-detail-keeps-product-context",
-        "checkout-form-fields-visible",
-        "checkout-page-accessible-from-cart",
-        "frontend-basic-user-journey-home-product-cart",
-        "navigation-home-to-product-to-home",
-        "order-complete-happy-path",
-        "order-form-requires-payment-data",
         "product-detail-page-has-add-to-cart-button",
         "product-detail-page-has-non-empty-body",
         "product-detail-page-has-price",

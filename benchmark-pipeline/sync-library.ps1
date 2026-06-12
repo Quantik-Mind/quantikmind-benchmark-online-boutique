@@ -98,6 +98,8 @@ if (-not (Get-Command qmind -ErrorAction SilentlyContinue)) {
     throw "qmind CLI was not found on PATH. Install or activate the Quantik Mind CLI, then rerun this script."
 }
 
+$env:PYTHONIOENCODING = "utf-8"
+$env:PYTHONUTF8 = "1"
 $output = & qmind @args 2>&1
 $exitCode = $LASTEXITCODE
 $text = ($output | Out-String)

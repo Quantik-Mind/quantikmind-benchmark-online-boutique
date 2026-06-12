@@ -24,6 +24,7 @@ SELECTION_FIELDS = (
 )
 NESTED_SELECTION_FIELDS = ("data", "result", "selection", "payload")
 NUMERIC_ID_PATTERN = re.compile(r"^\d+$")
+CANONICAL_TEXT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 
 
 def parse_args() -> argparse.Namespace:
@@ -64,8 +65,17 @@ def read_raw_selection(path: Path) -> Any:
         tokens = raw_text.split()
         if tokens and all(NUMERIC_ID_PATTERN.fullmatch(token) for token in tokens):
             return tokens
+        for line in raw_text.splitlines():
+            line_tokens = line.strip().split()
+            if (
+                line_tokens
+                and all(CANONICAL_TEXT_ID_PATTERN.fullmatch(token) for token in line_tokens)
+                and any("-" in token for token in line_tokens)
+            ):
+                return line_tokens
         raise SystemExit(
-            "Could not parse qmind output as JSON or whitespace-separated numeric IDs."
+            "Could not parse qmind output as JSON, whitespace-separated numeric IDs, "
+            "or whitespace-separated canonical test IDs."
         )
 
 
@@ -123,7 +133,8 @@ def extract_selected_tests(raw: Any) -> list[str]:
     if isinstance(raw, dict):
         return selected_tests_from_object(raw)
     raise SystemExit(
-        "qmind selection must be JSON array, JSON object, or whitespace-separated numeric IDs."
+        "qmind selection must be JSON array, JSON object, whitespace-separated numeric IDs, "
+        "or whitespace-separated canonical test IDs."
     )
 
 
