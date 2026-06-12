@@ -1,5 +1,48 @@
 # Benchmark Pipeline
 
+## QMind CLI reproducibility
+
+Run these scripts from the repository root after copying `.env.example` to `.env` and filling in `QMIND_API_URL`, `QMIND_API_KEY`, and `QMIND_PROJECT_ID`.
+
+```powershell
+.\benchmark-pipeline\setup-qmind.ps1
+.\benchmark-pipeline\sync-library.ps1
+.\benchmark-pipeline\import-history.ps1
+.\benchmark-pipeline\configure-observability.ps1
+.\benchmark-pipeline\run-qmind-subset.ps1
+.\benchmark-pipeline\evaluate-qmind.ps1
+```
+
+`setup-qmind.ps1` writes `qmind.yaml` from `qmind.example.yaml` with environment placeholders preserved, so secrets stay in `.env` and are not committed. The setup command prints the API key as `<redacted>`.
+
+`sync-library.ps1` syncs `qmind-test-library/online-boutique-playwright-51.json` and validates that it contains the expected 51 tests before invoking the CLI.
+
+`import-history.ps1` uses the existing synthetic history generators:
+
+- `generate-synthetic-history-junit.py`
+- `generate-targeted-entanglement-history.py`
+- `generate-entangled-history-json.py`
+
+It then attempts `qmind history import --file <artifact>`. If your installed CLI exposes history import through a different command, run `import-history.ps1 -GenerateOnly` and import the generated XML/JSON artifacts from `benchmark-runs/qmind-online-boutique/` manually.
+
+`configure-observability.ps1` applies `qmind-config/observability-online-boutique.example.yaml` with Prometheus and runs `qmind observability status`.
+
+`run-qmind-subset.ps1` executes:
+
+```powershell
+qmind subset --changed-files-file benchmark-runs/scenario-ob004-changed-files.json
+```
+
+It writes normalized canonical IDs to `benchmark-runs/qmind-online-boutique/qmind-current-selection.json` without a UTF-8 BOM and fails if `payment-order-completion-confirms-success` is missing.
+
+`evaluate-qmind.ps1` writes `benchmark-results/final-comparison/qmind-current-evaluation.json` and validates:
+
+- `selected_test_count = 15`
+- `defect_recall = 1.0`
+- `detected_scenarios_count = 4`
+
+Use `-DryRun` on the QMind-facing scripts to inspect the command path without contacting the API. Dry runs warn when `.env` still contains placeholders.
+
 ## Baseline validation
 
 Baseline validation runs the full canonical 51-test Playwright suite against a clean Online Boutique deployment before defect scenarios are implemented. This verifies that the test harness and deployed application are stable before any scenario-specific failures are used as benchmark evidence.
@@ -141,4 +184,11 @@ python -m py_compile benchmark-pipeline/select-random-approach.py
 python -m py_compile benchmark-pipeline/select-history-code-change-approach.py
 python -m py_compile benchmark-pipeline/run-expected-recall-matrix.py
 python -m py_compile benchmark-pipeline/normalize-qmind-selection.py benchmark-pipeline/evaluate-defect-recall.py
+foreach ($file in Get-ChildItem benchmark-pipeline -Filter *.ps1) {
+  $tokens = $null
+  $errors = $null
+  [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+  if ($errors.Count -gt 0) { throw "$($file.Name) has parser errors" }
+}
+python -m json.tool benchmark-results/final-comparison/final-comparison.json
 ```
