@@ -183,6 +183,47 @@
         "History + Code Change has no runtime input and scores these homepage tests from frontend mapping plus medium criticality only.",
         "QMind detection for this scenario must come from runtime observability, especially elevated currencyservice and frontend error rates under standard traffic."
       ]
+    },
+    {
+      "id": "OB-006",
+      "name": "Ad Service Latency Cascades Into Homepage Rendering",
+      "category": "combined-signal",
+      "signal_type": "code-change + runtime",
+      "affected_domain": "Ad service dependency and frontend homepage rendering",
+      "affected_service": "adservice",
+      "scenario_ref": "runtime-scenarios/ob-006-adservice-latency-cascade",
+      "expected_detecting_tests": [
+        "smoke-homepage-loads",
+        "homepage-body-is-not-empty",
+        "homepage-title-is-available",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-has-multiple-links"
+      ],
+      "validated_detecting_tests": [
+        "smoke-homepage-loads",
+        "homepage-body-is-not-empty",
+        "homepage-title-is-available",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-has-multiple-links"
+      ],
+      "expected_unaffected_tests": [
+        "checkout-tests-without-homepage-rendering",
+        "cart-tests-without-homepage-rendering",
+        "payment-tests-without-homepage-rendering",
+        "product-detail-tests-opened-directly"
+      ],
+      "validated_at": "2026-06-12",
+      "validation_status": "validated-combined-oracle",
+      "severity": "high",
+      "notes": [
+        "The defect is injected into the real upstream file src/adservice/src/main/java/hipstershop/AdService.java.",
+        "The direct oracle contains only homepage tests that observe frontend-visible homepage latency or rendering failure.",
+        "History + Code Change has no runtime input and no direct adservice tests in the canonical 51-test library.",
+        "QMind detection for this scenario must come from combined code-change and runtime observability: adservice degradation plus frontend impact under standard homepage traffic.",
+        "The oracle must be re-confirmed from a full-suite run against benchmark/scenario-ob006 before publishing externally if the upstream Online Boutique adservice/frontend dependency behavior changes."
+      ]
     }
   ]
 }
