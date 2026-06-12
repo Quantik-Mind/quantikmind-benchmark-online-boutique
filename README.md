@@ -205,6 +205,11 @@ Copy-Item qmind.example.yaml qmind.yaml
 The canonical test library is `qmind-test-library/online-boutique-playwright-51.json`.
 
 The final comparison result is `benchmark-results/final-comparison/final-comparison.json`.
+Regenerate it, the supporting evaluations, and `docs/final-benchmark-comparison.md` from committed inputs with:
+
+```powershell
+.\benchmark-pipeline\generate-final-comparison.ps1
+```
 
 Evaluation helpers and runbook details live in `benchmark-pipeline/README.md`.
 

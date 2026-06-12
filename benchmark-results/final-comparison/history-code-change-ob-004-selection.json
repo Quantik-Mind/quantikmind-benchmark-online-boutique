@@ -1,7 +1,7 @@
 {
   "method": "history-code-change",
   "method_label": "History + Code Change Approach",
-  "selection_size": 22,
+  "selection_size": 15,
   "scenario": "OB-004",
   "source_library": "qmind-test-library\\online-boutique-playwright-51.json",
   "source_oracle": "defect-oracle\\online-boutique-defect-oracle.v2.json",
@@ -21,14 +21,7 @@
     "catalog-first-product-link-has-valid-href",
     "product-detail-page-has-add-to-cart-button",
     "checkout-form-fields-visible",
-    "catalog-first-product-opens-detail-page",
-    "catalog-multiple-products-visible",
-    "catalog-open-first-product-detail",
-    "catalog-product-detail-can-be-opened-twice",
-    "catalog-product-detail-has-price",
-    "catalog-product-detail-keeps-product-context",
-    "catalog-product-link-href-starts-with-product",
-    "catalog-two-product-links-visible-if-present"
+    "catalog-first-product-opens-detail-page"
   ],
   "scores": [
     {

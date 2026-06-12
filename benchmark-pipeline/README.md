@@ -125,6 +125,18 @@ Use these four method names when publishing benchmark output:
 
 Machine-readable method slugs are `full-suite`, `random`, `history-code-change`, and `qmind`.
 
+### Final comparison generator
+
+`generate-final-comparison.ps1` regenerates the published final comparison artifacts from committed inputs:
+
+```powershell
+.\benchmark-pipeline\generate-final-comparison.ps1
+```
+
+It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/final-benchmark-comparison.md`, the full-suite evaluation, the deterministic random baseline, the per-scenario History + Code Change selections/evaluations for OB-001 through OB-004, and the QMind evaluation from `benchmark-runs/qmind-online-boutique/qmind-current-selection.json`.
+
+The generator uses the current QMind selection size as the comparison size for random and History + Code Change baselines. It fails if expected artifacts are missing or if the QMind evaluation is not exactly 15 selected tests, 4 detected scenarios, and 100.0% defect recall.
+
 ### Random Approach selector
 
 `select-random-approach.py` selects a deterministic random subset from the canonical 51-test library. Pass `--size` directly, or use `--same-size-as` to match an existing selected-test JSON such as a Quantik Mind selection.
