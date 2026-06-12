@@ -8,15 +8,30 @@ scrape_configs:
       - targets:
           - prometheus:9090
 
-  # TODO(PR 2): Replace or extend these targets when the local Online Boutique
-  # compose stack is pinned in this repository. These names match the intended
-  # benchmark compose network aliases and will work once those services expose
-  # Prometheus-compatible metrics endpoints.
-  - job_name: online-boutique
-    metrics_path: /metrics
+  - job_name: blackbox-exporter
     static_configs:
       - targets:
-          - online-boutique-frontend:8080
-          - loadgenerator:8089
+          - blackbox-exporter:9115
+
+  - job_name: online-boutique-probes
+    metrics_path: /probe
+    params:
+      module:
+        - http_2xx
+    static_configs:
+      - targets:
+          - http://online-boutique-frontend:8080/
+          - http://online-boutique-frontend:8080/product/OLJCESPC7Z
+          - http://online-boutique-frontend:8080/cart
         labels:
           namespace: default
+          deployment: frontend
+    relabel_configs:
+      - source_labels:
+          - __address__
+        target_label: __param_target
+      - source_labels:
+          - __param_target
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
