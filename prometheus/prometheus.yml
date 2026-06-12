@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - prometheus:9090
+
+  # TODO(PR 2): Replace or extend these targets when the local Online Boutique
+  # compose stack is pinned in this repository. These names match the intended
+  # benchmark compose network aliases and will work once those services expose
+  # Prometheus-compatible metrics endpoints.
+  - job_name: online-boutique
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - online-boutique-frontend:8080
+          - loadgenerator:8089
+        labels:
+          namespace: default

@@ -1,13 +1,17 @@
 services:
   qmind-runner:
-    build:
-      context: .
-      dockerfile: benchmark-runners/qmind/Dockerfile
+    image: python:3.12-slim
     volumes:
       - .:/workspace
       - ./qmind-home:/root/.qmind
-      - /mnt/c/Users/massi/QCE/quantikmind-platform/quantikmind-cli:/opt/quantikmind-cli:ro
     working_dir: /workspace
-    entrypoint: ["/workspace/benchmark-pipeline/run-with-qmind.sh"]
+    command:
+      - sh
+      - -lc
+      - |
+        echo "This legacy qmind compose service is now a placeholder."
+        echo "Use docker-compose.benchmark.yml for the reproducibility stack."
+        echo "PR 2 should pin a packaged qmind CLI image or install path."
+        sleep infinity
     environment:
       QMIND_HOME: /root/.qmind

@@ -27,6 +27,7 @@ Thumbs.db
 # Local env
 .env
 .env.*
+!.env.example
 qmind-home/
 
 # Local Git metadata backups

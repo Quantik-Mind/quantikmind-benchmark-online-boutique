@@ -1,0 +1,59 @@
+name: quantikmind-online-boutique-benchmark
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - benchmark
+
+  playwright-runner:
+    image: mcr.microsoft.com/playwright:v1.60.0-jammy
+    profiles:
+      - tools
+    working_dir: /workspace/qmind-test-harness/playwright
+    environment:
+      FRONTEND_URL: ${ONLINE_BOUTIQUE_FRONTEND_URL:-http://online-boutique-frontend:8080}
+    volumes:
+      - .:/workspace
+    networks:
+      - benchmark
+    command: ["sh", "-lc", "npm ci && npx playwright test --list"]
+
+  qmind-runner:
+    image: python:3.12-slim
+    profiles:
+      - qmind
+    working_dir: /workspace
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      QMIND_HOME: /workspace/qmind-home
+    volumes:
+      - .:/workspace
+    networks:
+      - benchmark
+    command:
+      - sh
+      - -lc
+      - |
+        echo "qmind-runner is a placeholder until the Quantik Mind CLI package or image is pinned."
+        echo "For now, install/run qmind on the host and use qmind.example.yaml plus the README flow."
+        sleep infinity
+
+networks:
+  benchmark:
+    name: qmind-online-boutique-benchmark
+
+volumes:
+  prometheus-data:

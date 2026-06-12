@@ -1,7 +1,7 @@
 observability:
   provider: prometheus
-  profile_name: online-boutique-linkerd
-  url: "http://192.168.1.43:19090"
+  profile_name: online-boutique-local
+  prometheus_url: http://prometheus:9090
   namespace: default
   service_label: deployment
 
