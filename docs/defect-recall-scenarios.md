@@ -128,13 +128,14 @@ The Playwright suite under `qmind-test-harness/playwright/tests` currently conta
 
 ## 4. Scenario Catalog
 
-The benchmark uses five independent defect scenarios:
+The benchmark uses six independent defect scenarios:
 
 - `OB-001 Checkout Regression`
 - `OB-002 Cart Regression`
 - `OB-003 Product Detail Regression`
 - `OB-004 Payment Regression`
 - `OB-005 Currency Data Corruption`
+- `OB-006 Ad Service Latency Cascades Into Homepage Rendering`
 
 Each scenario should be represented by a separate branch or tag in the external Online Boutique repository. Each scenario should contain exactly one intentionally introduced defect.
 
@@ -359,6 +360,23 @@ The direct oracle is limited to homepage tests:
 
 This scenario demonstrates a class of defects that code-change-only selection cannot reach structurally. History + Code Change sees `src/currencyservice/data/currency_conversion.json`; the direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and do not contain high-risk ID keywords. Their score is therefore only 10, below the top-15 checkout/cart/order/payment/product/catalog-heavy tests. QMind should detect OB-005 only through runtime observability, not oracle leakage.
 
+### OB-006 Ad Service Latency Cascades Into Homepage Rendering
+
+OB-006 is the first combined-signal scenario. It injects deterministic latency or failure into the upstream Online Boutique file `src/adservice/src/main/java/hipstershop/AdService.java`.
+
+The code-change signal points to `adservice`, but the direct user-visible failure is frontend homepage rendering. The scenario is defensible only when runtime evidence shows both sides of the cascade: elevated adservice latency and/or errors, plus elevated frontend latency and/or homepage rendering failure during the same traffic window.
+
+The direct oracle is limited to homepage tests:
+
+- `smoke-homepage-loads`
+- `homepage-body-is-not-empty`
+- `homepage-title-is-available`
+- `homepage-has-visible-text-content`
+- `homepage-shows-google-cloud-branding`
+- `homepage-has-multiple-links`
+
+History + Code Change sees `src/adservice/src/main/java/hipstershop/AdService.java`, but the canonical 51-test library has no direct adservice tests. The homepage smoke tests have medium criticality and do not map to adservice, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. QMind should detect OB-006 only by combining the adservice code-change context with runtime observability showing frontend impact.
+
 ## 6. External Online Boutique Branch/Tag Strategy
 
 Use Git states in the external Online Boutique repository as the reproducibility model.
@@ -390,7 +408,7 @@ Scenario branches should not stack defects on top of each other.
 
 ## 7. Defect Oracle Strategy
 
-The current oracle has evolved from generic service defects into scenario-specific entries for `OB-001` through `OB-005`.
+The current oracle has evolved from generic service defects into scenario-specific entries for `OB-001` through `OB-006`.
 
 Each scenario entry should include:
 

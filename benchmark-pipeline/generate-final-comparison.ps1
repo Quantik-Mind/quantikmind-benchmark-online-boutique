@@ -18,7 +18,7 @@ $ErrorActionPreference = "Stop"
 $FinalComparison = Join-Path $OutputDir "final-comparison.json"
 $FinalComparisonDoc = "docs/final-benchmark-comparison.md"
 $FullSuiteEvaluation = Join-Path $OutputDir "full-suite-evaluation.json"
-$CaseIds = @("OB-001", "OB-002", "OB-003", "OB-004", "OB-005")
+$CaseIds = @("OB-001", "OB-002", "OB-003", "OB-004", "OB-005", "OB-006")
 
 function Resolve-ParentPath {
     param([string]$Path)
@@ -135,6 +135,7 @@ function Get-CategoryLabel {
     switch ($Category) {
         "code-change" { return "Code Change" }
         "runtime-aware" { return "Runtime Aware" }
+        "combined-signal" { return "Combined Signal" }
         "overall" { return "Overall" }
         default { return $Category }
     }
@@ -530,7 +531,7 @@ $aggregateMethods = @(
 )
 
 $categorySummaries = @()
-foreach ($category in @("code-change", "runtime-aware")) {
+foreach ($category in @("code-change", "runtime-aware", "combined-signal")) {
     $categoryCases = @($caseResults | Where-Object { [string]$_.category -eq $category })
     if ($categoryCases.Count -gt 0) {
         $categorySummaries += New-CategorySummary $category $categoryCases
@@ -540,7 +541,7 @@ $categorySummaries += New-CategorySummary "overall" $caseResults
 
 $comparison = [ordered]@{
     benchmark = "online-boutique-defect-recall"
-    run_id = "final-comparison-005"
+    run_id = "final-comparison-006"
     comparison_status = "measured"
     methodology = "benchmark-case-ci-validation"
     created_at = "2026-06-12"
@@ -623,7 +624,7 @@ $doc = @"
 
 ## Scope
 
-This comparison models Online Boutique as five independent CI/CD benchmark cases. OB-001 through OB-004 are the code-change control group. OB-005 is the first runtime-aware scenario. Each case has commit context, changed files, an injected defect, and oracle detecting tests. Selectors run before scoring and do not receive defect identity, oracle detecting tests, or expected benchmark outcomes.
+This comparison models Online Boutique as six independent CI/CD benchmark cases. OB-001 through OB-004 are the code-change control group. OB-005 is the first runtime-aware scenario. OB-006 is the first combined-signal scenario, where code change and runtime observability point to different parts of the system. Each case has commit context, changed files, an injected defect, and oracle detecting tests. Selectors run before scoring and do not receive defect identity, oracle detecting tests, or expected benchmark outcomes.
 
 - Canonical library: ``$Library``
 - Defect oracle: ``$Oracle``
@@ -632,7 +633,7 @@ This comparison models Online Boutique as five independent CI/CD benchmark cases
 - Random seed: $RandomSeed
 - Random size: $RandomSize tests
 - History + Code Change size: $TargetedSize tests per case
-- QMind selection artifacts: ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-005.json``
+- QMind selection artifacts: ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-006.json``
 - QMind selection mode: ``$($comparison.qmind_selection_mode)``
 
 ## Oracle Precision
@@ -670,9 +671,9 @@ Full Suite always selects all 51 tests.
 
 Random uses only the canonical test library and deterministic seed 42. It produces a per-case selection artifact and selects 26 tests, approximately 50% of the 51-test suite.
 
-History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is ``src/currencyservice/data/currency_conversion.json``; the six direct homepage oracle tests map to ``src/frontend/**/*``, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection.
+History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is ``src/currencyservice/data/currency_conversion.json``; the six direct homepage oracle tests map to ``src/frontend/**/*``, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is ``src/adservice/src/main/java/hipstershop/AdService.java``; the canonical 51-test library has no direct adservice tests, so the same homepage smoke tests are not reachable from code-change context alone.
 
-Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a class of defect that code-change analysis structurally cannot reach. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime signals are required.
+Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to adservice while runtime observability points to frontend homepage impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime or combined signals are required.
 
 ## Hostile-Review Defense
 
@@ -680,6 +681,8 @@ Quantik Mind uses one canonical selection artifact per benchmark case, generated
 - OB-005 uses the real committed file ``src/currencyservice/data/currency_conversion.json``.
 - The changed file is data, not application code.
 - The OB-005 oracle uses direct homepage tests only.
+- OB-006 uses the real upstream file ``src/adservice/src/main/java/hipstershop/AdService.java`` through a reversible injector.
+- The OB-006 oracle uses direct homepage tests only; there are no direct adservice tests in the canonical 51-test library.
 - The History + Code Change miss is explained by exact scoring mechanics, not hidden exclusions.
 - QMind detection must come from runtime observability, not oracle leakage.
 - The generator reports actual selected-suite outcomes; it does not hardcode winners.

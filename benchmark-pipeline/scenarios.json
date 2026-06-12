@@ -228,6 +228,55 @@
         "The oracle uses direct homepage tests only.",
         "QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates, not from oracle leakage."
       ]
+    },
+    {
+      "id": "OB-006",
+      "name": "Ad Service Latency Cascades Into Homepage Rendering",
+      "category": "combined-signal",
+      "signal_type": "code-change + runtime",
+      "description": "Ad service latency or failure is introduced in adservice code. Code change context points at adservice, while runtime observability shows the defect cascading into frontend homepage latency or rendering failure.",
+      "target_domain": "Ad service dependency and frontend homepage rendering",
+      "target_service": "adservice",
+      "external_repo": "microservices-demo",
+      "baseline_ref": "benchmark-baseline",
+      "scenario_ref": "runtime-scenarios/ob-006-adservice-latency-cascade",
+      "expected_changed_files": [
+        "src/adservice/src/main/java/hipstershop/AdService.java"
+      ],
+      "defect_behavior": [
+        "The adservice GetAds path sleeps longer than the Playwright 30s test timeout or returns a deterministic gRPC error.",
+        "The adservice degradation is visible as elevated adservice latency and/or error rate under standard homepage traffic.",
+        "The frontend homepage path degrades because homepage rendering depends on adservice responses during the request.",
+        "Catalog, cart, checkout, payment, and product detail tests that do not require homepage rendering should remain outside the direct oracle."
+      ],
+      "signal_breadth": "combined-cross-service",
+      "expected_runtime_effect": [
+        "adservice p95 latency increases sharply or adservice error rate increases under standard traffic.",
+        "frontend p95 latency increases sharply and/or frontend homepage requests fail under the same traffic window."
+      ],
+      "expected_user_visible_effect": "Homepage load or basic homepage content checks fail due to the frontend-visible adservice cascade.",
+      "expected_detecting_tests": [
+        "smoke-homepage-loads",
+        "homepage-body-is-not-empty",
+        "homepage-title-is-available",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-has-multiple-links"
+      ],
+      "expected_unaffected_tests": [
+        "checkout-tests-without-homepage-rendering",
+        "cart-tests-without-homepage-rendering",
+        "payment-tests-without-homepage-rendering",
+        "product-detail-tests-opened-directly"
+      ],
+      "validation_status": "validated-combined-oracle",
+      "notes": [
+        "OB-006 is the first combined-signal scenario: code change points to adservice, while the direct oracle is frontend homepage smoke coverage.",
+        "History + Code Change receives only the adservice changed-file context; it does not receive runtime metrics or oracle detecting tests.",
+        "The canonical library has no direct adservice tests, so code-change-only selection should not be expected to select homepage smoke tests from adservice alone.",
+        "QMind detection must come from runtime observability showing both adservice degradation and frontend impact, not from oracle leakage.",
+        "Use runtime-scenarios/ob-006-adservice-latency-cascade/apply-ob006-adservice-latency.ps1 against an external Online Boutique checkout to inject or restore the defect."
+      ]
     }
   ]
 }
