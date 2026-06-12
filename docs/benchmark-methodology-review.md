@@ -21,7 +21,7 @@ That made the History + Code Change baseline scientifically too strong: it could
 
 ## Changes Applied
 
-The benchmark now treats OB-001, OB-002, OB-003, and OB-004 as first-class benchmark cases.
+The benchmark now treats OB-001 through OB-005 as first-class benchmark cases. OB-001 through OB-004 form the code-change control group. OB-005 is the first runtime-aware case.
 
 Each case has:
 
@@ -48,6 +48,7 @@ The defect oracle was also tightened to minimal direct validated detecting tests
 - OB-002 keeps the direct cart-state detector and drops checkout/order downstream symptoms.
 - OB-003 keeps product-detail and catalog-detail detectors and drops cart, checkout, order, navigation, and broad frontend symptom tests.
 - OB-004 keeps the single payment completion detector.
+- OB-005 adds direct homepage detectors for a runtime-visible currency data corruption.
 
 This precision pass keeps the oracle defensible: a selected test receives credit only when it directly validates the affected behavior, not merely because it can fail downstream from a broader user journey.
 
@@ -59,7 +60,7 @@ For each benchmark case, the generator:
 2. Runs QMind for the same case and writes one per-case QMind selection artifact.
 3. Evaluates each selection against only that case's oracle entry.
 4. Records selected tests, execution reduction, whether the defect was detected, and case recall.
-5. Aggregates detected cases across all four benchmark cases.
+5. Aggregates detected cases across all five benchmark cases and by category.
 
 This is closer to a CI/CD workflow: a commit arrives with changed files, a selector chooses tests, then test execution and oracle validation determine whether the defect was caught.
 
@@ -94,6 +95,7 @@ QMind produces one artifact per benchmark case in normal generator mode:
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json`
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json`
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json`
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-005.json`
 
 The generator does not reuse `benchmark-runs/qmind-online-boutique/qmind-current-selection.json` for all cases. Existing per-case artifacts may be reused only with `-UseExistingQMindSelections`.
 
@@ -112,11 +114,12 @@ The final comparison uses `validated_detecting_tests` from `defect-oracle/online
 The aggregate result for each method is:
 
 - detected benchmark cases / total benchmark cases
+- detected benchmark cases / category benchmark cases
 - case recall
 - average selected tests
 - average execution reduction
 
-The current workspace cannot produce a valid aggregate comparison until live QMind configuration is available and QMind produces selections for all four benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for OB-001, OB-002, and OB-003 would make the aggregate QMind result invalid.
+Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all five benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the five per-case QMind artifacts before scoring them.
 
 ## Benchmark Limitations
 
@@ -132,13 +135,15 @@ That command requires a configured QMind CLI, synced library, imported history, 
 Missing required QMIND_API_URL in .env.
 ```
 
-After a successful normal run, the four QMind selection artifacts may be reused for reproducibility checks with:
+After a successful normal run, the five QMind selection artifacts may be reused for reproducibility checks with:
 
 ```powershell
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
 ```
 
 That mode still validates that every QMind selection contains canonical test IDs and that OB-004 includes `payment-order-completion-confirms-success`.
+
+OB-005 is intentionally different from the code-change controls. Its changed file is `src/currencyservice/data/currency_conversion.json`, while the direct oracle tests are frontend homepage tests. The History + Code Change selector therefore misses OB-005 for transparent scoring reasons, while QMind can detect it only when runtime observability surfaces the currencyservice/frontend error signal.
 
 The History + Code Change baseline is deterministic and transparent, but it is still a simplified local proxy for a Launchable or SmartTest-style service. It uses local test metadata and changed-file matching rather than a production-trained model.
 

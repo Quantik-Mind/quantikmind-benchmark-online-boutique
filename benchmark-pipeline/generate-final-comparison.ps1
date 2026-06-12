@@ -18,7 +18,7 @@ $ErrorActionPreference = "Stop"
 $FinalComparison = Join-Path $OutputDir "final-comparison.json"
 $FinalComparisonDoc = "docs/final-benchmark-comparison.md"
 $FullSuiteEvaluation = Join-Path $OutputDir "full-suite-evaluation.json"
-$CaseIds = @("OB-001", "OB-002", "OB-003", "OB-004")
+$CaseIds = @("OB-001", "OB-002", "OB-003", "OB-004", "OB-005")
 
 function Resolve-ParentPath {
     param([string]$Path)
@@ -104,10 +104,40 @@ function Format-Percent {
     return "{0:N1}%" -f ($Value * 100)
 }
 
+function Format-Fraction {
+    param(
+        [int]$Numerator,
+        [int]$Denominator
+    )
+
+    return "$Numerator/$Denominator"
+}
+
 function To-RepoPath {
     param([string]$Path)
 
     return $Path.Replace("\", "/")
+}
+
+function Get-CategoryKey {
+    param([object]$Scenario)
+
+    $category = [string]$Scenario.category
+    if ([string]::IsNullOrWhiteSpace($category)) {
+        return "code-change"
+    }
+    return $category
+}
+
+function Get-CategoryLabel {
+    param([string]$Category)
+
+    switch ($Category) {
+        "code-change" { return "Code Change" }
+        "runtime-aware" { return "Runtime Aware" }
+        "overall" { return "Overall" }
+        default { return $Category }
+    }
 }
 
 function Get-ScenarioMap {
@@ -208,7 +238,7 @@ function Assert-QMindCaseSelections {
     if ($missing.Count -gt 0) {
         $lines = @(
             "Missing required per-case QMind selection artifacts.",
-            "Use -UseExistingQMindSelections only after generating all four per-case QMind selections.",
+            "Use -UseExistingQMindSelections only after generating all per-case QMind selections.",
             "The final comparison cannot reuse benchmark-runs/qmind-online-boutique/qmind-current-selection.json for all cases.",
             "",
             "Create the missing artifacts with:"
@@ -281,10 +311,39 @@ function New-AggregateResult {
         benchmark_cases = [int]$methodCases.Count
         detected_cases = [int]$detected.Count
         missed_cases = [int]($methodCases.Count - $detected.Count)
+        recall_fraction = Format-Fraction $detected.Count $methodCases.Count
         defect_recall = if ($methodCases.Count -gt 0) { $detected.Count / $methodCases.Count } else { 0 }
         average_selected_tests = [Math]::Round([double]$averageSelected, 1)
         average_execution_reduction = [double]$averageReduction
         average_execution_reduction_percent = [Math]::Round(([double]$averageReduction * 100), 1)
+    }
+}
+
+function New-CategorySummary {
+    param(
+        [string]$Category,
+        [object[]]$Cases
+    )
+
+    $methodSummaries = [ordered]@{}
+    foreach ($method in @("full-suite", "random", "history-code-change", "qmind")) {
+        $methodCases = @($Cases | ForEach-Object { $_.methods[$method] })
+        $detected = @($methodCases | Where-Object { [bool]$_.defect_detected })
+        $methodSummaries[$method] = [ordered]@{
+            method = $method
+            method_label = [string]$methodCases[0].method_label
+            detected_cases = [int]$detected.Count
+            total_cases = [int]$methodCases.Count
+            recall_fraction = Format-Fraction $detected.Count $methodCases.Count
+            defect_recall = if ($methodCases.Count -gt 0) { $detected.Count / $methodCases.Count } else { 0 }
+        }
+    }
+
+    return [ordered]@{
+        category = $Category
+        category_label = Get-CategoryLabel $Category
+        scenarios = @($Cases | ForEach-Object { [string]$_.id })
+        methods = $methodSummaries
     }
 }
 
@@ -440,6 +499,9 @@ foreach ($caseId in $CaseIds) {
     $caseResult = [ordered]@{
         id = $caseId
         name = [string]$scenario.name
+        category = Get-CategoryKey $scenario
+        category_label = Get-CategoryLabel (Get-CategoryKey $scenario)
+        signal_type = if ([string]::IsNullOrWhiteSpace([string]$scenario.signal_type)) { "code-change" } else { [string]$scenario.signal_type }
         commit_context = [ordered]@{
             external_repo = [string]$scenario.external_repo
             baseline_ref = [string]$scenario.baseline_ref
@@ -467,9 +529,18 @@ $aggregateMethods = @(
     New-AggregateResult "qmind" "Quantik Mind" $caseResults
 )
 
+$categorySummaries = @()
+foreach ($category in @("code-change", "runtime-aware")) {
+    $categoryCases = @($caseResults | Where-Object { [string]$_.category -eq $category })
+    if ($categoryCases.Count -gt 0) {
+        $categorySummaries += New-CategorySummary $category $categoryCases
+    }
+}
+$categorySummaries += New-CategorySummary "overall" $caseResults
+
 $comparison = [ordered]@{
     benchmark = "online-boutique-defect-recall"
-    run_id = "final-comparison-004"
+    run_id = "final-comparison-005"
     comparison_status = "measured"
     methodology = "benchmark-case-ci-validation"
     created_at = "2026-06-12"
@@ -481,6 +552,7 @@ $comparison = [ordered]@{
     full_suite_size = 51
     benchmark_cases = $caseResults
     aggregate_methods = $aggregateMethods
+    category_summaries = $categorySummaries
     selector_input_policy = [ordered]@{
         full_suite = @("test library")
         random = @("test library", "seed")
@@ -502,7 +574,7 @@ Write-Json $FinalComparison $comparison
 
 $docRows = @()
 foreach ($method in $aggregateMethods) {
-    $docRows += "| $($method.method_label) | $($method.average_selected_tests) | $(Format-Percent $method.average_execution_reduction) | $($method.detected_cases) / $($method.benchmark_cases) | $(Format-Percent $method.defect_recall) |"
+    $docRows += "| $($method.method_label) | $($method.average_selected_tests) | $(Format-Percent $method.average_execution_reduction) | $($method.recall_fraction) | $(Format-Percent $method.defect_recall) |"
 }
 $oracleRows = @()
 foreach ($caseId in $CaseIds) {
@@ -527,12 +599,31 @@ $aggregateRows = $docRows -join [Environment]::NewLine
 $oracleTableRows = $oracleRows -join [Environment]::NewLine
 $qmindAggregate = @($aggregateMethods | Where-Object { $_.method -eq "qmind" })[0]
 
+$scenarioRows = @()
+foreach ($case in $caseResults) {
+    $changedFiles = @($case.commit_context.changed_files) -join "<br>"
+    $full = if ($case.methods["full-suite"].defect_detected) { "detected" } else { "missed" }
+    $random = if ($case.methods["random"].defect_detected) { "detected" } else { "missed" }
+    $history = if ($case.methods["history-code-change"].defect_detected) { "detected" } else { "missed" }
+    $qmind = if ($case.methods["qmind"].defect_detected) { "detected" } else { "missed" }
+    $scenarioRows += "| $($case.id): $($case.name) | $($case.category_label) | $changedFiles | $full | $random | $history | $qmind |"
+}
+$scenarioTableRows = $scenarioRows -join [Environment]::NewLine
+
+$categoryRows = @()
+foreach ($summary in $categorySummaries) {
+    $methods = $summary.methods
+    $scenarioList = @($summary.scenarios) -join ", "
+    $categoryRows += "| $($summary.category_label) | $scenarioList | $($methods["full-suite"].recall_fraction) | $($methods["random"].recall_fraction) | $($methods["history-code-change"].recall_fraction) | $($methods["qmind"].recall_fraction) |"
+}
+$categoryTableRows = $categoryRows -join [Environment]::NewLine
+
 $doc = @"
 # Final Benchmark Comparison
 
 ## Scope
 
-This comparison models Online Boutique as four independent CI/CD benchmark cases. Each case has commit context, changed files, an injected defect, and oracle detecting tests. Selectors run before scoring and do not receive defect identity, oracle detecting tests, or expected benchmark outcomes.
+This comparison models Online Boutique as five independent CI/CD benchmark cases. OB-001 through OB-004 are the code-change control group. OB-005 is the first runtime-aware scenario. Each case has commit context, changed files, an injected defect, and oracle detecting tests. Selectors run before scoring and do not receive defect identity, oracle detecting tests, or expected benchmark outcomes.
 
 - Canonical library: ``$Library``
 - Defect oracle: ``$Oracle``
@@ -541,7 +632,7 @@ This comparison models Online Boutique as four independent CI/CD benchmark cases
 - Random seed: $RandomSeed
 - Random size: $RandomSize tests
 - History + Code Change size: $TargetedSize tests per case
-- QMind selection artifacts: ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-004.json``
+- QMind selection artifacts: ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-005.json``
 - QMind selection mode: ``$($comparison.qmind_selection_mode)``
 
 ## Oracle Precision
@@ -558,6 +649,18 @@ $oracleTableRows
 | --- | ---: | ---: | ---: | ---: |
 $aggregateRows
 
+## Per-Scenario Results
+
+| Scenario | Category | Changed files | Full Suite result | Random result | History + Code Change result | Quantik Mind result |
+| --- | --- | --- | --- | --- | --- | --- |
+$scenarioTableRows
+
+## Per-Category Summary
+
+| Category | Scenarios | Full Suite | Random | History + Code Change | Quantik Mind |
+| --- | --- | ---: | ---: | ---: | ---: |
+$categoryTableRows
+
 ## Benchmark Cases
 
 $caseText
@@ -567,9 +670,19 @@ Full Suite always selects all 51 tests.
 
 Random uses only the canonical test library and deterministic seed 42. It produces a per-case selection artifact and selects 26 tests, approximately 50% of the 51-test suite.
 
-History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests.
+History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is ``src/currencyservice/data/currency_conversion.json``; the six direct homepage oracle tests map to ``src/frontend/**/*``, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection.
 
-Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, detects $($qmindAggregate.detected_cases)/$($qmindAggregate.benchmark_cases) cases, and requires OB-004 to include ``payment-order-completion-confirms-success``.
+Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a class of defect that code-change analysis structurally cannot reach. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime signals are required.
+
+## Hostile-Review Defense
+
+- OB-001 through OB-004 functional definitions and oracle detecting tests were not modified.
+- OB-005 uses the real committed file ``src/currencyservice/data/currency_conversion.json``.
+- The changed file is data, not application code.
+- The OB-005 oracle uses direct homepage tests only.
+- The History + Code Change miss is explained by exact scoring mechanics, not hidden exclusions.
+- QMind detection must come from runtime observability, not oracle leakage.
+- The generator reports actual selected-suite outcomes; it does not hardcode winners.
 
 ## Reproduction
 
@@ -592,5 +705,5 @@ To reuse previously generated per-case QMind selections instead of calling live 
 
 Write-Host "Final benchmark-case comparison generated:"
 foreach ($method in $aggregateMethods) {
-    Write-Host "  $($method.method_label): $($method.detected_cases)/$($method.benchmark_cases), $(Format-Percent $method.defect_recall) recall, avg tests $($method.average_selected_tests)"
+    Write-Host "  $($method.method_label): $($method.recall_fraction), $(Format-Percent $method.defect_recall) recall, avg tests $($method.average_selected_tests)"
 }

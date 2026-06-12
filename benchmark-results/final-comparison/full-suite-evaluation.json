@@ -4,8 +4,8 @@
   "full_suite_size": 51,
   "selected_test_count": 51,
   "execution_reduction": 0.0,
-  "total_scenarios": 4,
-  "detected_scenarios_count": 4,
+  "total_scenarios": 5,
+  "detected_scenarios_count": 5,
   "missed_scenarios_count": 0,
   "defect_recall": 1.0,
   "per_scenario": [
@@ -74,6 +74,28 @@
         "payment-order-completion-confirms-success"
       ],
       "validation_status": "validated"
+    },
+    {
+      "id": "OB-005",
+      "name": "Currency Data Corruption",
+      "detected": true,
+      "selected_detecting_tests": [
+        "homepage-body-is-not-empty",
+        "homepage-has-multiple-links",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-title-is-available",
+        "smoke-homepage-loads"
+      ],
+      "detecting_tests_used": [
+        "homepage-body-is-not-empty",
+        "homepage-has-multiple-links",
+        "homepage-has-visible-text-content",
+        "homepage-shows-google-cloud-branding",
+        "homepage-title-is-available",
+        "smoke-homepage-loads"
+      ],
+      "validation_status": "validated-runtime-oracle"
     }
   ]
 }

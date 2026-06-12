@@ -128,12 +128,13 @@ The Playwright suite under `qmind-test-harness/playwright/tests` currently conta
 
 ## 4. Scenario Catalog
 
-The benchmark should use four independent defect scenarios:
+The benchmark uses five independent defect scenarios:
 
 - `OB-001 Checkout Regression`
 - `OB-002 Cart Regression`
 - `OB-003 Product Detail Regression`
 - `OB-004 Payment Regression`
+- `OB-005 Currency Data Corruption`
 
 Each scenario should be represented by a separate branch or tag in the external Online Boutique repository. Each scenario should contain exactly one intentionally introduced defect.
 
@@ -341,6 +342,23 @@ Risk notes:
 - Payment validation has date-sensitive logic, so tests should avoid relying on expiration edge cases.
 - If `payment-order-completion-confirms-success` is flaky, this scenario becomes unreliable; baseline stability matters.
 
+### OB-005 Currency Data Corruption
+
+OB-005 is the first runtime-aware scenario. It corrupts the real committed Online Boutique data file `src/currencyservice/data/currency_conversion.json` by zeroing or corrupting the USD exchange rate.
+
+The changed file is not application code. Under standard traffic, the expected runtime effect is elevated currencyservice error rate plus elevated frontend error rate because homepage price rendering depends on currency conversion. The expected user-visible effect is that the homepage fails to load correctly or renders invalid content.
+
+The direct oracle is limited to homepage tests:
+
+- `smoke-homepage-loads`
+- `homepage-body-is-not-empty`
+- `homepage-title-is-available`
+- `homepage-has-visible-text-content`
+- `homepage-shows-google-cloud-branding`
+- `homepage-has-multiple-links`
+
+This scenario demonstrates a class of defects that code-change-only selection cannot reach structurally. History + Code Change sees `src/currencyservice/data/currency_conversion.json`; the direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and do not contain high-risk ID keywords. Their score is therefore only 10, below the top-15 checkout/cart/order/payment/product/catalog-heavy tests. QMind should detect OB-005 only through runtime observability, not oracle leakage.
+
 ## 6. External Online Boutique Branch/Tag Strategy
 
 Use Git states in the external Online Boutique repository as the reproducibility model.
@@ -372,7 +390,7 @@ Scenario branches should not stack defects on top of each other.
 
 ## 7. Defect Oracle Strategy
 
-The current oracle should be evolved from generic service defects into scenario-specific entries for `OB-001` through `OB-004`.
+The current oracle has evolved from generic service defects into scenario-specific entries for `OB-001` through `OB-005`.
 
 Each scenario entry should include:
 
@@ -421,10 +439,10 @@ Overall defect recall:
 detected_scenarios / scenarios_detected_by_full_suite
 ```
 
-Because each branch should contain exactly one defect, the denominator should be four after all scenarios are validated:
+Because each scenario should contain exactly one defect, the denominator is five after all scenarios are validated:
 
 ```text
-detected_scenarios / 4
+detected_scenarios / 5
 ```
 
 Execution reduction should be reported beside recall:
@@ -497,7 +515,7 @@ No `.gitignore` change is currently required for this plan.
    - Quantik Mind normalized selection.
 
 8. Run the full benchmark matrix.
-   - Four scenarios by four selection methods.
+   - Five scenarios by four selection methods.
    - Keep raw outputs ignored.
    - Commit only source, config, oracle, and documentation.
 
