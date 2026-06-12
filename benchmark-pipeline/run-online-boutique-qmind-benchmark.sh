@@ -12,7 +12,7 @@ QMIND_API_KEY="${QMIND_API_KEY:-}"
 TEST_LIBRARY="${TEST_LIBRARY:-$ROOT_DIR/qmind-test-library/online-boutique-playwright-51.json}"
 LIBRARY_API="${LIBRARY_API:-$RUN_DIR/library-api-51.json}"
 OBSERVABILITY_CONFIG="$ROOT_DIR/qmind-config/observability-online-boutique.container.yaml"
-PROMETHEUS_URL="${PROMETHEUS_URL:-http://34.185.226.81:9090}"
+PROMETHEUS_URL="${PROMETHEUS_URL:-http://prometheus:9090}"
 
 COMMIT_SHA="${COMMIT_SHA:-benchmark-payment-checkout-001}"
 COMMIT_BRANCH="${COMMIT_BRANCH:-benchmark/online-boutique}"
