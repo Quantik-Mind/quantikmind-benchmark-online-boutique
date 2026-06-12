@@ -1,0 +1,96 @@
+{
+  "method": "qmind",
+  "full_suite_size": 51,
+  "selected_test_count": 15,
+  "execution_reduction": 0.7058823529411764,
+  "total_scenarios": 4,
+  "detected_scenarios_count": 4,
+  "missed_scenarios_count": 0,
+  "defect_recall": 1.0,
+  "per_scenario": [
+    {
+      "id": "OB-001",
+      "name": "Checkout Regression",
+      "detected": true,
+      "selected_detecting_tests": [
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "detecting_tests_used": [
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "validation_status": "validated"
+    },
+    {
+      "id": "OB-002",
+      "name": "Cart Regression",
+      "detected": true,
+      "selected_detecting_tests": [
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "detecting_tests_used": [
+        "cart-add-from-product-detail-keeps-price-context",
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "validation_status": "validated"
+    },
+    {
+      "id": "OB-003",
+      "name": "Product Detail Regression",
+      "detected": true,
+      "selected_detecting_tests": [
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "frontend-basic-user-journey-home-product-cart",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data"
+      ],
+      "detecting_tests_used": [
+        "cart-add-from-product-detail-keeps-price-context",
+        "cart-add-from-product-detail-shows-cart-context",
+        "cart-add-product-and-view-cart",
+        "cart-add-product-from-detail-page",
+        "cart-survives-home-navigation",
+        "catalog-first-product-opens-detail-page",
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-has-price",
+        "catalog-product-detail-keeps-product-context",
+        "checkout-form-fields-visible",
+        "checkout-page-accessible-from-cart",
+        "frontend-basic-user-journey-home-product-cart",
+        "navigation-home-to-product-to-home",
+        "order-complete-happy-path",
+        "order-form-requires-payment-data",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-page-has-price",
+        "product-detail-refresh-keeps-content"
+      ],
+      "validation_status": "validated"
+    },
+    {
+      "id": "OB-004",
+      "name": "Payment Regression",
+      "detected": true,
+      "selected_detecting_tests": [
+        "payment-order-completion-confirms-success"
+      ],
+      "detecting_tests_used": [
+        "payment-order-completion-confirms-success"
+      ],
+      "validation_status": "validated"
+    }
+  ]
+}

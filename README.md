@@ -57,12 +57,45 @@ This PR creates the local Docker Compose foundation for fresh-user reproducibili
    docker compose -f docker-compose.benchmark.yml --profile traffic run --rm traffic-standard
    ```
 
-13. Run `qmind init` using the project values from `.env` and the paths from `qmind.example.yaml`.
-14. Configure observability with Prometheus using `qmind-config/observability-online-boutique.example.yaml`.
-15. Sync the canonical 51-test library from `qmind-test-library/online-boutique-playwright-51.json`.
-16. Generate or import benchmark history for the project.
-17. Run the Quantik Mind subset selection using the changed-files scenario context.
-18. Run the evaluations and final comparison scripts under `benchmark-pipeline/`.
+13. Set up the Quantik Mind CLI config from `.env`:
+
+   ```powershell
+   .\benchmark-pipeline\setup-qmind.ps1
+   ```
+
+14. Sync the canonical 51-test library:
+
+   ```powershell
+   .\benchmark-pipeline\sync-library.ps1
+   ```
+
+15. Generate and import benchmark history:
+
+   ```powershell
+   .\benchmark-pipeline\import-history.ps1
+   ```
+
+   If your installed CLI uses a different history import command, run the script with `-GenerateOnly` and import the generated artifacts from `benchmark-runs/qmind-online-boutique/` manually.
+
+16. Configure Prometheus observability and check status:
+
+   ```powershell
+   .\benchmark-pipeline\configure-observability.ps1
+   ```
+
+17. Run the Quantik Mind changed-files subset:
+
+   ```powershell
+   .\benchmark-pipeline\run-qmind-subset.ps1
+   ```
+
+   This reads `benchmark-runs/scenario-ob004-changed-files.json` and writes canonical test IDs to `benchmark-runs/qmind-online-boutique/qmind-current-selection.json`.
+
+18. Evaluate the Quantik Mind selection:
+
+   ```powershell
+   .\benchmark-pipeline\evaluate-qmind.ps1
+   ```
 
 The current compose file intentionally starts the services that are under this repository's control. Prometheus is included and runs on the compose network as `http://prometheus:9090`.
 
@@ -175,6 +208,19 @@ The final comparison result is `benchmark-results/final-comparison/final-compari
 
 Evaluation helpers and runbook details live in `benchmark-pipeline/README.md`.
 
+## QMind CLI Scripts
+
+The reproducible QMind-side scripts live under `benchmark-pipeline/`:
+
+- `setup-qmind.ps1`: loads `.env`, validates required QMind settings, writes `qmind.yaml` from the template without embedding secrets, and runs `qmind init`.
+- `sync-library.ps1`: validates and syncs the canonical 51-test library.
+- `import-history.ps1`: generates synthetic benchmark history and imports it through the CLI when supported.
+- `configure-observability.ps1`: configures Prometheus observability from `qmind-config/observability-online-boutique.example.yaml` and runs status.
+- `run-qmind-subset.ps1`: runs the changed-files subset and normalizes the output to canonical test IDs.
+- `evaluate-qmind.ps1`: evaluates the current QMind selection and validates the expected measured benchmark values.
+
+Most scripts support `-DryRun` to print the command path without contacting QMind. Real runs require `.env` values for `QMIND_API_URL`, `QMIND_API_KEY`, and `QMIND_PROJECT_ID`.
+
 ## Not Yet Automated
 
 This foundation deliberately leaves the following for later PRs:
@@ -182,5 +228,4 @@ This foundation deliberately leaves the following for later PRs:
 - One-command Online Boutique startup across Docker Desktop, minikube, kind, and Skaffold image-building variants.
 - Local per-service Prometheus metrics equivalent to the Linkerd/Kubernetes observability profile.
 - Packaging the Quantik Mind CLI in the `qmind-runner` container.
-- One-command history generation, subset selection, and comparison.
 - End-to-end orchestration across Online Boutique, Prometheus, qmind, Playwright, and the evaluator.
