@@ -52,6 +52,10 @@ def parse_args() -> argparse.Namespace:
         help="Use validated_detecting_tests instead of expected_detecting_tests.",
     )
     parser.add_argument(
+        "--scenario",
+        help="Optional benchmark case/scenario id to evaluate, for example OB-001.",
+    )
+    parser.add_argument(
         "--output",
         help="Optional path to write the JSON report.",
     )
@@ -218,6 +222,7 @@ def evaluate(
     selected_tests: list[str],
     method: str,
     use_validated: bool,
+    scenario_id: str | None = None,
 ) -> dict[str, Any]:
     selected_set = set(selected_tests)
     detecting_field = "validated_detecting_tests" if use_validated else "expected_detecting_tests"
@@ -226,6 +231,14 @@ def evaluate(
         raise SystemExit("Oracle field 'full_suite_size' must be a positive integer.")
 
     scenarios = sorted(oracle["scenarios"], key=lambda item: str(item.get("id", "")))
+    if scenario_id:
+        scenarios = [
+            scenario
+            for scenario in scenarios
+            if str(scenario.get("id", "")).strip() == scenario_id
+        ]
+        if not scenarios:
+            raise SystemExit(f"Scenario id not found in oracle: {scenario_id}")
     per_scenario: list[dict[str, Any]] = []
 
     for scenario in scenarios:
@@ -253,6 +266,7 @@ def evaluate(
 
     return {
         "method": method,
+        "benchmark_case": scenario_id,
         "full_suite_size": full_suite_size,
         "selected_test_count": selected_test_count,
         "execution_reduction": 1 - selected_test_count / full_suite_size,
@@ -277,7 +291,7 @@ def main() -> int:
     oracle = load_oracle(Path(args.oracle))
     selected_tests = load_selected_tests(Path(args.selected))
     selected_tests = normalize_numeric_selected_tests(selected_tests, args.library_api)
-    report = evaluate(oracle, selected_tests, args.method, args.use_validated)
+    report = evaluate(oracle, selected_tests, args.method, args.use_validated, args.scenario)
     payload = json.dumps(report, indent=2)
 
     print(payload)

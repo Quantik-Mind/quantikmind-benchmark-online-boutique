@@ -1,13 +1,13 @@
-api_url: ${QMIND_API_URL}
-api_key: ${QMIND_API_KEY}
-project_id: ${QMIND_PROJECT_ID}
-project_name: ${QMIND_PROJECT_NAME}
+﻿api_url: http://localhost:8000
+api_key: qm_dev_7nzGML8fNA0RR0PtWbZoqWazooZJuY86HjLpxhOW5Ow
+project_id: 5d1cd73e-0f60-4d88-8894-465d2fd2f1d3
+project_name: google-online-boutique
 framework: playwright
 test_dir: qmind-test-harness/playwright/tests
 results_dir: qmind-test-harness/playwright/test-results
 
 agent:
-  prometheus_url: ${PROMETHEUS_URL}
+  prometheus_url: http://localhost:19090
   push_interval_seconds: 60
 
 observability:
@@ -19,5 +19,3 @@ observability:
 
 benchmark:
   test_library: qmind-test-library/online-boutique-playwright-51.json
-  run_dir: benchmark-runs/qmind-online-boutique
-  final_comparison: benchmark-results/final-comparison/final-comparison.json

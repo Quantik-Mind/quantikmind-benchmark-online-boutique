@@ -61,6 +61,10 @@ def parse_args() -> argparse.Namespace:
         default="random",
         help="Machine-readable method slug. Defaults to random.",
     )
+    parser.add_argument(
+        "--benchmark-case",
+        help="Optional benchmark case id recorded for traceability. It does not affect selection.",
+    )
     parser.add_argument("--output", help="Optional path to write the selected-test JSON.")
     return parser.parse_args()
 
@@ -197,7 +201,15 @@ def main() -> int:
         "method_label": METHOD_LABELS.get(args.method_name, args.method_name),
         "selection_size": size,
         "seed": args.seed,
+        "benchmark_case": args.benchmark_case,
         "source_library": str(library_path),
+        "selector_inputs": {
+            "uses_test_library": True,
+            "uses_history": False,
+            "uses_changed_files": False,
+            "uses_oracle": False,
+            "uses_runtime": False,
+        },
         "selected_tests": selected_tests,
     }
     payload = json.dumps(result, indent=2)

@@ -12,7 +12,6 @@ from typing import Any
 
 
 DEFAULT_LIBRARY = "qmind-test-library/online-boutique-playwright-51.json"
-DEFAULT_ORACLE = "defect-oracle/online-boutique-defect-oracle.v2.json"
 DEFAULT_SCENARIOS = "benchmark-pipeline/scenarios.json"
 HIGH_RISK_KEYWORDS = (
     "checkout",
@@ -69,8 +68,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--oracle",
-        default=DEFAULT_ORACLE,
-        help=f"Path to defect oracle JSON. Defaults to {DEFAULT_ORACLE}.",
+        help="Deprecated compatibility option. Oracle data is not read by this selector.",
     )
     parser.add_argument(
         "--scenarios",
@@ -86,7 +84,7 @@ def parse_args() -> argparse.Namespace:
         "--same-size-as",
         help="Selected tests JSON whose selected test count should be reused.",
     )
-    parser.add_argument("--scenario", help="Optional scenario id, for example OB-001.")
+    parser.add_argument("--scenario", help="Optional benchmark case id, for example OB-001.")
     parser.add_argument(
         "--method-name",
         default="history-code-change",
@@ -271,22 +269,23 @@ def code_mapping_globs(test: dict[str, Any]) -> list[str]:
 def scenario_tokens(scenario: dict[str, Any]) -> set[str]:
     values: list[Any] = []
     for field in (
-        "target_domain",
-        "target_service",
-        "affected_domain",
-        "affected_service",
         "expected_changed_files",
-        "defect_behavior",
+        "changed_files",
+        "changed_services",
     ):
         values.extend(text_values(scenario.get(field)))
     return tokens_from_values(values)
 
 
-def score_test(
-    test: dict[str, Any],
-    scenario: dict[str, Any] | None,
-    expected_detecting_tests: set[str],
-) -> dict[str, Any]:
+def changed_files_from_scenario(scenario: dict[str, Any]) -> list[str]:
+    for field in ("changed_files", "expected_changed_files"):
+        value = scenario.get(field)
+        if isinstance(value, list):
+            return [str(item) for item in value]
+    return []
+
+
+def score_test(test: dict[str, Any], scenario: dict[str, Any] | None) -> dict[str, Any]:
     test_id = str(test_id_from_item(test) or "")
     test_id_lower = test_id.lower()
     meta_text = metadata_text(test)
@@ -309,10 +308,6 @@ def score_test(
         score += criticality_scores[test_criticality]
         reasons.append(f"historical risk criticality: {test_criticality}")
 
-    if scenario and test_id in expected_detecting_tests:
-        score += 100
-        reasons.append("scenario oracle expected detecting test")
-
     if scenario:
         matched_tokens = [
             token for token in sorted(scenario_tokens(scenario)) if token in test_id_lower
@@ -333,7 +328,7 @@ def score_test(
                 + ", ".join(matched_metadata_tokens[:12])
             )
 
-        changed_files = [str(item) for item in scenario.get("expected_changed_files", [])]
+        changed_files = changed_files_from_scenario(scenario)
         changed_file_tokens = tokens_from_values(changed_files)
         mapped_tokens = tokens_from_values(code_mapping_globs(test))
         matched_mapping_tokens = sorted(changed_file_tokens.intersection(mapped_tokens))
@@ -350,18 +345,18 @@ def score_test(
     return {"test_id": test_id, "score": score, "reasons": reasons}
 
 
-def merged_scenario(
+def selected_scenario(
     scenario_id: str | None,
-    oracle_scenarios: dict[str, dict[str, Any]],
     scenario_scenarios: dict[str, dict[str, Any]],
 ) -> dict[str, Any] | None:
     if not scenario_id:
         return None
-    if scenario_id not in oracle_scenarios and scenario_id not in scenario_scenarios:
-        raise SystemExit(f"Scenario id not found in oracle or scenarios file: {scenario_id}")
+    if scenario_id not in scenario_scenarios:
+        raise SystemExit(f"Benchmark case id not found in scenarios file: {scenario_id}")
+    scenario = scenario_scenarios[scenario_id]
     return {
-        **oracle_scenarios.get(scenario_id, {}),
-        **scenario_scenarios.get(scenario_id, {}),
+        "id": scenario_id,
+        "expected_changed_files": scenario.get("expected_changed_files", []),
     }
 
 
@@ -376,31 +371,17 @@ def write_output(path: Path, payload: str) -> None:
 def main() -> int:
     args = parse_args()
     library_path = Path(args.library)
-    oracle_path = Path(args.oracle)
     scenarios_path = Path(args.scenarios)
 
     tests = load_library_tests(library_path)
-    oracle_scenarios = load_scenario_map(oracle_path, "Oracle")
     scenario_scenarios = load_scenario_map(scenarios_path, "Scenarios")
-    scenario = merged_scenario(args.scenario, oracle_scenarios, scenario_scenarios)
+    scenario = selected_scenario(args.scenario, scenario_scenarios)
     size = selection_size(args)
 
     if size > len(tests):
         raise SystemExit(f"Cannot select {size} tests from library with only {len(tests)} tests.")
 
-    expected_detecting_tests = set()
-    if args.scenario:
-        expected_detecting_tests = {
-            str(item)
-            for item in oracle_scenarios.get(args.scenario, {}).get(
-                "expected_detecting_tests", []
-            )
-        }
-
-    scores = [
-        score_test(test, scenario, expected_detecting_tests)
-        for test in tests
-    ]
+    scores = [score_test(test, scenario) for test in tests]
     scores = sorted(scores, key=lambda item: (-int(item["score"]), str(item["test_id"])))
     selected_tests = [str(item["test_id"]) for item in scores[:size]]
 
@@ -408,10 +389,17 @@ def main() -> int:
         "method": args.method_name,
         "method_label": METHOD_LABELS.get(args.method_name, args.method_name),
         "selection_size": size,
-        "scenario": args.scenario if args.scenario else None,
+        "benchmark_case": args.scenario if args.scenario else None,
         "source_library": str(library_path),
-        "source_oracle": str(oracle_path),
         "source_scenarios": str(scenarios_path),
+        "selector_inputs": {
+            "uses_test_library": True,
+            "uses_history": True,
+            "uses_changed_files": bool(scenario),
+            "uses_oracle": False,
+            "uses_runtime": False,
+        },
+        "case_context": scenario,
         "selected_tests": selected_tests,
         "scores": scores,
     }

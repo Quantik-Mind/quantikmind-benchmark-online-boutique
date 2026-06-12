@@ -639,6 +639,8 @@
       "criticality": "medium",
       "code_mapping": {
         "file_globs": [
+          "src/cartservice/**/*",
+          "src/frontend/**/*",
           "src/productcatalogservice/**/*"
         ]
       },
