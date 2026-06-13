@@ -2,6 +2,7 @@ param(
     [string]$Oracle = "defect-oracle/online-boutique-defect-oracle.v2.json",
     [string]$Library = "qmind-test-library/online-boutique-playwright-51.json",
     [string]$Scenarios = "benchmark-pipeline/scenarios.json",
+    [string]$QMindSelectionDir = "benchmark-results/qmind-selections",
     [string]$QMindRunDir = "benchmark-runs/qmind-online-boutique",
     [string]$QMindEnvFile = ".env",
     [string]$QMindLibraryApi,
@@ -172,7 +173,7 @@ function Get-TestId {
 function Get-QMindSelectionPath {
     param([string]$CaseId)
 
-    return Join-Path $QMindRunDir "qmind-selection-$($CaseId.ToLowerInvariant()).json"
+    return Join-Path $QMindSelectionDir "qmind-selection-$($CaseId.ToLowerInvariant()).json"
 }
 
 function Get-QMindSelectionCommand {
@@ -240,7 +241,7 @@ function Assert-QMindCaseSelections {
     if ($missing.Count -gt 0) {
         $lines = @(
             "Missing required per-case QMind selection artifacts.",
-            "Use -UseExistingQMindSelections only after generating all per-case QMind selections.",
+            "Use -UseExistingQMindSelections only after committing or generating all canonical per-case QMind selections.",
             "The final comparison cannot reuse benchmark-runs/qmind-online-boutique/qmind-current-selection.json for all cases.",
             "",
             "Create the missing artifacts with:"
@@ -478,12 +479,18 @@ function New-QMindDynamicRiskDiagnostics {
 }
 
 function Format-RiskDiagnosticValue {
-    param([object]$Value)
+    param(
+        [object]$Value,
+        [switch]$Percent
+    )
 
     if ($null -eq $Value) {
         return "not present"
     }
-    return [string]$Value
+    if ($Percent) {
+        return "{0:N1}%" -f [double]$Value
+    }
+    return "{0:N1}" -f [double]$Value
 }
 
 foreach ($path in @($Oracle, $Library, $Scenarios)) {
@@ -706,8 +713,9 @@ $comparison = [ordered]@{
     qmind_selection_mode = if ($UseExistingQMindSelections) { "existing-per-case-artifacts" } else { "generated-by-run-qmind-subset" }
     supporting_artifacts = @($expectedArtifacts | ForEach-Object { To-RepoPath $_ })
     limitations = @(
-        "QMind is evaluated from one canonical selection artifact per benchmark case under benchmark-runs/qmind-online-boutique/qmind-selection-ob-*.json.",
-        "Normal generator mode creates QMind selections by invoking benchmark-pipeline/run-qmind-subset.ps1 for each case; -UseExistingQMindSelections may reuse already generated per-case artifacts.",
+        "QMind is evaluated from one canonical selection artifact per benchmark case under benchmark-results/qmind-selections/qmind-selection-ob-*.json.",
+        "Normal generator mode creates QMind selections by invoking benchmark-pipeline/run-qmind-subset.ps1 for each case; -UseExistingQMindSelections reuses committed canonical per-case artifacts.",
+        "The committed OB-005 and OB-006 QMind artifacts currently select the same frontend/homepage risk cluster and have identical business metrics; OB-006 should not be read as independent live-runtime proof beyond the documented combined-signal scenario until distinct live evidence is captured.",
         "History + Code Change uses changed files and library/history metadata only; oracle detecting tests are used only by the evaluator.",
         "No canonical test library content was changed; oracle changes are limited to minimal direct detecting test lists."
     )
@@ -769,7 +777,7 @@ $riskDiagnosticsWithValues = @($qmindDynamicRiskPerScenario | Where-Object {
     $null -ne $_.risk_density
 })
 foreach ($diagnostic in $riskDiagnosticsWithValues) {
-    $riskRows += "| $($diagnostic.benchmark_case) | $(Format-RiskDiagnosticValue $diagnostic.observed_risk_coverage) | $(Format-RiskDiagnosticValue $diagnostic.critical_risk_captured) | $(Format-RiskDiagnosticValue $diagnostic.residual_risk) | $(Format-RiskDiagnosticValue $diagnostic.risk_density) |"
+    $riskRows += "| $($diagnostic.benchmark_case) | $(Format-RiskDiagnosticValue $diagnostic.observed_risk_coverage -Percent) | $(Format-RiskDiagnosticValue $diagnostic.critical_risk_captured -Percent) | $(Format-RiskDiagnosticValue $diagnostic.residual_risk -Percent) | $(Format-RiskDiagnosticValue $diagnostic.risk_density) |"
 }
 $riskDiagnosticsText = if ($riskRows.Count -gt 0) {
 @"
@@ -800,7 +808,7 @@ This comparison models Online Boutique as six independent CI/CD benchmark cases.
 - Random seed: $RandomSeed
 - Random size: $RandomSize tests
 - History + Code Change size: $TargetedSize tests per case
-- QMind selection artifacts: ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindRunDir)/qmind-selection-ob-006.json``
+- QMind selection artifacts: ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-006.json``
 - QMind selection mode: ``$($comparison.qmind_selection_mode)``
 
 ## Oracle Precision
@@ -858,7 +866,9 @@ History + Code Change uses the canonical test library, history-oriented test met
 
 Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to adservice while runtime observability points to frontend homepage impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime or combined signals are required.
 
-## Hostile-Review Defense
+The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This is transparent in the artifacts and means OB-006 should not be presented as independent proof of an additional runtime-aware win until distinct live runtime evidence is captured. It remains documented as a combined-signal case because the scenario, changed file, and oracle are separate from OB-005.
+
+## Benchmark Integrity Controls
 
 - OB-001 through OB-004 functional definitions and oracle detecting tests were not modified.
 - OB-005 uses the real committed file ``src/currencyservice/data/currency_conversion.json``.
@@ -872,7 +882,7 @@ Quantik Mind uses one canonical selection artifact per benchmark case, generated
 
 ## Reproduction
 
-Regenerate all final comparison artifacts from committed inputs:
+Regenerate all final comparison artifacts using live QMind plus committed benchmark inputs:
 
 ``````powershell
 .\benchmark-pipeline\generate-final-comparison.ps1
@@ -880,7 +890,7 @@ Regenerate all final comparison artifacts from committed inputs:
 
 The generator fails if any per-case QMind selection artifact is missing, contains non-canonical test IDs, or if the OB-004 artifact does not include ``payment-order-completion-confirms-success``.
 
-To reuse previously generated per-case QMind selections instead of calling live QMind:
+To reuse committed canonical per-case QMind selections instead of calling live QMind:
 
 ``````powershell
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections

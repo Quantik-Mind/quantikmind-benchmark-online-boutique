@@ -11,7 +11,7 @@ This comparison models Online Boutique as six independent CI/CD benchmark cases.
 - Random seed: 42
 - Random size: 26 tests
 - History + Code Change size: 15 tests per case
-- QMind selection artifacts: `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json` through `benchmark-runs/qmind-online-boutique/qmind-selection-ob-006.json`
+- QMind selection artifacts: `benchmark-results/qmind-selections/qmind-selection-ob-001.json` through `benchmark-results/qmind-selections/qmind-selection-ob-006.json`
 - QMind selection mode: `existing-per-case-artifacts`
 
 ## Oracle Precision
@@ -72,12 +72,12 @@ Current QMind selection artifacts include dynamic risk diagnostics for 6 of 6 be
 
 | Scenario | Observed Risk Coverage | Critical Risk Captured | Residual Risk | Risk Density |
 | --- | ---: | ---: | ---: | ---: |
-| OB-001 | 24.0160248659931 | 50 | 75.9839751340069 | 1.36090807573961 |
-| OB-002 | 43.4435668187888 | 66.6666666666667 | 56.5564331812112 | 1.30330700456366 |
-| OB-003 | 37.2102473101709 | 91.6666666666667 | 62.7897526898291 | 1.26514840854581 |
-| OB-004 | 42.055825047258 | 91.6666666666667 | 57.944174952742 | 1.19158170967231 |
-| OB-005 | 40.4564622350446 | 91.6666666666667 | 59.5435377649554 | 1.21369386705134 |
-| OB-006 | 40.4564622350446 | 91.6666666666667 | 59.5435377649554 | 1.21369386705134 |
+| OB-001 | 24.0% | 50.0% | 76.0% | 1.4 |
+| OB-002 | 43.4% | 66.7% | 56.6% | 1.3 |
+| OB-003 | 37.2% | 91.7% | 62.8% | 1.3 |
+| OB-004 | 42.1% | 91.7% | 57.9% | 1.2 |
+| OB-005 | 40.5% | 91.7% | 59.5% | 1.2 |
+| OB-006 | 40.5% | 91.7% | 59.5% | 1.2 |
 
 These metrics are not included in the benchmark comparison table because equivalent dynamic risk diagnostics are not available for Full Suite, Random, or History + Code Change. They are reported as Quantik Mind product diagnostics.
 
@@ -141,7 +141,9 @@ History + Code Change uses the canonical test library, history-oriented test met
 
 Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by `benchmark-pipeline/run-qmind-subset.ps1` in normal mode. The aggregate QMind result averages 15.5 selected tests, gives 69.6% average execution reduction, and detects 6/6 cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to adservice while runtime observability points to frontend homepage impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime or combined signals are required.
 
-## Hostile-Review Defense
+The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This is transparent in the artifacts and means OB-006 should not be presented as independent proof of an additional runtime-aware win until distinct live runtime evidence is captured. It remains documented as a combined-signal case because the scenario, changed file, and oracle are separate from OB-005.
+
+## Benchmark Integrity Controls
 
 - OB-001 through OB-004 functional definitions and oracle detecting tests were not modified.
 - OB-005 uses the real committed file `src/currencyservice/data/currency_conversion.json`.
@@ -155,7 +157,7 @@ Quantik Mind uses one canonical selection artifact per benchmark case, generated
 
 ## Reproduction
 
-Regenerate all final comparison artifacts from committed inputs:
+Regenerate all final comparison artifacts using live QMind plus committed benchmark inputs:
 
 ```powershell
 .\benchmark-pipeline\generate-final-comparison.ps1
@@ -163,7 +165,7 @@ Regenerate all final comparison artifacts from committed inputs:
 
 The generator fails if any per-case QMind selection artifact is missing, contains non-canonical test IDs, or if the OB-004 artifact does not include `payment-order-completion-confirms-success`.
 
-To reuse previously generated per-case QMind selections instead of calling live QMind:
+To reuse committed canonical per-case QMind selections instead of calling live QMind:
 
 ```powershell
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections

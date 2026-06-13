@@ -36,7 +36,7 @@
       ],
       "validation_status": "validated",
       "notes": [
-        "Validated against the full 50-test Playwright suite: 4 failed, 46 passed.",
+        "Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 4 failed, 46 passed. The current canonical benchmark library has 51 tests.",
         "Validated external scenario commit e5234240 against baseline commit 5096a85b.",
         "Renaming only one label may make the signal too narrow.",
         "Service crashes may broaden the signal through HTTP 500s or slow recovery."
@@ -82,7 +82,7 @@
       ],
       "validation_status": "validated",
       "notes": [
-        "Validated against the full 50-test Playwright suite: 5 failed, 45 passed.",
+        "Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 5 failed, 45 passed. The current canonical benchmark library has 51 tests.",
         "Validated external scenario commit f7bac607 against baseline commit 5096a85b.",
         "Only one direct cart assertion failed; several expected cart tests remained green, which indicates those tests are broad/soft and should not be treated as validated detecting tests.",
         "A silent cart-state drop may not be detected by tests that only assert generic cart text.",
@@ -135,7 +135,7 @@
       ],
       "validation_status": "validated",
       "notes": [
-        "Validated against the full 50-test Playwright suite: 20 failed, 30 passed.",
+        "Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 20 failed, 30 passed. The current canonical benchmark library has 51 tests.",
         "External scenario commit 381043a6 on benchmark/scenario-ob003; baseline commit 5096a85b.",
         "Failure scope is product detail and downstream flows depending on product detail.",
         "Homepage/catalog listing remained sufficiently healthy because 30 tests passed."
