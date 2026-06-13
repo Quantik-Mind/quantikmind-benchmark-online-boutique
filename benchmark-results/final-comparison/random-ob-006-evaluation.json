@@ -11,20 +11,41 @@
   "per_scenario": [
     {
       "id": "OB-006",
-      "name": "Ad Service Latency Cascades Into Homepage Rendering",
+      "name": "ProductCatalog ListProducts Cascade Into Homepage Rendering",
       "detected": true,
       "selected_detecting_tests": [
-        "homepage-body-is-not-empty",
-        "homepage-has-visible-text-content",
-        "homepage-title-is-available"
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-has-price",
+        "catalog-product-link-href-starts-with-product",
+        "frontend-products-have-prices",
+        "homepage-has-at-least-one-product-link",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-page-has-price",
+        "product-detail-refresh-keeps-content",
+        "smoke-product-links-visible"
       ],
       "detecting_tests_used": [
-        "homepage-body-is-not-empty",
-        "homepage-has-multiple-links",
-        "homepage-has-visible-text-content",
-        "homepage-shows-google-cloud-branding",
-        "homepage-title-is-available",
-        "smoke-homepage-loads"
+        "catalog-first-product-link-has-valid-href",
+        "catalog-first-product-opens-detail-page",
+        "catalog-multiple-products-visible",
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-has-price",
+        "catalog-product-detail-keeps-product-context",
+        "catalog-product-link-href-starts-with-product",
+        "frontend-homepage-has-product-grid",
+        "frontend-products-have-prices",
+        "homepage-contains-product-price",
+        "homepage-has-at-least-one-product-link",
+        "product-detail-allows-return-navigation",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-body-content",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-page-has-price",
+        "product-detail-refresh-keeps-content",
+        "smoke-product-links-visible"
       ],
       "validation_status": "validated-combined-oracle"
     }

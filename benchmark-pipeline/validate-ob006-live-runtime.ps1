@@ -4,7 +4,7 @@ param(
     [string]$PrometheusUrl = "http://localhost:19090",
     [string]$SourceRoot = "microservices-demo",
     [string]$Namespace = "default",
-    [string]$Deployment = "adservice",
+    [string]$Deployment = "productcatalogservice",
     [string]$Container = "server",
     [ValidateSet("latency", "failure")]
     [string]$Mode = "latency",
@@ -20,8 +20,16 @@ param(
     [int]$TrafficDelayMs = 500,
     [int]$TrafficTimeoutSec = 45,
     [int]$StabilizationSeconds = 30,
+    [double]$ProductCatalogLatencyMinRatio = 5.0,
+    [double]$ProductCatalogLatencyMinDeltaSeconds = 1.0,
+    [double]$ProductCatalogErrorRateMinDelta = 0.05,
+    [double]$FrontendLatencyMinRatio = 1.5,
+    [double]$FrontendLatencyMinDeltaSeconds = 0.2,
+    [double]$FrontendErrorRateMinDelta = 0.02,
     [string]$RunDir = "benchmark-runs/ob-006-live-runtime-validation",
+    [string]$EvidenceDir = "benchmark-results/runtime-evidence/ob-006",
     [string]$QMindSelectionOutput = "benchmark-results/qmind-selections/qmind-selection-ob-006.json",
+    [string]$OB005Selection = "benchmark-results/qmind-selections/qmind-selection-ob-005.json",
     [string]$Oracle = "defect-oracle/online-boutique-defect-oracle.v2.json",
     [string]$Library = "qmind-test-library/online-boutique-playwright-51.json",
     [string]$Scenarios = "benchmark-pipeline/scenarios.json"
@@ -29,14 +37,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$Injector = "runtime-scenarios/ob-006-adservice-latency-cascade/apply-ob006-adservice-latency.ps1"
+$Injector = "runtime-scenarios/ob-006-productcatalog-listproducts-cascade/apply-ob006-productcatalog-listproducts.ps1"
 $FinalComparisonScript = "benchmark-pipeline/generate-final-comparison.ps1"
 $QMindSubsetScript = "benchmark-pipeline/run-qmind-subset.ps1"
 $CaseId = "OB-006"
-$AdServiceRelativeFile = "src/adservice/src/main/java/hipstershop/AdService.java"
+$ProductCatalogRelativeFile = "src/productcatalogservice/product_catalog.go"
 $ExpectedDetectorIds = @()
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $CommandLog = $null
+$PreviousOB006RunId = $null
+$RuntimeMovementSummary = $null
 
 function Write-Phase {
     param([string]$Message)
@@ -247,7 +257,7 @@ function Assert-Tool {
     Write-Host "Found tool: $Name"
 }
 
-function Get-CurrentAdserviceImage {
+function Get-CurrentProductCatalogImage {
     $jsonPath = "{.spec.template.spec.containers[?(@.name=='$Container')].image}"
     $result = Invoke-LoggedCommand -Command "kubectl" -Arguments @("-n", $Namespace, "get", "deployment", $Deployment, "-o", "jsonpath=$jsonPath")
     $image = $result.output.Trim()
@@ -299,11 +309,11 @@ function Write-ArtifactRegistryAuthPreflight {
     }
 }
 
-function Get-AdServiceBuildContext {
-    $context = Join-Path $SourceRoot "src/adservice"
+function Get-ProductCatalogBuildContext {
+    $context = Join-Path $SourceRoot "src/productcatalogservice"
     $dockerfile = Join-Path $context "Dockerfile"
     if (-not (Test-Path -LiteralPath $dockerfile -PathType Leaf)) {
-        throw "Could not detect adservice Docker build context. Expected Dockerfile at: $dockerfile"
+        throw "Could not detect productcatalogservice Docker build context. Expected Dockerfile at: $dockerfile"
     }
     return $context
 }
@@ -315,7 +325,7 @@ function Build-And-PushImage {
         [string]$Phase
     )
 
-    Write-Phase "Build $Phase adservice image"
+    Write-Phase "Build $Phase productcatalogservice image"
     Invoke-LoggedCommand -Command "docker" -Arguments @("build", "-t", $Image, $BuildContext) | Out-Null
     if ($Phase -eq "injected") {
         $script:InjectedImageBuilt = $true
@@ -323,7 +333,7 @@ function Build-And-PushImage {
         $script:CleanImageBuilt = $true
     }
 
-    Write-Phase "Push $Phase adservice image"
+    Write-Phase "Push $Phase productcatalogservice image"
     Invoke-LoggedCommand -Command "docker" -Arguments @("push", $Image) | Out-Null
     if ($Phase -eq "injected") {
         $script:InjectedImagePushed = $true
@@ -332,13 +342,13 @@ function Build-And-PushImage {
     }
 }
 
-function Deploy-AdserviceImage {
+function Deploy-ProductCatalogImage {
     param(
         [string]$Image,
         [string]$Phase
     )
 
-    Write-Phase "Deploy $Phase adservice image"
+    Write-Phase "Deploy $Phase productcatalogservice image"
     Invoke-LoggedCommand -Command "kubectl" -Arguments @("-n", $Namespace, "set", "image", "deployment/$Deployment", "$Container=$Image") | Out-Null
     if ($Phase -eq "injected") {
         $script:InjectedImageDeployed = $true
@@ -534,6 +544,79 @@ function Test-MetricMoved {
     return ([double]$Injected[$Key].value -gt [double]$Baseline[$Key].value)
 }
 
+function Get-MetricValue {
+    param(
+        [hashtable]$Metrics,
+        [string]$Key
+    )
+
+    if (-not $Metrics.ContainsKey($Key)) {
+        return $null
+    }
+    if ($null -eq $Metrics[$Key].value) {
+        return $null
+    }
+    return [double]$Metrics[$Key].value
+}
+
+function Get-MaterialMovement {
+    param(
+        [hashtable]$Baseline,
+        [hashtable]$Injected,
+        [string]$Key,
+        [double]$MinRatio,
+        [double]$MinDelta
+    )
+
+    $baselineValue = Get-MetricValue -Metrics $Baseline -Key $Key
+    $injectedValue = Get-MetricValue -Metrics $Injected -Key $Key
+    $hasData = ($null -ne $baselineValue -and $null -ne $injectedValue)
+    $delta = if ($hasData) { $injectedValue - $baselineValue } else { $null }
+    $ratio = if ($hasData -and [Math]::Abs($baselineValue) -gt 0.000000001) { $injectedValue / $baselineValue } else { $null }
+    $deltaPassed = ($null -ne $delta -and $delta -ge $MinDelta)
+    $ratioPassed = ($null -ne $ratio -and $ratio -ge $MinRatio)
+    $passed = $hasData -and $deltaPassed -and $ratioPassed
+
+    return [ordered]@{
+        key = $Key
+        baseline = $baselineValue
+        injected = $injectedValue
+        delta = $delta
+        ratio = $ratio
+        min_delta = $MinDelta
+        min_ratio = $MinRatio
+        has_data = $hasData
+        delta_passed = $deltaPassed
+        ratio_passed = $ratioPassed
+        passed = $passed
+    }
+}
+
+function Get-MaterialDeltaMovement {
+    param(
+        [hashtable]$Baseline,
+        [hashtable]$Injected,
+        [string]$Key,
+        [double]$MinDelta
+    )
+
+    $baselineValue = Get-MetricValue -Metrics $Baseline -Key $Key
+    $injectedValue = Get-MetricValue -Metrics $Injected -Key $Key
+    $hasData = ($null -ne $baselineValue -and $null -ne $injectedValue)
+    $delta = if ($hasData) { $injectedValue - $baselineValue } else { $null }
+    $passed = ($hasData -and $delta -ge $MinDelta)
+
+    return [ordered]@{
+        key = $Key
+        baseline = $baselineValue
+        injected = $injectedValue
+        delta = $delta
+        min_delta = $MinDelta
+        has_data = $hasData
+        passed = $passed
+    }
+}
+
 function Write-RuntimeMovementSummary {
     param(
         [hashtable]$Baseline,
@@ -541,30 +624,43 @@ function Write-RuntimeMovementSummary {
     )
 
     Write-Phase "Runtime movement summary"
-    $adLatencyMoved = Test-MetricMoved -Baseline $Baseline -Injected $Injected -Key "$Deployment.latency_p95"
-    $adErrorMoved = Test-MetricMoved -Baseline $Baseline -Injected $Injected -Key "$Deployment.error_rate"
-    $frontendLatencyMoved = Test-MetricMoved -Baseline $Baseline -Injected $Injected -Key "frontend.latency_p95"
-    $frontendErrorMoved = Test-MetricMoved -Baseline $Baseline -Injected $Injected -Key "frontend.error_rate"
-    $confirmed = (($adLatencyMoved -or $adErrorMoved) -and ($frontendLatencyMoved -or $frontendErrorMoved))
+    $productCatalogLatency = Get-MaterialMovement -Baseline $Baseline -Injected $Injected -Key "$Deployment.latency_p95" -MinRatio $ProductCatalogLatencyMinRatio -MinDelta $ProductCatalogLatencyMinDeltaSeconds
+    $productCatalogError = Get-MaterialDeltaMovement -Baseline $Baseline -Injected $Injected -Key "$Deployment.error_rate" -MinDelta $ProductCatalogErrorRateMinDelta
+    $frontendLatency = Get-MaterialMovement -Baseline $Baseline -Injected $Injected -Key "frontend.latency_p95" -MinRatio $FrontendLatencyMinRatio -MinDelta $FrontendLatencyMinDeltaSeconds
+    $frontendError = Get-MaterialDeltaMovement -Baseline $Baseline -Injected $Injected -Key "frontend.error_rate" -MinDelta $FrontendErrorRateMinDelta
+    $productCatalogConfirmed = [bool]$productCatalogLatency.passed -or [bool]$productCatalogError.passed
+    $frontendConfirmed = [bool]$frontendLatency.passed -or [bool]$frontendError.passed
+    $confirmed = ($productCatalogConfirmed -and $frontendConfirmed)
 
     $summary = @{
         scenario = $CaseId
         captured_at_utc = (Get-Date).ToUniversalTime().ToString("o")
-        adservice_latency_moved = $adLatencyMoved
-        adservice_error_moved = $adErrorMoved
-        frontend_latency_moved = $frontendLatencyMoved
-        frontend_error_moved = $frontendErrorMoved
+        validation_thresholds = @{
+            productcatalogservice_latency_min_ratio = $ProductCatalogLatencyMinRatio
+            productcatalogservice_latency_min_delta_seconds = $ProductCatalogLatencyMinDeltaSeconds
+            productcatalogservice_error_rate_min_delta = $ProductCatalogErrorRateMinDelta
+            frontend_latency_min_ratio = $FrontendLatencyMinRatio
+            frontend_latency_min_delta_seconds = $FrontendLatencyMinDeltaSeconds
+            frontend_error_rate_min_delta = $FrontendErrorRateMinDelta
+        }
+        productcatalogservice_latency = $productCatalogLatency
+        productcatalogservice_error_rate = $productCatalogError
+        frontend_latency = $frontendLatency
+        frontend_error_rate = $frontendError
+        productcatalogservice_signal_confirmed = $productCatalogConfirmed
+        frontend_signal_confirmed = $frontendConfirmed
         publication_runtime_evidence = if ($confirmed) { "CONFIRMED" } else { "NOT CONFIRMED" }
     }
 
-    Write-Host "adservice latency moved: $(if ($adLatencyMoved) { 'YES' } else { 'NO' })"
-    Write-Host "adservice error moved: $(if ($adErrorMoved) { 'YES' } else { 'NO' })"
-    Write-Host "frontend latency moved: $(if ($frontendLatencyMoved) { 'YES' } else { 'NO' })"
-    Write-Host "frontend error moved: $(if ($frontendErrorMoved) { 'YES' } else { 'NO' })"
+    Write-Host "productcatalogservice latency material: $(if ($productCatalogLatency.passed) { 'YES' } else { 'NO' }) delta=$($productCatalogLatency.delta) ratio=$($productCatalogLatency.ratio)"
+    Write-Host "productcatalogservice error material: $(if ($productCatalogError.passed) { 'YES' } else { 'NO' }) delta=$($productCatalogError.delta)"
+    Write-Host "frontend latency material: $(if ($frontendLatency.passed) { 'YES' } else { 'NO' }) delta=$($frontendLatency.delta) ratio=$($frontendLatency.ratio)"
+    Write-Host "frontend error material: $(if ($frontendError.passed) { 'YES' } else { 'NO' }) delta=$($frontendError.delta)"
     Write-Host "publication runtime evidence: $($summary.publication_runtime_evidence)"
 
     if (-not $confirmed) {
-        Write-Warning "OB-006 runtime evidence is NOT CONFIRMED. Do not claim external validation from this run."
+        Write-JsonFile -Path (Join-Path $RunDir "runtime-movement-summary.json") -Value $summary
+        throw "OB-006 runtime evidence is NOT CONFIRMED. Required material movement: productcatalogservice latency or error, plus frontend latency or error."
     }
 
     $path = Join-Path $RunDir "runtime-movement-summary.json"
@@ -575,12 +671,55 @@ function Write-RuntimeMovementSummary {
 
 function Backup-QMindSelectionIfPresent {
     if (Test-Path -LiteralPath $QMindSelectionOutput -PathType Leaf) {
+        try {
+            $existingSelection = Get-Content -LiteralPath $QMindSelectionOutput -Raw | ConvertFrom-Json
+            $script:PreviousOB006RunId = [string]$existingSelection.qmind_subset_json.run_id
+            if ([string]::IsNullOrWhiteSpace($script:PreviousOB006RunId)) {
+                $script:PreviousOB006RunId = [string]$existingSelection.run_id
+            }
+        } catch {
+            Write-Warning "Could not read existing OB-006 run_id before backup: $($_.Exception.Message)"
+        }
         $backup = "$QMindSelectionOutput.pre-ob006-live-$Timestamp.bak"
         Copy-Item -LiteralPath $QMindSelectionOutput -Destination $backup -Force
         Write-Host "Existing QMind OB-006 selection found: $QMindSelectionOutput"
         Write-Host "Backed it up before live regeneration: $backup"
     } else {
         Write-Host "No existing QMind OB-006 selection to back up at $QMindSelectionOutput."
+    }
+}
+
+function Get-SelectionRunId {
+    param([object]$Selection)
+
+    $runId = [string]$Selection.qmind_subset_json.run_id
+    if ([string]::IsNullOrWhiteSpace($runId)) {
+        $runId = [string]$Selection.run_id
+    }
+    return $runId
+}
+
+function Get-CanonicalJson {
+    param([object]$Value)
+
+    return ($Value | ConvertTo-Json -Depth 40 -Compress)
+}
+
+function Assert-Ob006SelectionIsDistinctFromOb005 {
+    param([object]$Selection)
+
+    if (-not (Test-Path -LiteralPath $OB005Selection -PathType Leaf)) {
+        throw "Missing OB-005 selection for duplicate guard: $OB005Selection"
+    }
+
+    $ob005 = Get-Content -LiteralPath $OB005Selection -Raw | ConvertFrom-Json
+    $sameSelectedTests = ((@($ob005.selected_tests) -join "|") -eq (@($Selection.selected_tests) -join "|"))
+    $sameBusinessMetrics = ((Get-CanonicalJson $ob005.business_metrics) -eq (Get-CanonicalJson $Selection.business_metrics))
+    $sameRiskCoverage = ([string]$ob005.risk_coverage -eq [string]$Selection.risk_coverage)
+    $sameRiskEfficiency = ([string]$ob005.risk_efficiency -eq [string]$Selection.risk_efficiency)
+
+    if ($sameSelectedTests -and $sameBusinessMetrics -and $sameRiskCoverage -and $sameRiskEfficiency) {
+        throw "Live OB-006 QMind selection is substantively identical to OB-005. Refusing to publish OB-006 as independent combined-signal evidence."
     }
 }
 
@@ -592,6 +731,28 @@ function Assert-LiveQMindSelection {
     }
     if ([string]$selection.benchmark_case -ne $CaseId) {
         throw "Expected benchmark_case=$CaseId in $QMindSelectionOutput."
+    }
+    if ([string]$selection.changed_files_file -ne "benchmark-runs/scenario-ob-006-changed-files.json") {
+        throw "Expected OB-006 changed_files_file to be benchmark-runs/scenario-ob-006-changed-files.json. Found: $($selection.changed_files_file)"
+    }
+    Assert-File $selection.changed_files_file
+    $changedFiles = @(Get-Content -LiteralPath $selection.changed_files_file -Raw | ConvertFrom-Json | ForEach-Object { [string]$_ })
+    if ($changedFiles.Count -ne 1 -or $changedFiles[0] -ne $ProductCatalogRelativeFile) {
+        throw "OB-006 QMind changed-files input must be exactly $ProductCatalogRelativeFile. Found: $($changedFiles -join ', ')"
+    }
+
+    $newRunId = Get-SelectionRunId -Selection $selection
+    if ([string]::IsNullOrWhiteSpace($newRunId)) {
+        throw "Live OB-006 QMind selection does not include a run_id."
+    }
+    if (-not [string]::IsNullOrWhiteSpace($PreviousOB006RunId) -and $newRunId -eq $PreviousOB006RunId) {
+        throw "Live OB-006 QMind run_id did not change from previous artifact: $newRunId"
+    }
+    if ([bool]$selection.qmind_subset_json.observability_enabled -ne $true) {
+        throw "Live OB-006 QMind selection does not show observability_enabled=true."
+    }
+    if ([bool]$selection.qmind_subset_json.has_runtime_signal -ne $true) {
+        throw "Live OB-006 QMind selection does not show has_runtime_signal=true."
     }
 
     $selected = @($selection.selected_tests | ForEach-Object { [string]$_ })
@@ -606,9 +767,16 @@ function Assert-LiveQMindSelection {
 
     Write-Host "Live QMind OB-006 detection PASS. Selected detector intersection:"
     $intersection | ForEach-Object { Write-Host "  $_" }
+    Assert-Ob006SelectionIsDistinctFromOb005 -Selection $selection
     Write-JsonFile -Path (Join-Path $RunDir "qmind-ob006-detection-summary.json") -Value @{
         scenario = $CaseId
         selection_artifact = $QMindSelectionOutput
+        qmind_run_id = $newRunId
+        previous_qmind_run_id = $PreviousOB006RunId
+        changed_files_file = [string]$selection.changed_files_file
+        changed_files = $changedFiles
+        observability_enabled = [bool]$selection.qmind_subset_json.observability_enabled
+        has_runtime_signal = [bool]$selection.qmind_subset_json.has_runtime_signal
         expected_detector_ids = $ExpectedDetectorIds
         selected_detector_ids = $intersection
         missing_detector_ids = $missing
@@ -626,6 +794,57 @@ function Invoke-QMindOb006 {
         Library = $Library
     }
     Assert-LiveQMindSelection
+}
+
+function Copy-EvidenceFile {
+    param(
+        [string]$Source,
+        [string]$DestinationName
+    )
+
+    Assert-File $Source
+    $destination = Join-Path $EvidenceDir $DestinationName
+    Copy-Item -LiteralPath $Source -Destination $destination -Force
+    return $destination
+}
+
+function Publish-Ob006Evidence {
+    Write-Phase "Publish OB-006 runtime evidence"
+
+    if ($null -eq $RuntimeMovementSummary -or [string]$RuntimeMovementSummary.publication_runtime_evidence -ne "CONFIRMED") {
+        throw "Refusing to publish OB-006 evidence because runtime movement was not confirmed."
+    }
+
+    New-Item -ItemType Directory -Force -Path $EvidenceDir | Out-Null
+    $published = @()
+    $published += Copy-EvidenceFile -Source (Join-Path $RunDir "baseline-prometheus-snapshot.json") -DestinationName "baseline-prometheus-snapshot.json"
+    $published += Copy-EvidenceFile -Source (Join-Path $RunDir "injected-prometheus-snapshot.json") -DestinationName "injected-prometheus-snapshot.json"
+    $published += Copy-EvidenceFile -Source (Join-Path $RunDir "runtime-movement-summary.json") -DestinationName "runtime-movement-summary.json"
+    $published += Copy-EvidenceFile -Source (Join-Path $RunDir "baseline-homepage-traffic.json") -DestinationName "baseline-homepage-traffic.json"
+    $published += Copy-EvidenceFile -Source (Join-Path $RunDir "injected-homepage-traffic.json") -DestinationName "injected-homepage-traffic.json"
+    $published += Copy-EvidenceFile -Source (Join-Path $RunDir "qmind-ob006-detection-summary.json") -DestinationName "qmind-ob006-detection-summary.json"
+    $published += Copy-EvidenceFile -Source "benchmark-runs/scenario-ob-006-changed-files.json" -DestinationName "scenario-ob-006-changed-files.json"
+    $published += Copy-EvidenceFile -Source $QMindSelectionOutput -DestinationName "qmind-selection-ob-006.json"
+
+    $selection = Get-Content -LiteralPath $QMindSelectionOutput -Raw | ConvertFrom-Json
+    $manifest = [ordered]@{
+        scenario = $CaseId
+        evidence_status = "verified"
+        published_at_utc = (Get-Date).ToUniversalTime().ToString("o")
+        source_run_dir = $RunDir
+        qmind_selection_artifact = $QMindSelectionOutput
+        qmind_run_id = Get-SelectionRunId -Selection $selection
+        changed_files = @($ProductCatalogRelativeFile)
+        required_runtime_chain = @(
+            "productcatalogservice material latency or error movement",
+            "frontend material latency or error movement",
+            "QMind selection generated after injected runtime window",
+            "OB-006 QMind selection not substantively identical to OB-005"
+        )
+        published_files = @($published | ForEach-Object { $_.Replace("\", "/") })
+    }
+    Write-JsonFile -Path (Join-Path $EvidenceDir "evidence-manifest.json") -Value $manifest
+    Write-Host "Published OB-006 evidence under $EvidenceDir."
 }
 
 function Invoke-FinalComparison {
@@ -662,13 +881,13 @@ function Write-ManualRecoveryWarning {
     Write-Warning "LOUD WARNING: automatic clean redeploy failed. Reason: $Reason"
     Write-Warning "State: InjectionApplied=$InjectionApplied, InjectedImageBuilt=$InjectedImageBuilt, InjectedImagePushed=$InjectedImagePushed, InjectedImageDeployed=$InjectedImageDeployed, SourceRestored=$SourceRestored, CleanImageBuilt=$CleanImageBuilt, CleanImagePushed=$CleanImagePushed, CleanImageDeployed=$CleanImageDeployed"
     if ($InjectedImageDeployed -and -not $CleanImageDeployed) {
-        Write-Warning "The cluster may still be running the injected OB-006 adservice image."
+        Write-Warning "The cluster may still be running the injected OB-006 productcatalogservice image."
     } else {
         Write-Warning "The injected image was not successfully deployed to the cluster, so the cluster should not be running the injected OB-006 image from this run."
     }
     Write-Warning "Manual recovery commands:"
     if (-not $SourceRestored) {
-        Write-Warning "  .\runtime-scenarios\ob-006-adservice-latency-cascade\apply-ob006-adservice-latency.ps1 -SourceRoot $SourceRoot -Restore"
+        Write-Warning "  .\runtime-scenarios\ob-006-productcatalog-listproducts-cascade\apply-ob006-productcatalog-listproducts.ps1 -SourceRoot $SourceRoot -Restore"
     }
     if (-not [string]::IsNullOrWhiteSpace($CleanImage)) {
         if ($InjectedImageDeployed -and -not $CleanImageDeployed) {
@@ -706,7 +925,7 @@ try {
         Write-Host "Found: $path"
     }
     Assert-Directory $SourceRoot
-    Assert-File (Join-Path $SourceRoot $AdServiceRelativeFile)
+    Assert-File (Join-Path $SourceRoot $ProductCatalogRelativeFile)
     foreach ($tool in @("docker", "kubectl", "qmind", "python")) {
         Assert-Tool $tool
     }
@@ -719,7 +938,7 @@ try {
     Invoke-LoggedCommand -Command "kubectl" -Arguments @("get", "namespace", $Namespace) | Out-Null
     Invoke-LoggedCommand -Command "kubectl" -Arguments @("-n", $Namespace, "get", "deployment", $Deployment) | Out-Null
 
-    $currentImage = Get-CurrentAdserviceImage
+    $currentImage = Get-CurrentProductCatalogImage
     Write-Host "Current $Deployment/$Container image: $currentImage"
     $currentImageRepository = Get-ImageRepository -Image $currentImage
     Write-Host "Current deployment image repository: $currentImageRepository"
@@ -743,11 +962,11 @@ try {
     Write-ArtifactRegistryAuthPreflight -Repository $targetImageRepository
     $liveImage = "${targetImageRepository}:$ImageTagPrefix-$Timestamp"
     $cleanImage = "${targetImageRepository}:$CleanImageTagPrefix-$Timestamp"
-    $buildContext = Get-AdServiceBuildContext
+    $buildContext = Get-ProductCatalogBuildContext
     Write-Host "Target image repository: $targetImageRepository"
     Write-Host "Live image tag: $liveImage"
     Write-Host "Clean image tag: $cleanImage"
-    Write-Host "Adservice build context: $buildContext"
+    Write-Host "Productcatalogservice build context: $buildContext"
 
     $ExpectedDetectorIds = @(Get-Ob006ExpectedDetectorIds)
     Write-Host "Loaded $($ExpectedDetectorIds.Count) OB-006 detector IDs from $Oracle."
@@ -763,17 +982,21 @@ try {
     $InjectionApplied = $true
 
     Build-And-PushImage -Image $liveImage -BuildContext $buildContext -Phase "injected"
-    Deploy-AdserviceImage -Image $liveImage -Phase "injected"
+    Deploy-ProductCatalogImage -Image $liveImage -Phase "injected"
 
     Write-Phase "Validate injected runtime"
     Invoke-HomepageTraffic -Phase "injected"
     $injectedMetrics = Capture-RuntimeSnapshot -Phase "injected"
-    Write-RuntimeMovementSummary -Baseline $baselineMetrics -Injected $injectedMetrics | Out-Null
+    $RuntimeMovementSummary = Write-RuntimeMovementSummary -Baseline $baselineMetrics -Injected $injectedMetrics
 
     if ($SkipQMind) {
         Write-Host "SkipQMind was set. QMind live OB-006 selection was not regenerated."
     } else {
         Invoke-QMindOb006
+    }
+
+    if (-not $SkipQMind) {
+        Publish-Ob006Evidence
     }
 
     if ($SkipComparison) {
@@ -786,23 +1009,26 @@ try {
 
     Write-Phase "Live validation command complete"
     Write-Host "Evidence artifacts were written under $RunDir."
+    if (-not $SkipQMind) {
+        Write-Host "Publication evidence was written under $EvidenceDir."
+    }
 } finally {
     if ($InjectionApplied) {
         if ($SkipRestore) {
             Write-Warning "SkipRestore was set. The source tree still contains the OB-006 injection."
             if ($InjectedImageDeployed) {
-                Write-Warning "The cluster may still be running the injected OB-006 adservice image."
+                Write-Warning "The cluster may still be running the injected OB-006 productcatalogservice image."
             } else {
                 Write-Warning "The injected image was not successfully deployed to the cluster in this run."
             }
-            Write-Warning "Manual source restore command: .\runtime-scenarios\ob-006-adservice-latency-cascade\apply-ob006-adservice-latency.ps1 -SourceRoot $SourceRoot -Restore"
+            Write-Warning "Manual source restore command: .\runtime-scenarios\ob-006-productcatalog-listproducts-cascade\apply-ob006-productcatalog-listproducts.ps1 -SourceRoot $SourceRoot -Restore"
         } else {
             $restoreError = $null
             try {
                 Restore-Ob006Source
                 if ($InjectedImageDeployed -and -not [string]::IsNullOrWhiteSpace($cleanImage) -and -not [string]::IsNullOrWhiteSpace($buildContext)) {
                     Build-And-PushImage -Image $cleanImage -BuildContext $buildContext -Phase "clean"
-                    Deploy-AdserviceImage -Image $cleanImage -Phase "clean"
+                    Deploy-ProductCatalogImage -Image $cleanImage -Phase "clean"
                 } elseif (-not $InjectedImageDeployed) {
                     Write-Host "Injected image was not deployed; source restore completed and clean cluster redeploy is not required."
                 } else {

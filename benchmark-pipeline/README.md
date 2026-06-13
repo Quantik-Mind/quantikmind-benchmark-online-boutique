@@ -54,7 +54,9 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 
 `generate-final-comparison.ps1` is the main benchmark entry point. In normal mode it invokes `run-qmind-subset.ps1` once per benchmark case, derives changed files from `benchmark-pipeline/scenarios.json`, writes per-case QMind selections, evaluates every method against the matching case oracle, and regenerates the final comparison artifacts.
 
-Use `-UseExistingQMindSelections` to verify the committed comparison from the six canonical per-case QMind selection artifacts under `benchmark-results/qmind-selections/` without contacting QMind.
+OB-006 has an additional publication gate. The generator requires tracked runtime evidence under `benchmark-results/runtime-evidence/ob-006/`, material productcatalogservice and frontend runtime movement, and an OB-006 QMind selection that is not substantively identical to OB-005. If those checks fail, the generator refuses to publish the six-case headline comparison.
+
+Use `-UseExistingQMindSelections` to verify the committed comparison from the six canonical per-case QMind selection artifacts under `benchmark-results/qmind-selections/` without contacting QMind. This mode still enforces the OB-006 runtime-evidence gate.
 
 `run-qmind-subset.ps1` can also be run directly for debugging a single QMind changed-files subset:
 
@@ -187,9 +189,9 @@ The committed OB-005 and OB-006 QMind artifacts currently select the same 17-tes
 | OB-003 Product Detail Regression | Code Change | `src/productcatalogservice/product_catalog.go`, `src/productcatalogservice/products.json`, `src/frontend/templates/product.html` | Product detail lookup fails or returns unusable data | Product detail page tests |
 | OB-004 Payment Regression | Code Change | `src/paymentservice/charge.js` | Valid card payments are rejected | Payment-aware successful order completion |
 | OB-005 Currency Data Corruption | Runtime Aware | `src/currencyservice/data/currency_conversion.json` | Corrupted USD conversion data causes currencyservice/frontend homepage failures under standard traffic | Homepage rendering tests selected from runtime observability signals |
-| OB-006 Ad Service Latency Cascade | Combined Signal | `src/adservice/src/main/java/hipstershop/AdService.java` | Adservice latency or errors cascade into frontend homepage latency/rendering failure | Homepage rendering tests selected from combined adservice code-change and frontend runtime impact |
+| OB-006 Product Catalog ListProducts Cascade | Combined Signal | `src/productcatalogservice/product_catalog.go` | Product catalog ListProducts latency or errors cascade into frontend homepage/product-grid rendering failure | Homepage/product-grid tests selected from combined productcatalogservice code-change and frontend runtime impact |
 
-For OB-005, History + Code Change receives only currency data changed-file context; it does not receive runtime metrics or oracle detecting tests. QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates. For OB-006, the changed file points to adservice and the canonical library has no direct adservice tests; QMind detection must come from combined adservice degradation and frontend homepage impact.
+For OB-005, History + Code Change receives only currency data changed-file context; it does not receive runtime metrics or oracle detecting tests. QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates. For OB-006, the changed file points to productcatalogservice and QMind detection must come from combined productcatalogservice degradation and frontend homepage/product-grid impact.
 
 QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates canonical artifacts at:
 

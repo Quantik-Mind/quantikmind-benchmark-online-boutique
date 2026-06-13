@@ -1,0 +1,118 @@
+{
+    "prometheus_window":  "2m",
+    "namespace":  "default",
+    "prometheus_url":  "http://localhost:19090",
+    "scenario":  "OB-006",
+    "metrics":  [
+                    {
+                        "no_data":  false,
+                        "promql":  "histogram_quantile(0.95, sum by (deployment, le) (rate(inbound_http_response_duration_seconds_bucket{namespace=\"default\",deployment=\"productcatalogservice\"}[2m])))",
+                        "key":  "productcatalogservice.latency_p95",
+                        "value":  10,
+                        "name":  "productcatalogservice latency p95",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "productcatalogservice"
+                                                      },
+                                           "value":  [
+                                                         1781377719.049,
+                                                         "10"
+                                                     ]
+                                       }
+                                   ]
+                    },
+                    {
+                        "no_data":  false,
+                        "promql":  "1 - (sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"productcatalogservice\",status=~\"2..|3..\"}[2m])) / sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"productcatalogservice\"}[2m])))",
+                        "key":  "productcatalogservice.error_rate",
+                        "value":  0,
+                        "name":  "productcatalogservice error rate",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "productcatalogservice"
+                                                      },
+                                           "value":  [
+                                                         1781377719.084,
+                                                         "0"
+                                                     ]
+                                       }
+                                   ]
+                    },
+                    {
+                        "no_data":  false,
+                        "promql":  "sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"productcatalogservice\"}[2m]))",
+                        "key":  "productcatalogservice.request_rate",
+                        "value":  1.9545454545454544,
+                        "name":  "productcatalogservice request rate",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "productcatalogservice"
+                                                      },
+                                           "value":  [
+                                                         1781377719.119,
+                                                         "1.9545454545454544"
+                                                     ]
+                                       }
+                                   ]
+                    },
+                    {
+                        "no_data":  false,
+                        "promql":  "histogram_quantile(0.95, sum by (deployment, le) (rate(inbound_http_response_duration_seconds_bucket{namespace=\"default\",deployment=\"frontend\"}[2m])))",
+                        "key":  "frontend.latency_p95",
+                        "value":  10,
+                        "name":  "frontend latency p95",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "frontend"
+                                                      },
+                                           "value":  [
+                                                         1781377719.154,
+                                                         "10"
+                                                     ]
+                                       }
+                                   ]
+                    },
+                    {
+                        "no_data":  false,
+                        "promql":  "1 - (sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\",status=~\"2..|3..\"}[2m])) / sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\"}[2m])))",
+                        "key":  "frontend.error_rate",
+                        "value":  0.016949152542372947,
+                        "name":  "frontend error rate",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "frontend"
+                                                      },
+                                           "value":  [
+                                                         1781377719.193,
+                                                         "0.016949152542372947"
+                                                     ]
+                                       }
+                                   ]
+                    },
+                    {
+                        "no_data":  false,
+                        "promql":  "sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\"}[2m]))",
+                        "key":  "frontend.request_rate",
+                        "value":  0.53636363636363638,
+                        "name":  "frontend request rate",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "frontend"
+                                                      },
+                                           "value":  [
+                                                         1781377719.229,
+                                                         "0.5363636363636364"
+                                                     ]
+                                       }
+                                   ]
+                    }
+                ],
+    "phase":  "injected",
+    "captured_at_utc":  "2026-06-13T19:08:38.0236417Z"
+}

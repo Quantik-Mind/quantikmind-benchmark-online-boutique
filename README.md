@@ -72,9 +72,9 @@ The six benchmark cases are intentionally small and independently scored:
 | OB-003 Product Detail Regression | Code Change | Product catalog service data/lookup and product template | Valid product detail lookup fails or returns unusable product data while listing remains healthy | Product detail pages and downstream flows that require product detail |
 | OB-004 Payment Regression | Code Change | Payment service charge path | Valid Visa or Mastercard payments are rejected | Successful payment/order completion |
 | OB-005 Currency Data Corruption | Runtime Aware | Currency conversion data | Corrupted USD conversion data causes currencyservice/frontend homepage failures under standard traffic | Homepage rendering checks informed by runtime error signals |
-| OB-006 Ad Service Latency Cascade | Combined Signal | Ad service GetAds path | Ad service latency or errors cascade into frontend homepage latency/rendering failure | Homepage rendering checks informed by adservice plus frontend runtime signals |
+| OB-006 Product Catalog ListProducts Cascade | Combined Signal | Product catalog ListProducts path | Product catalog latency or errors cascade into frontend homepage/product-grid rendering failure | Homepage/product-grid checks informed by productcatalogservice plus frontend runtime signals |
 
-OB-005 validates the value of runtime observability because a code-change-only selector sees only a currency data file and does not receive runtime metrics or oracle tests. Runtime-aware selection can connect elevated currencyservice and frontend errors to the user-visible homepage checks. OB-006 validates combined-signal selection because the code change points to adservice, while the direct user-visible impact appears through frontend homepage behavior.
+OB-005 validates the value of runtime observability because a code-change-only selector sees only a currency data file and does not receive runtime metrics or oracle tests. Runtime-aware selection can connect elevated currencyservice and frontend errors to the user-visible homepage checks. OB-006 validates combined-signal selection because the code change points to productcatalogservice, while the direct user-visible impact appears through frontend homepage/product-grid behavior.
 
 ## Fresh-User Flow
 
