@@ -1,0 +1,188 @@
+{
+    "scenario":  "OB-006",
+    "events":  [
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  174,
+                       "status_code":  200,
+                       "index":  1
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  149,
+                       "status_code":  200,
+                       "index":  2
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  141,
+                       "status_code":  200,
+                       "index":  3
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  161,
+                       "status_code":  200,
+                       "index":  4
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  147,
+                       "status_code":  200,
+                       "index":  5
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  143,
+                       "status_code":  200,
+                       "index":  6
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  142,
+                       "status_code":  200,
+                       "index":  7
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  149,
+                       "status_code":  200,
+                       "index":  8
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  147,
+                       "status_code":  200,
+                       "index":  9
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  158,
+                       "status_code":  200,
+                       "index":  10
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  131,
+                       "status_code":  200,
+                       "index":  11
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  149,
+                       "status_code":  200,
+                       "index":  12
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  149,
+                       "status_code":  200,
+                       "index":  13
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  150,
+                       "status_code":  200,
+                       "index":  14
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  142,
+                       "status_code":  200,
+                       "index":  15
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  151,
+                       "status_code":  200,
+                       "index":  16
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  138,
+                       "status_code":  200,
+                       "index":  17
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  151,
+                       "status_code":  200,
+                       "index":  18
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  144,
+                       "status_code":  200,
+                       "index":  19
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  147,
+                       "status_code":  200,
+                       "index":  20
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  130,
+                       "status_code":  200,
+                       "index":  21
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  181,
+                       "status_code":  200,
+                       "index":  22
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  194,
+                       "status_code":  200,
+                       "index":  23
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  144,
+                       "status_code":  200,
+                       "index":  24
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  155,
+                       "status_code":  200,
+                       "index":  25
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  162,
+                       "status_code":  200,
+                       "index":  26
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  151,
+                       "status_code":  200,
+                       "index":  27
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  155,
+                       "status_code":  200,
+                       "index":  28
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  153,
+                       "status_code":  200,
+                       "index":  29
+                   },
+                   {
+                       "ok":  true,
+                       "elapsed_ms":  137,
+                       "status_code":  200,
+                       "index":  30
+                   }
+               ],
+    "phase":  "baseline",
+    "frontend_url":  "http://34.185.198.67/",
+    "captured_at_utc":  "2026-06-13T18:50:04.2105708Z"
+}

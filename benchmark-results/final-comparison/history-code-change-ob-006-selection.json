@@ -15,27 +15,290 @@
   "case_context": {
     "id": "OB-006",
     "expected_changed_files": [
-      "src/adservice/src/main/java/hipstershop/AdService.java"
+      "src/productcatalogservice/product_catalog.go"
     ]
   },
   "selected_tests": [
-    "checkout-empty-cart-does-not-complete-order",
-    "frontend-basic-user-journey-home-product-cart",
-    "checkout-page-accessible-from-cart",
-    "checkout-page-does-not-crash-with-empty-cart",
-    "order-form-requires-payment-data",
-    "payment-order-completion-confirms-success",
+    "catalog-first-product-link-has-valid-href",
+    "catalog-first-product-opens-detail-page",
+    "catalog-multiple-products-visible",
+    "catalog-open-first-product-detail",
+    "catalog-product-detail-can-be-opened-twice",
+    "catalog-product-detail-has-price",
+    "catalog-product-detail-keeps-product-context",
+    "catalog-product-link-href-starts-with-product",
+    "catalog-two-product-links-visible-if-present",
     "cart-add-from-product-detail-keeps-price-context",
     "cart-add-from-product-detail-shows-cart-context",
     "cart-add-product-and-view-cart",
     "cart-add-product-from-detail-page",
     "cart-page-loads-without-product",
-    "catalog-first-product-link-has-valid-href",
-    "catalog-first-product-opens-detail-page",
-    "catalog-multiple-products-visible",
-    "catalog-open-first-product-detail"
+    "product-detail-page-has-add-to-cart-button"
   ],
   "scores": [
+    {
+      "test_id": "catalog-first-product-link-has-valid-href",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-first-product-opens-detail-page",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-multiple-products-visible",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-open-first-product-detail",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-product-detail-can-be-opened-twice",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-product-detail-has-price",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-product-detail-keeps-product-context",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-product-link-href-starts-with-product",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "catalog-two-product-links-visible-if-present",
+      "score": 120,
+      "reasons": [
+        "high-risk id keyword match: catalog, product",
+        "historical risk criticality: medium",
+        "scenario id token match: catalog, product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "cart-add-from-product-detail-keeps-price-context",
+      "score": 105,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "cart-add-from-product-detail-shows-cart-context",
+      "score": 105,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "cart-add-product-and-view-cart",
+      "score": 105,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "cart-add-product-from-detail-page",
+      "score": 105,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "cart-page-loads-without-product",
+      "score": 105,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "product-detail-page-has-add-to-cart-button",
+      "score": 105,
+      "reasons": [
+        "high-risk id keyword match: cart, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "frontend-basic-user-journey-home-product-cart",
+      "score": 90,
+      "reasons": [
+        "high-risk id keyword match: cart, frontend, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: product"
+      ]
+    },
+    {
+      "test_id": "homepage-contains-product-price",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "homepage-has-at-least-one-product-link",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "navigation-home-to-product-to-home",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "product-detail-allows-return-navigation",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "product-detail-page-has-body-content",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "product-detail-page-has-non-empty-body",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "product-detail-page-has-price",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
+    {
+      "test_id": "product-detail-refresh-keeps-content",
+      "score": 85,
+      "reasons": [
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: catalog, product, productcatalogservice",
+        "changed-code mapping match: productcatalogservice"
+      ]
+    },
     {
       "test_id": "checkout-empty-cart-does-not-complete-order",
       "score": 80,
@@ -45,11 +308,23 @@
       ]
     },
     {
-      "test_id": "frontend-basic-user-journey-home-product-cart",
+      "test_id": "frontend-homepage-has-product-grid",
       "score": 70,
       "reasons": [
-        "high-risk id keyword match: cart, frontend, product",
-        "historical risk criticality: medium"
+        "high-risk id keyword match: frontend, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: product"
+      ]
+    },
+    {
+      "test_id": "frontend-products-have-prices",
+      "score": 70,
+      "reasons": [
+        "high-risk id keyword match: frontend, product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: product"
       ]
     },
     {
@@ -85,139 +360,13 @@
       ]
     },
     {
-      "test_id": "cart-add-from-product-detail-keeps-price-context",
+      "test_id": "smoke-product-links-visible",
       "score": 50,
       "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "cart-add-from-product-detail-shows-cart-context",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "cart-add-product-and-view-cart",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "cart-add-product-from-detail-page",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "cart-page-loads-without-product",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-first-product-link-has-valid-href",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-first-product-opens-detail-page",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-multiple-products-visible",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-open-first-product-detail",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-product-detail-can-be-opened-twice",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-product-detail-has-price",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-product-detail-keeps-product-context",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-product-link-href-starts-with-product",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "catalog-two-product-links-visible-if-present",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: catalog, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "frontend-homepage-has-product-grid",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: frontend, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "frontend-products-have-prices",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: frontend, product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "product-detail-page-has-add-to-cart-button",
-      "score": 50,
-      "reasons": [
-        "high-risk id keyword match: cart, product",
-        "historical risk criticality: medium"
+        "high-risk id keyword match: product",
+        "historical risk criticality: medium",
+        "scenario id token match: product",
+        "scenario metadata token match: product"
       ]
     },
     {
@@ -321,78 +470,6 @@
       "score": 30,
       "reasons": [
         "high-risk id keyword match: frontend",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "homepage-contains-product-price",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "homepage-has-at-least-one-product-link",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "navigation-home-to-product-to-home",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "product-detail-allows-return-navigation",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "product-detail-page-has-body-content",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "product-detail-page-has-non-empty-body",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "product-detail-page-has-price",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "product-detail-refresh-keeps-content",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "smoke-product-links-visible",
-      "score": 30,
-      "reasons": [
-        "high-risk id keyword match: product",
         "historical risk criticality: medium"
       ]
     },

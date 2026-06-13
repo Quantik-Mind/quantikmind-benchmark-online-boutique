@@ -2,13 +2,19 @@
 
 ## Scenario
 
-OB-006 introduces deterministic adservice latency or failure in the upstream Online Boutique file:
+OB-006 introduces deterministic latency or failure in the upstream Online Boutique product catalog listing path:
 
 ```text
-src/adservice/src/main/java/hipstershop/AdService.java
+src/productcatalogservice/product_catalog.go
 ```
 
-The direct detecting tests are homepage/frontend smoke checks:
+The injected method is:
+
+```text
+func (p *productCatalog) ListProducts(context.Context, *pb.Empty) (*pb.ListProductsResponse, error)
+```
+
+The direct detecting tests are homepage and product-grid checks:
 
 ```text
 smoke-homepage-loads
@@ -19,64 +25,44 @@ homepage-shows-google-cloud-branding
 homepage-has-multiple-links
 ```
 
-This is a combined-signal case because code change points to `adservice`, while runtime observability must show the impact crossing into `frontend`.
+This is a combined-signal case because code change points to `productcatalogservice`, while runtime observability must show the impact crossing into `frontend` homepage/product-grid behavior.
+
+## Why OB-006 Was Redesigned
+
+The original adservice version was rejected because frontend treats ads as optional, uses a 100 ms timeout, and ignores ad errors. Product catalog listing is homepage-critical because `homeHandler` calls `getProducts`, which calls `ProductCatalogService/ListProducts`; if that call fails, the frontend returns an error before building the homepage product grid.
 
 ## Reproducible Defect Injection
 
 Use the helper against an external Online Boutique checkout:
 
 ```powershell
-.\runtime-scenarios\ob-006-adservice-latency-cascade\apply-ob006-adservice-latency.ps1 -SourceRoot microservices-demo
+.\runtime-scenarios\ob-006-productcatalog-listproducts-cascade\apply-ob006-productcatalog-listproducts.ps1 -SourceRoot microservices-demo
 ```
 
-The default mode injects a 35 second sleep in `getAds`, which is intentionally above the Playwright 30 second test timeout. The helper also supports deterministic gRPC failure:
+The default mode returns a deterministic gRPC `Unavailable` error from `ListProducts`. The helper also supports deterministic latency above Playwright's 30 second test timeout:
 
 ```powershell
-.\runtime-scenarios\ob-006-adservice-latency-cascade\apply-ob006-adservice-latency.ps1 -SourceRoot microservices-demo -Mode failure
+.\runtime-scenarios\ob-006-productcatalog-listproducts-cascade\apply-ob006-productcatalog-listproducts.ps1 `
+  -SourceRoot microservices-demo `
+  -Mode latency `
+  -LatencyMs 35000
 ```
 
 Restore:
 
 ```powershell
-.\runtime-scenarios\ob-006-adservice-latency-cascade\apply-ob006-adservice-latency.ps1 -SourceRoot microservices-demo -Restore
+.\runtime-scenarios\ob-006-productcatalog-listproducts-cascade\apply-ob006-productcatalog-listproducts.ps1 -SourceRoot microservices-demo -Restore
 ```
-
-## Local Artifact Validation
-
-Local artifact validation checks committed benchmark inputs and generated comparison artifacts. It does not prove that the running Online Boutique deployment emitted live Prometheus evidence for OB-006.
-
-The following checks were run locally from committed inputs:
-
-```powershell
-python -m json.tool benchmark-pipeline\scenarios.json
-python -m json.tool defect-oracle\online-boutique-defect-oracle.v2.json
-python benchmark-pipeline\check-defect-oracle.py --oracle defect-oracle\online-boutique-defect-oracle.v2.json --library qmind-test-library\online-boutique-playwright-51.json
-.\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
-```
-
-Oracle/library validation status: `warn`, with only the existing broad `expected_unaffected_tests` label warnings. OB-006 detecting and validated detecting tests are all canonical library IDs.
-
-OB-006 per-method results from local artifacts:
-
-| Method | Result | Selected tests | Execution reduction |
-| --- | --- | ---: | ---: |
-| Full Suite | detected | 51 | 0.0% |
-| Random | detected | 26 | 49.0% |
-| History + Code Change | missed | 15 | 70.6% |
-| Quantik Mind | detected | 15 | 70.6% |
-
-Aggregate expected benchmark results after OB-006 from local artifacts:
-
-| Method | Recall | Average selected tests | Average execution reduction |
-| --- | ---: | ---: | ---: |
-| Full Suite | 6/6 | 51.0 | 0.0% |
-| Random | 5/6 | 26.0 | 49.0% |
-| History + Code Change | 4/6 | 15.0 | 70.6% |
-| Quantik Mind | 6/6 | 15.5 | 69.6% |
 
 ## Live Runtime Validation
 
-Live runtime validation is the missing independent publication evidence for OB-006. It must capture Prometheus movement for both `adservice` and `frontend` in the same validation window used for homepage traffic and the live OB-006 QMind subset. The committed OB-006 QMind selection currently matches OB-005 exactly and reports identical business metrics, so it must not be presented as independent proof of an additional runtime-aware win until distinct live evidence is captured.
+Live runtime validation must capture Prometheus movement for both `productcatalogservice` and `frontend` in the same validation window used for homepage traffic and the live OB-006 QMind subset. Evidence is copied to:
+
+```text
+benchmark-results/runtime-evidence/ob-006/
+```
+
+only after runtime movement and QMind selection checks pass.
 
 Current live runtime evidence status: `TBD`.
 
@@ -101,32 +87,30 @@ Prerequisites:
   -FrontendUrl "http://34.185.198.67/" `
   -PrometheusUrl "http://localhost:19090" `
   -SourceRoot "microservices-demo" `
-  -ImageRepository "europe-west3-docker.pkg.dev/quantik-mind/online-boutique-benchmark/adservice"
+  -ImageRepository "europe-west3-docker.pkg.dev/quantik-mind/online-boutique-benchmark/productcatalogservice"
 ```
 
 The script performs these phases:
 
 1. Fails fast if required files or tools are missing: `docker`, `kubectl`, `qmind`, `python`, and `gcloud` when the active image repository requires it.
-2. Fails fast if Prometheus, `FrontendUrl`, `SourceRoot`, the adservice source file, kubectl context, namespace, or deployment is unavailable.
-3. Derives the current running adservice image from Kubernetes with:
-
-```powershell
-kubectl -n <namespace> get deployment adservice -o jsonpath="{.spec.template.spec.containers[?(@.name=='server')].image}"
-```
-
+2. Fails fast if Prometheus, `FrontendUrl`, `SourceRoot`, the product catalog source file, kubectl context, namespace, or deployment is unavailable.
+3. Derives the current running productcatalogservice image from Kubernetes.
 4. Uses `-ImageRepository` for injected and clean image tags. If it is omitted, the script derives the repository from the running image only when that repository is not a read-only upstream such as `google-samples`.
 5. Runs baseline homepage traffic against `-FrontendUrl`.
-6. Captures baseline Prometheus snapshots for `adservice` and `frontend`.
+6. Captures baseline Prometheus snapshots for `productcatalogservice` and `frontend`.
 7. Applies the OB-006 injector locally.
-8. Builds and pushes the injected adservice image from `SourceRoot/src/adservice`.
+8. Builds and pushes the injected productcatalogservice image from `SourceRoot/src/productcatalogservice`.
 9. Deploys the injected image with `kubectl set image` and waits for rollout.
 10. Runs injected homepage traffic and captures injected Prometheus snapshots.
-11. Prints and saves a runtime movement summary.
+11. Fails unless material productcatalogservice movement and material frontend movement are both present.
 12. Backs up any existing `benchmark-results/qmind-selections/qmind-selection-ob-006.json`.
 13. Runs `run-qmind-subset.ps1 -BenchmarkCase OB-006`.
-14. Verifies QMind detection by intersecting selected tests with OB-006 oracle detectors. At least one detector is required; missing non-selected detectors are warnings.
-15. Regenerates final comparison artifacts with `generate-final-comparison.ps1 -UseExistingQMindSelections`.
-16. Restores the source file in a `finally` block unless `-SkipRestore` is set. If the injected image reached the cluster, the script also builds and pushes `<ImageRepository>:ob006-clean-<timestamp>`, deploys it, and waits for rollout.
+14. Verifies that QMind used the OB-006 productcatalogservice changed-files artifact, observability was enabled, runtime signal was present, and the new run ID differs from the previous OB-006 artifact.
+15. Verifies QMind detection by intersecting selected tests with OB-006 oracle detectors. At least one detector is required; missing non-selected detectors are warnings.
+16. Fails if the live OB-006 QMind selection is substantively identical to OB-005 in selected tests, business metrics, risk coverage, and risk density.
+17. Publishes the publication-safe runtime evidence under `benchmark-results/runtime-evidence/ob-006/`.
+18. Regenerates final comparison artifacts with `generate-final-comparison.ps1 -UseExistingQMindSelections`.
+19. Restores the source file in a `finally` block unless `-SkipRestore` is set. If the injected image reached the cluster, the script also builds and pushes `<ImageRepository>:ob006-clean-<timestamp>`, deploys it, and waits for rollout.
 
 If only runtime snapshots are needed and QMind/final comparison should not run:
 
@@ -135,27 +119,31 @@ If only runtime snapshots are needed and QMind/final comparison should not run:
   -FrontendUrl "http://34.185.198.67/" `
   -PrometheusUrl "http://localhost:19090" `
   -SourceRoot "microservices-demo" `
-  -ImageRepository "europe-west3-docker.pkg.dev/quantik-mind/online-boutique-benchmark/adservice" `
+  -ImageRepository "europe-west3-docker.pkg.dev/quantik-mind/online-boutique-benchmark/productcatalogservice" `
   -SkipQMind `
   -SkipComparison
 ```
 
-Use `-SkipRestore` only for deliberate debugging. Without it, any failure after injection still attempts to restore the local source and redeploy a clean adservice image. If clean redeploy fails, the script prints manual recovery commands loudly.
-
 ## Evidence To Capture
 
-The validation script writes runtime artifacts under:
+The validation script writes scratch runtime artifacts under:
 
 ```text
 benchmark-runs/ob-006-live-runtime-validation/
+```
+
+After all checks pass, it copies only publication-safe evidence into:
+
+```text
+benchmark-results/runtime-evidence/ob-006/
 ```
 
 Required evidence fields:
 
 | Evidence | Status | Artifact or value |
 | --- | --- | --- |
-| Baseline adservice p95/error | TBD | `baseline-prometheus-snapshot.json` |
-| Injected adservice p95/error | TBD | `injected-prometheus-snapshot.json` |
+| Baseline productcatalogservice p95/error | TBD | `baseline-prometheus-snapshot.json` |
+| Injected productcatalogservice p95/error | TBD | `injected-prometheus-snapshot.json` |
 | Baseline frontend p95/error | TBD | `baseline-prometheus-snapshot.json` |
 | Injected frontend p95/error | TBD | `injected-prometheus-snapshot.json` |
 | Baseline homepage traffic | TBD | `baseline-homepage-traffic.json` |
@@ -165,25 +153,7 @@ Required evidence fields:
 | QMind detection summary | TBD | `qmind-ob006-detection-summary.json` |
 | Final comparison result | TBD | `benchmark-results/final-comparison/final-comparison.json` |
 
-Prometheus queries printed and captured by the script:
-
-```promql
-histogram_quantile(0.95, sum by (deployment, le) (rate(inbound_http_response_duration_seconds_bucket{namespace="default",deployment="adservice"}[2m])))
-```
-
-```promql
-1 - (sum by (deployment) (rate(inbound_http_statuses_total{namespace="default",deployment="adservice",status=~"2..|3.."}[2m])) / sum by (deployment) (rate(inbound_http_statuses_total{namespace="default",deployment="adservice"}[2m])))
-```
-
-```promql
-histogram_quantile(0.95, sum by (deployment, le) (rate(inbound_http_response_duration_seconds_bucket{namespace="default",deployment="frontend"}[2m])))
-```
-
-```promql
-1 - (sum by (deployment) (rate(inbound_http_statuses_total{namespace="default",deployment="frontend",status=~"2..|3.."}[2m])) / sum by (deployment) (rate(inbound_http_statuses_total{namespace="default",deployment="frontend"}[2m])))
-```
-
-The script also captures request-rate queries for both services. If any metric query returns an empty Prometheus vector, the script prints `NO DATA`; such output is not publishable evidence for that metric.
+Material movement thresholds are explicit script parameters. Defaults require productcatalogservice p95 latency to increase by at least `5.0x` and `1.0s`, or productcatalogservice error rate to increase by at least `0.05`; frontend p95 latency must increase by at least `1.5x` and `0.2s`, or frontend error rate must increase by at least `0.02`.
 
 ## Publication Gate
 
@@ -192,8 +162,11 @@ OB-006 can be published externally only if all of the following are true:
 - Full suite detects OB-006.
 - History + Code Change misses OB-006.
 - QMind detects OB-006 using a live `qmind subset` artifact generated during the validation window.
-- The live OB-006 selection and business metrics are reviewed against OB-005 so any duplicate-selection behavior is disclosed.
-- Prometheus shows adservice movement and frontend movement in the same validation window.
+- The live OB-006 selection uses `benchmark-runs/scenario-ob-006-changed-files.json`, and that file contains only `src/productcatalogservice/product_catalog.go`.
+- The live OB-006 artifact shows `observability_enabled=true`, `has_runtime_signal=true`, and a new QMind run ID.
+- The live OB-006 selected tests, business metrics, risk coverage, and risk density are not substantively identical to OB-005.
+- Prometheus shows material productcatalogservice movement and material frontend movement in the same validation window.
+- Publication-safe evidence is committed under `benchmark-results/runtime-evidence/ob-006/`.
 
 Until those conditions are met from live runtime evidence, OB-006 must be described as implemented and locally artifact-validated, with external publication readiness marked `pending`.
 
@@ -204,6 +177,5 @@ Until those conditions are met from live runtime evidence, OB-006 must be descri
 - OB-001 through OB-005 definitions and oracle detecting tests were not changed.
 - The H+CC selector explicitly reports `uses_runtime: false` and `uses_oracle: false`.
 - The OB-006 H+CC selection contains no oracle detecting tests.
-- The OB-006 QMind artifact must contain canonical test IDs only and detect by intersecting homepage tests with the oracle.
-- The oracle uses direct homepage smoke checks only, not broad downstream failures.
+- The OB-006 QMind artifact must contain canonical test IDs only and detect by intersecting homepage/product-grid tests with the oracle.
 - Runtime evidence is not inferred from local JSON artifacts; live Prometheus snapshots are required before external publication.

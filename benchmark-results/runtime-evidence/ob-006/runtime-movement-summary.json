@@ -1,0 +1,59 @@
+{
+    "captured_at_utc":  "2026-06-13T19:08:38.0341039Z",
+    "scenario":  "OB-006",
+    "frontend_latency":  {
+                             "key":  "frontend.latency_p95",
+                             "baseline":  0.40478658536585366,
+                             "injected":  10,
+                             "delta":  9.5952134146341468,
+                             "ratio":  24.704375988551632,
+                             "min_delta":  0.2,
+                             "min_ratio":  1.5,
+                             "has_data":  true,
+                             "delta_passed":  true,
+                             "ratio_passed":  true,
+                             "passed":  true
+                         },
+    "validation_thresholds":  {
+                                  "productcatalogservice_latency_min_delta_seconds":  1,
+                                  "frontend_latency_min_ratio":  1.5,
+                                  "frontend_latency_min_delta_seconds":  0.2,
+                                  "productcatalogservice_error_rate_min_delta":  0.05,
+                                  "frontend_error_rate_min_delta":  0.02,
+                                  "productcatalogservice_latency_min_ratio":  5
+                              },
+    "productcatalogservice_signal_confirmed":  true,
+    "frontend_signal_confirmed":  true,
+    "productcatalogservice_error_rate":  {
+                                             "key":  "productcatalogservice.error_rate",
+                                             "baseline":  0,
+                                             "injected":  0,
+                                             "delta":  0,
+                                             "min_delta":  0.05,
+                                             "has_data":  true,
+                                             "passed":  false
+                                         },
+    "productcatalogservice_latency":  {
+                                          "key":  "productcatalogservice.latency_p95",
+                                          "baseline":  0.0475,
+                                          "injected":  10,
+                                          "delta":  9.9525,
+                                          "ratio":  210.52631578947367,
+                                          "min_delta":  1,
+                                          "min_ratio":  5,
+                                          "has_data":  true,
+                                          "delta_passed":  true,
+                                          "ratio_passed":  true,
+                                          "passed":  true
+                                      },
+    "publication_runtime_evidence":  "CONFIRMED",
+    "frontend_error_rate":  {
+                                "key":  "frontend.error_rate",
+                                "baseline":  0.03170028818443793,
+                                "injected":  0.016949152542372947,
+                                "delta":  -0.014751135642064983,
+                                "min_delta":  0.02,
+                                "has_data":  true,
+                                "passed":  false
+                            }
+}

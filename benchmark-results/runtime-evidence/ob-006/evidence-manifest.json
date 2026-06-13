@@ -1,0 +1,27 @@
+{
+    "scenario":  "OB-006",
+    "evidence_status":  "verified",
+    "published_at_utc":  "2026-06-13T19:08:41.8768119Z",
+    "source_run_dir":  "benchmark-runs/ob-006-live-runtime-validation",
+    "qmind_selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-006.json",
+    "qmind_run_id":  "306707f3-0b41-4b3f-b218-ac9a2c34ad5e",
+    "changed_files":  [
+                          "src/productcatalogservice/product_catalog.go"
+                      ],
+    "required_runtime_chain":  [
+                                   "productcatalogservice material latency or error movement",
+                                   "frontend material latency or error movement",
+                                   "QMind selection generated after injected runtime window",
+                                   "OB-006 QMind selection not substantively identical to OB-005"
+                               ],
+    "published_files":  [
+                            "benchmark-results/runtime-evidence/ob-006/baseline-prometheus-snapshot.json",
+                            "benchmark-results/runtime-evidence/ob-006/injected-prometheus-snapshot.json",
+                            "benchmark-results/runtime-evidence/ob-006/runtime-movement-summary.json",
+                            "benchmark-results/runtime-evidence/ob-006/baseline-homepage-traffic.json",
+                            "benchmark-results/runtime-evidence/ob-006/injected-homepage-traffic.json",
+                            "benchmark-results/runtime-evidence/ob-006/qmind-ob006-detection-summary.json",
+                            "benchmark-results/runtime-evidence/ob-006/scenario-ob-006-changed-files.json",
+                            "benchmark-results/runtime-evidence/ob-006/qmind-selection-ob-006.json"
+                        ]
+}

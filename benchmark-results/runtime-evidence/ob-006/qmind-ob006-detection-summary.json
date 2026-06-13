@@ -1,0 +1,57 @@
+{
+    "detected":  true,
+    "scenario":  "OB-006",
+    "previous_qmind_run_id":  "f2e0a22e-4d82-4133-855e-7fdb1cfef311",
+    "qmind_run_id":  "306707f3-0b41-4b3f-b218-ac9a2c34ad5e",
+    "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-006.json",
+    "has_runtime_signal":  true,
+    "expected_detector_ids":  [
+                                  "frontend-homepage-has-product-grid",
+                                  "frontend-products-have-prices",
+                                  "homepage-contains-product-price",
+                                  "homepage-has-at-least-one-product-link",
+                                  "smoke-product-links-visible",
+                                  "catalog-multiple-products-visible",
+                                  "catalog-first-product-link-has-valid-href",
+                                  "catalog-product-link-href-starts-with-product",
+                                  "catalog-open-first-product-detail",
+                                  "catalog-product-detail-has-price",
+                                  "catalog-product-detail-can-be-opened-twice",
+                                  "catalog-product-detail-keeps-product-context",
+                                  "catalog-first-product-opens-detail-page",
+                                  "product-detail-page-has-body-content",
+                                  "product-detail-allows-return-navigation",
+                                  "product-detail-page-has-add-to-cart-button",
+                                  "product-detail-page-has-price",
+                                  "product-detail-page-has-non-empty-body",
+                                  "product-detail-refresh-keeps-content"
+                              ],
+    "observability_enabled":  true,
+    "selected_detector_ids":  [
+                                  "frontend-homepage-has-product-grid",
+                                  "frontend-products-have-prices",
+                                  "homepage-contains-product-price",
+                                  "catalog-open-first-product-detail",
+                                  "catalog-product-detail-has-price",
+                                  "catalog-product-detail-keeps-product-context",
+                                  "catalog-first-product-opens-detail-page",
+                                  "product-detail-page-has-add-to-cart-button"
+                              ],
+    "changed_files_file":  "benchmark-runs/scenario-ob-006-changed-files.json",
+    "changed_files":  [
+                          "src/productcatalogservice/product_catalog.go"
+                      ],
+    "missing_detector_ids":  [
+                                 "homepage-has-at-least-one-product-link",
+                                 "smoke-product-links-visible",
+                                 "catalog-multiple-products-visible",
+                                 "catalog-first-product-link-has-valid-href",
+                                 "catalog-product-link-href-starts-with-product",
+                                 "catalog-product-detail-can-be-opened-twice",
+                                 "product-detail-page-has-body-content",
+                                 "product-detail-allows-return-navigation",
+                                 "product-detail-page-has-price",
+                                 "product-detail-page-has-non-empty-body",
+                                 "product-detail-refresh-keeps-content"
+                             ]
+}

@@ -1,9 +1,9 @@
 param(
     [string]$SourceRoot = "microservices-demo",
-    [string]$AdServiceFile = "src/adservice/src/main/java/hipstershop/AdService.java",
+    [string]$ProductCatalogFile = "src/productcatalogservice/product_catalog.go",
     [string]$BackupPath,
     [ValidateSet("latency", "failure")]
-    [string]$Mode = "latency",
+    [string]$Mode = "failure",
     [int]$LatencyMs = 35000,
     [switch]$Restore
 )
@@ -29,7 +29,7 @@ function Write-Utf8NoBom {
     )
 }
 
-$target = Join-Path $SourceRoot $AdServiceFile
+$target = Join-Path $SourceRoot $ProductCatalogFile
 if ([string]::IsNullOrWhiteSpace($BackupPath)) {
     $BackupPath = "$target.ob006.bak"
 }
@@ -44,7 +44,7 @@ if ($Restore) {
 }
 
 if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
-    throw "Missing adservice file: $target"
+    throw "Missing productcatalogservice file: $target"
 }
 
 if ($LatencyMs -lt 0) {
@@ -56,44 +56,31 @@ if (-not (Test-Path -LiteralPath $BackupPath -PathType Leaf)) {
 }
 
 $source = Get-Content -LiteralPath $target -Raw
-if ($source -match "OB-006 Ad Service Latency Cascade") {
+if ($source -match "OB-006 ProductCatalog ListProducts Cascade") {
     throw "OB-006 injection is already present in $target. Restore first or inspect the file."
 }
 
 $injection = if ($Mode -eq "failure") {
 @"
-    // OB-006 Ad Service Latency Cascade: deterministic adservice failure for benchmark validation.
-    responseObserver.onError(
-        io.grpc.Status.UNAVAILABLE
-            .withDescription("OB-006 deterministic adservice failure")
-            .asRuntimeException());
-    return;
+	// OB-006 ProductCatalog ListProducts Cascade: deterministic homepage-critical product listing failure.
+	return nil, status.Errorf(codes.Unavailable, "OB-006 deterministic product catalog ListProducts failure")
 
 "@
 } else {
 @"
-    // OB-006 Ad Service Latency Cascade: deterministic latency above Playwright's 30s test timeout.
-    try {
-      Thread.sleep(${LatencyMs}L);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      responseObserver.onError(
-          io.grpc.Status.DEADLINE_EXCEEDED
-              .withDescription("OB-006 adservice latency interrupted")
-              .asRuntimeException());
-      return;
-    }
+	// OB-006 ProductCatalog ListProducts Cascade: deterministic latency above Playwright's 30s test timeout.
+	time.Sleep(time.Duration(${LatencyMs}) * time.Millisecond)
 
 "@
 }
 
-$pattern = "(?ms)(public\s+void\s+getAds\s*\([^)]*responseObserver[^)]*\)\s*\{\s*)"
+$pattern = "(?ms)(func\s+\(p\s+\*productCatalog\)\s+ListProducts\s*\(\s*context\.Context\s*,\s*\*pb\.Empty\s*\)\s*\(\s*\*pb\.ListProductsResponse\s*,\s*error\s*\)\s*\{\s*)"
 if ($source -notmatch $pattern) {
-    throw "Could not find the adservice getAds method in $target. The helper expects the standard Online Boutique AdService.java shape."
+    throw "Could not find productcatalogservice ListProducts in $target. The helper expects the standard Online Boutique product_catalog.go shape."
 }
 
 $updated = [regex]::Replace($source, $pattern, "`$1$injection", 1)
 Write-Utf8NoBom -Path $target -Text $updated
 
-Write-Host "Applied OB-006 Ad Service Latency Cascade to ${target}: mode=$Mode latency_ms=$LatencyMs."
-Write-Host "Restore with: .\runtime-scenarios\ob-006-adservice-latency-cascade\apply-ob006-adservice-latency.ps1 -Restore"
+Write-Host "Applied OB-006 ProductCatalog ListProducts Cascade to ${target}: mode=$Mode latency_ms=$LatencyMs."
+Write-Host "Restore with: .\runtime-scenarios\ob-006-productcatalog-listproducts-cascade\apply-ob006-productcatalog-listproducts.ps1 -Restore"

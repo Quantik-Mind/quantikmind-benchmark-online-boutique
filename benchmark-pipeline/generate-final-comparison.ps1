@@ -7,6 +7,7 @@ param(
     [string]$QMindEnvFile = ".env",
     [string]$QMindLibraryApi,
     [string]$OutputDir = "benchmark-results/final-comparison",
+    [string]$RuntimeEvidenceDir = "benchmark-results/runtime-evidence/ob-006",
     [int]$RandomSeed = 42,
     [int]$RandomSize = 26,
     [int]$TargetedSize = 15,
@@ -255,6 +256,92 @@ function Assert-QMindCaseSelections {
             $lines += "  $($item.case): $($item.path)"
         }
         throw ($lines -join [Environment]::NewLine)
+    }
+}
+
+function Get-CanonicalJson {
+    param([object]$Value)
+
+    return ($Value | ConvertTo-Json -Depth 40 -Compress)
+}
+
+function Get-SelectionRunId {
+    param([object]$Selection)
+
+    $runId = [string]$Selection.qmind_subset_json.run_id
+    if ([string]::IsNullOrWhiteSpace($runId)) {
+        $runId = [string]$Selection.run_id
+    }
+    return $runId
+}
+
+function Assert-Ob006RuntimeEvidence {
+    param(
+        [string]$EvidenceDir,
+        [string]$Ob005SelectionPath,
+        [string]$Ob006SelectionPath
+    )
+
+    $requiredFiles = @(
+        "evidence-manifest.json",
+        "baseline-prometheus-snapshot.json",
+        "injected-prometheus-snapshot.json",
+        "runtime-movement-summary.json",
+        "baseline-homepage-traffic.json",
+        "injected-homepage-traffic.json",
+        "qmind-ob006-detection-summary.json",
+        "scenario-ob-006-changed-files.json",
+        "qmind-selection-ob-006.json"
+    )
+    foreach ($fileName in $requiredFiles) {
+        $path = Join-Path $EvidenceDir $fileName
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            throw "Missing required OB-006 runtime evidence artifact: $(To-RepoPath $path)"
+        }
+    }
+
+    $manifest = Read-Json (Join-Path $EvidenceDir "evidence-manifest.json")
+    if ([string]$manifest.evidence_status -ne "verified") {
+        throw "OB-006 evidence manifest must set evidence_status=verified."
+    }
+
+    $movement = Read-Json (Join-Path $EvidenceDir "runtime-movement-summary.json")
+    if ([string]$movement.publication_runtime_evidence -ne "CONFIRMED") {
+        throw "OB-006 runtime movement summary must set publication_runtime_evidence=CONFIRMED."
+    }
+    if ([bool]$movement.productcatalogservice_signal_confirmed -ne $true) {
+        throw "OB-006 runtime evidence must confirm material productcatalogservice latency or error movement."
+    }
+    if ([bool]$movement.frontend_signal_confirmed -ne $true) {
+        throw "OB-006 runtime evidence must confirm material frontend latency or error movement."
+    }
+
+    $changedFiles = @(Read-Json (Join-Path $EvidenceDir "scenario-ob-006-changed-files.json") | ForEach-Object { [string]$_ })
+    if ($changedFiles.Count -ne 1 -or $changedFiles[0] -ne "src/productcatalogservice/product_catalog.go") {
+        throw "OB-006 runtime evidence changed-files artifact must contain only src/productcatalogservice/product_catalog.go."
+    }
+
+    $detection = Read-Json (Join-Path $EvidenceDir "qmind-ob006-detection-summary.json")
+    if ([bool]$detection.detected -ne $true) {
+        throw "OB-006 QMind detection summary must set detected=true."
+    }
+    if ([bool]$detection.observability_enabled -ne $true -or [bool]$detection.has_runtime_signal -ne $true) {
+        throw "OB-006 QMind detection summary must show observability_enabled=true and has_runtime_signal=true."
+    }
+
+    $ob005 = Read-Json $Ob005SelectionPath
+    $ob006 = Read-Json $Ob006SelectionPath
+    $sameSelectedTests = ((@($ob005.selected_tests) -join "|") -eq (@($ob006.selected_tests) -join "|"))
+    $sameBusinessMetrics = ((Get-CanonicalJson $ob005.business_metrics) -eq (Get-CanonicalJson $ob006.business_metrics))
+    $sameRiskCoverage = ([string]$ob005.risk_coverage -eq [string]$ob006.risk_coverage)
+    $sameRiskEfficiency = ([string]$ob005.risk_efficiency -eq [string]$ob006.risk_efficiency)
+    if ($sameSelectedTests -and $sameBusinessMetrics -and $sameRiskCoverage -and $sameRiskEfficiency) {
+        throw "OB-006 QMind selection is substantively identical to OB-005. Regenerate OB-006 from distinct live combined-signal evidence before producing the 6-case headline."
+    }
+
+    $evidenceSelection = Read-Json (Join-Path $EvidenceDir "qmind-selection-ob-006.json")
+    if ((Get-SelectionRunId $evidenceSelection) -ne (Get-SelectionRunId $ob006)) {
+        throw "Tracked OB-006 evidence selection run_id does not match benchmark-results/qmind-selections/qmind-selection-ob-006.json."
     }
 }
 
@@ -513,6 +600,12 @@ $libraryIds = @($fullSuiteLibrary.tests | ForEach-Object { Get-TestId $_ } | Whe
 if ($UseExistingQMindSelections -or $SkipRun) {
     Assert-QMindCaseSelections $CaseIds $libraryIds
 }
+Assert-Ob006RuntimeEvidence `
+    -EvidenceDir $RuntimeEvidenceDir `
+    -Ob005SelectionPath (Get-QMindSelectionPath "OB-005") `
+    -Ob006SelectionPath (Get-QMindSelectionPath "OB-006")
+$ob006EvidenceManifest = Read-Json (Join-Path $RuntimeEvidenceDir "evidence-manifest.json")
+$ob006RuntimeMovement = Read-Json (Join-Path $RuntimeEvidenceDir "runtime-movement-summary.json")
 
 if (-not $SkipRun) {
     Invoke-Python @(
@@ -703,6 +796,18 @@ $comparison = [ordered]@{
     aggregate_methods = $aggregateMethods
     category_summaries = $categorySummaries
     qmind_dynamic_risk_diagnostics = $qmindDynamicRiskDiagnostics
+    runtime_evidence = [ordered]@{
+        "OB-006" = [ordered]@{
+            evidence_dir = To-RepoPath $RuntimeEvidenceDir
+            evidence_status = [string]$ob006EvidenceManifest.evidence_status
+            qmind_run_id = [string]$ob006EvidenceManifest.qmind_run_id
+            publication_runtime_evidence = [string]$ob006RuntimeMovement.publication_runtime_evidence
+            productcatalogservice_signal_confirmed = [bool]$ob006RuntimeMovement.productcatalogservice_signal_confirmed
+            frontend_signal_confirmed = [bool]$ob006RuntimeMovement.frontend_signal_confirmed
+            changed_files = @($ob006EvidenceManifest.changed_files | ForEach-Object { [string]$_ })
+            published_files = @($ob006EvidenceManifest.published_files | ForEach-Object { [string]$_ })
+        }
+    }
     selector_input_policy = [ordered]@{
         full_suite = @("test library")
         random = @("test library", "seed")
@@ -715,7 +820,7 @@ $comparison = [ordered]@{
     limitations = @(
         "QMind is evaluated from one canonical selection artifact per benchmark case under benchmark-results/qmind-selections/qmind-selection-ob-*.json.",
         "Normal generator mode creates QMind selections by invoking benchmark-pipeline/run-qmind-subset.ps1 for each case; -UseExistingQMindSelections reuses committed canonical per-case artifacts.",
-        "The committed OB-005 and OB-006 QMind artifacts currently select the same frontend/homepage risk cluster and have identical business metrics; OB-006 should not be read as independent live-runtime proof beyond the documented combined-signal scenario until distinct live evidence is captured.",
+        "OB-006 headline inclusion requires tracked runtime evidence under benchmark-results/runtime-evidence/ob-006 and a QMind selection that is not substantively identical to OB-005.",
         "History + Code Change uses changed files and library/history metadata only; oracle detecting tests are used only by the evaluator.",
         "No canonical test library content was changed; oracle changes are limited to minimal direct detecting test lists."
     )
@@ -810,6 +915,7 @@ This comparison models Online Boutique as six independent CI/CD benchmark cases.
 - History + Code Change size: $TargetedSize tests per case
 - QMind selection artifacts: ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-006.json``
 - QMind selection mode: ``$($comparison.qmind_selection_mode)``
+- OB-006 runtime evidence: ``$(To-RepoPath $RuntimeEvidenceDir)``
 
 ## Oracle Precision
 
@@ -862,11 +968,11 @@ Full Suite always selects all 51 tests.
 
 Random uses only the canonical test library and deterministic seed 42. It produces a per-case selection artifact and selects 26 tests, approximately 50% of the 51-test suite.
 
-History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is ``src/currencyservice/data/currency_conversion.json``; the six direct homepage oracle tests map to ``src/frontend/**/*``, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is ``src/adservice/src/main/java/hipstershop/AdService.java``; the canonical 51-test library has no direct adservice tests, so the same homepage smoke tests are not reachable from code-change context alone.
+History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is ``src/currencyservice/data/currency_conversion.json``; the six direct homepage oracle tests map to ``src/frontend/**/*``, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is ``src/productcatalogservice/product_catalog.go``; QMind must use the productcatalogservice code-change signal together with live frontend impact rather than oracle detecting tests.
 
-Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to adservice while runtime observability points to frontend homepage impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime or combined signals are required.
+Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to productcatalogservice while runtime observability points to frontend homepage/product-grid impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime or combined signals are required.
 
-The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This is transparent in the artifacts and means OB-006 should not be presented as independent proof of an additional runtime-aware win until distinct live runtime evidence is captured. It remains documented as a combined-signal case because the scenario, changed file, and oracle are separate from OB-005.
+OB-006 is included in the headline aggregate only when ``benchmark-pipeline/generate-final-comparison.ps1`` can validate tracked runtime evidence under ``$(To-RepoPath $RuntimeEvidenceDir)``. That evidence must show material productcatalogservice movement and material frontend movement in the same validation window, and the OB-006 QMind artifact must not be substantively identical to OB-005. QMind selected OB-006 from the productcatalogservice changed-file input plus runtime observability evidence, not from oracle detecting tests.
 
 ## Benchmark Integrity Controls
 
@@ -874,8 +980,9 @@ The committed OB-005 and OB-006 QMind artifacts currently select the same 17-tes
 - OB-005 uses the real committed file ``src/currencyservice/data/currency_conversion.json``.
 - The changed file is data, not application code.
 - The OB-005 oracle uses direct homepage tests only.
-- OB-006 uses the real upstream file ``src/adservice/src/main/java/hipstershop/AdService.java`` through a reversible injector.
-- The OB-006 oracle uses direct homepage tests only; there are no direct adservice tests in the canonical 51-test library.
+- OB-006 uses the real upstream file ``src/productcatalogservice/product_catalog.go`` through a reversible injector.
+- The OB-006 oracle uses direct homepage/product-grid tests only.
+- OB-006 runtime evidence is stored under ``$(To-RepoPath $RuntimeEvidenceDir)`` and is required by the final comparison generator.
 - The History + Code Change miss is explained by exact scoring mechanics, not hidden exclusions.
 - QMind detection must come from runtime observability, not oracle leakage.
 - The generator reports actual selected-suite outcomes; it does not hardcode winners.

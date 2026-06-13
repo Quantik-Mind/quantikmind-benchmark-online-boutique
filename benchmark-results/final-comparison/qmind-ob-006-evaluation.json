@@ -2,8 +2,8 @@
   "method": "qmind",
   "benchmark_case": "OB-006",
   "full_suite_size": 51,
-  "selected_test_count": 17,
-  "execution_reduction": 0.6666666666666667,
+  "selected_test_count": 19,
+  "execution_reduction": 0.6274509803921569,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
@@ -11,18 +11,38 @@
   "per_scenario": [
     {
       "id": "OB-006",
-      "name": "Ad Service Latency Cascades Into Homepage Rendering",
+      "name": "ProductCatalog ListProducts Cascade Into Homepage Rendering",
       "detected": true,
       "selected_detecting_tests": [
-        "homepage-has-visible-text-content"
+        "catalog-first-product-opens-detail-page",
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-has-price",
+        "catalog-product-detail-keeps-product-context",
+        "frontend-homepage-has-product-grid",
+        "frontend-products-have-prices",
+        "homepage-contains-product-price",
+        "product-detail-page-has-add-to-cart-button"
       ],
       "detecting_tests_used": [
-        "homepage-body-is-not-empty",
-        "homepage-has-multiple-links",
-        "homepage-has-visible-text-content",
-        "homepage-shows-google-cloud-branding",
-        "homepage-title-is-available",
-        "smoke-homepage-loads"
+        "catalog-first-product-link-has-valid-href",
+        "catalog-first-product-opens-detail-page",
+        "catalog-multiple-products-visible",
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-has-price",
+        "catalog-product-detail-keeps-product-context",
+        "catalog-product-link-href-starts-with-product",
+        "frontend-homepage-has-product-grid",
+        "frontend-products-have-prices",
+        "homepage-contains-product-price",
+        "homepage-has-at-least-one-product-link",
+        "product-detail-allows-return-navigation",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-body-content",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-page-has-price",
+        "product-detail-refresh-keeps-content",
+        "smoke-product-links-visible"
       ],
       "validation_status": "validated-combined-oracle"
     }
