@@ -154,7 +154,7 @@ That mode still validates that every QMind selection contains canonical test IDs
 
 OB-005 is intentionally different from the code-change controls. Its changed file is `src/currencyservice/data/currency_conversion.json`, while the direct oracle tests are frontend homepage tests. The History + Code Change selector therefore misses OB-005 for transparent scoring reasons, while QMind can detect it only when runtime observability surfaces the currencyservice/frontend error signal.
 
-The History + Code Change baseline is deterministic and transparent, but it is still a simplified local proxy for a Launchable or SmartTest-style service. It uses local test metadata and changed-file matching rather than a production-trained model.
+The History + Code Change baseline is deterministic and transparent, but it is still a simplified local proxy for a static history/code-change-aware selection service. It uses local test metadata and changed-file matching rather than a production-trained model.
 
 Random uses one deterministic seed. A seed sweep would give a distribution, but this benchmark intentionally keeps one reproducible control.
 

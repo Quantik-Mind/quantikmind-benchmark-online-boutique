@@ -10,6 +10,57 @@ Quantik Mind additionally reports dynamic risk diagnostics such as observed risk
 
 Read the final comparison as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" benchmark: History + Code Change reaches 4/6 recall with 15 average tests and 70.6% execution reduction, while Quantik Mind reaches 6/6 recall with 15.5 average tests and 69.6% execution reduction. Quantik Mind spends 0.5 extra tests on average to recover runtime-aware and combined-signal defect classes that History + Code Change misses.
 
+## Reproducibility Scope
+
+This repository is a benchmark artifact package. It contains the scenario metadata, defect oracle, canonical 51-test library reference, selection/evaluation scripts, committed QMind per-case selection artifacts, and final comparison outputs needed to inspect or regenerate the published Online Boutique comparison.
+
+The benchmark demonstrates how four test-selection approaches behave on six defined Online Boutique CI/CD validation cases. In particular, it demonstrates the additional value of live runtime observability for the OB-005 runtime-aware case and the OB-006 combined-signal case under this benchmark design.
+
+This is not a vendor head-to-head benchmark. No third-party proprietary test-selection product is evaluated here. History + Code Change is treated as a strong code-change-aware baseline, and Quantik Mind is evaluated as a complementary runtime-aware approach.
+
+The benchmark demonstrates value when static history/code-change signals alone are insufficient for the defined runtime-aware and combined-signal cases. It does not demonstrate universal superiority across all applications, all defect classes, or all traffic/observability configurations. It also does not replace product onboarding documentation, production deployment guidance, or a full Online Boutique operations runbook.
+
+## Prerequisites
+
+External reviewers need:
+
+- PowerShell for the benchmark scripts.
+- Python for the selector, evaluator, oracle checker, and validation helpers.
+- Docker Compose for the benchmark-owned proxy, Prometheus, traffic, and helper containers.
+- `git`, `kubectl`, and either Skaffold or equivalent Kubernetes deployment commands for the pinned upstream Online Boutique checkout.
+- Access to a Quantik Mind project, API key, and CLI/API endpoint for normal live QMind regeneration.
+- The pinned upstream `GoogleCloudPlatform/microservices-demo` checkout at commit `b7ecc96372238b0dda6cefaf95cc2c3e9118ea73`.
+
+Product onboarding is included here only to the extent required to obtain `QMIND_API_URL`, `QMIND_API_KEY`, and `QMIND_PROJECT_ID` for reproducing live QMind selections. General Quantik Mind onboarding belongs in the Quantik Mind product repository or product documentation, not in this benchmark artifact package.
+
+## Benchmark Approaches
+
+The benchmark compares four selection approaches:
+
+| Approach | What it uses | Role in the comparison |
+| --- | --- | --- |
+| Full Suite | All 51 canonical tests | Recall baseline with no prioritization and no risk model |
+| Random | A fixed 26-test random subset from the canonical library | Statistical baseline with no knowledge of code changes, history, runtime, or risk |
+| History + Code Change | Historical test/failure metadata, test metadata, and changed files | Strong code-change-aware baseline that estimates risk from static signals without live runtime observability |
+| Quantik Mind | History, code changes, test metadata, and live runtime observability | Runtime-aware selection that recalculates risk at selection time from dynamic system signals |
+
+Full Suite executes everything and establishes the maximum-recall reference point. Random provides a fixed statistical control. History + Code Change represents a strong static baseline: it can estimate risk from history and changed-file context, but it does not calculate dynamic runtime risk because it does not consume live observability signals. Quantik Mind is complementary to that static approach: it also uses history and code-change context, then adds runtime signals such as latency, error rate, request rate, and service health to select tests based on current system risk rather than static change impact alone. This framing is about signal classes, not a product-to-product comparison.
+
+## Dynamic Risk Intelligence
+
+Quantik Mind reports Dynamic Risk Intelligence as product diagnostics for the selected tests:
+
+| Metric | Meaning |
+| --- | --- |
+| Observed Risk Coverage | Percentage of currently observed system risk covered by the selected tests |
+| Critical Risk Captured | Percentage of the highest-priority risk band captured by the selected tests |
+| Residual Risk | Observed risk left uncovered after selection |
+| Risk Density | Amount of risk information captured per executed test |
+
+Residual Risk is not random leftover risk and is not expected to be zero. In this benchmark it is mostly lower-priority risk intentionally left uncovered when execution cost outweighs expected value. Risk Density values above 1.0 mean the selected tests are denser in risk information than an average test set.
+
+Under the defined Online Boutique scenarios, Quantik Mind executed 15.5 tests on average out of 51, reduced execution volume by 69.6%, detected 6/6 benchmark defects, and captured 80.56% of critical observed risk. This demonstrates the value of dynamic runtime risk signals in these benchmark cases without claiming universal superiority.
+
 ## Scenario Overview
 
 The six benchmark cases are intentionally small and independently scored:
@@ -27,7 +78,7 @@ OB-005 validates the value of runtime observability because a code-change-only s
 
 ## Fresh-User Flow
 
-1. Create or log in to Quantik Mind.
+1. Create or log in to Quantik Mind only if you need to regenerate live QMind selections.
 2. Verify your email address.
 3. Create a project for the Online Boutique benchmark.
 4. Create or copy an API key for that project.
@@ -220,6 +271,15 @@ The canonical test library is `qmind-test-library/online-boutique-playwright-51.
 
 The final comparison result is `benchmark-results/final-comparison/final-comparison.json`.
 It uses the benchmark-case CI/CD methodology described in `docs/benchmark-methodology-review.md`: selectors run from allowed CI inputs first, and the defect oracle scores the resulting selections afterward.
+
+Primary outputs:
+
+- `benchmark-results/final-comparison/final-comparison.json`: machine-readable final comparison.
+- `docs/final-benchmark-comparison.md`: human-readable final comparison.
+- `benchmark-results/final-comparison/*-selection.json`: generated Random and History + Code Change selections.
+- `benchmark-results/final-comparison/*-evaluation.json`: per-method and per-case scoring outputs.
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json` through `qmind-selection-ob-006.json`: per-case QMind selections used by the final comparison.
+- `benchmark-runs/baseline-validation/`: baseline Playwright outputs when baseline validation is run.
 
 Regenerate the supporting evaluations and `docs/final-benchmark-comparison.md` from committed inputs with:
 

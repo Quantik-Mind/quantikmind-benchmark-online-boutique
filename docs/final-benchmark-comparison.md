@@ -72,26 +72,12 @@ Current QMind selection artifacts include dynamic risk diagnostics for 6 of 6 be
 
 | Scenario | Observed Risk Coverage | Critical Risk Captured | Residual Risk | Risk Density |
 | --- | ---: | ---: | ---: | ---: |
-| OB-001 | 24.02% | 50.00% | 75.98% | 1.36x |
-| OB-002 | 43.44% | 66.67% | 56.56% | 1.30x |
-| OB-003 | 37.21% | 91.67% | 62.79% | 1.27x |
-| OB-004 | 42.06% | 91.67% | 57.94% | 1.19x |
-| OB-005 | 40.46% | 91.67% | 59.54% | 1.21x |
-| OB-006 | 40.46% | 91.67% | 59.54% | 1.21x |
-
-### How to interpret these risk metrics
-
-Observed Risk Coverage is the percentage of currently observed system risk covered by the selected tests.
-
-Critical Risk Captured is the percentage of the highest-priority risk band captured by the selected tests.
-
-Residual Risk is the observed risk left uncovered after selection. This is not random leftover risk; it is mostly lower-priority risk that Quantik Mind intentionally leaves uncovered when the execution cost outweighs the expected value.
-
-Risk Density is the amount of risk information captured per executed test. A value above 1.0 means the selected set is denser in risk information than an average test set.
-
-In this benchmark, Quantik Mind executed 15.5 tests on average out of 51, reduced execution by 69.6%, detected 6/6 benchmark defects, and captured 80.56% of critical observed risk. This shows that Quantik Mind is not simply executing fewer tests; it is concentrating execution on the tests that cover the highest-value dynamic risk.
-
-Full Suite executes everything and therefore does not prioritize risk. Random has no risk model. History + Code Change estimates risk from historical and code-change signals. Quantik Mind adds runtime observability, so it can evaluate risk based on what is happening in the system at selection time. The baseline approaches do not calculate dynamic runtime risk because they do not consume observability signals.
+| OB-001 | 24.0160248659931 | 50 | 75.9839751340069 | 1.36090807573961 |
+| OB-002 | 43.4435668187888 | 66.6666666666667 | 56.5564331812112 | 1.30330700456366 |
+| OB-003 | 37.2102473101709 | 91.6666666666667 | 62.7897526898291 | 1.26514840854581 |
+| OB-004 | 42.055825047258 | 91.6666666666667 | 57.944174952742 | 1.19158170967231 |
+| OB-005 | 40.4564622350446 | 91.6666666666667 | 59.5435377649554 | 1.21369386705134 |
+| OB-006 | 40.4564622350446 | 91.6666666666667 | 59.5435377649554 | 1.21369386705134 |
 
 These metrics are not included in the benchmark comparison table because equivalent dynamic risk diagnostics are not available for Full Suite, Random, or History + Code Change. They are reported as Quantik Mind product diagnostics.
 
@@ -99,10 +85,7 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-001: Checkout Regression
 
-- Category: Code Change
 - Changed files: `src/frontend/templates/cart.html`, `src/frontend/handlers.go`
-- Injected defect: after a product is added to the cart, the checkout form no longer renders the required checkout fields or actions while homepage, product listing, and basic cart access remain healthy.
-- Expected detecting area: checkout page access and checkout form rendering.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -110,10 +93,7 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-002: Cart Regression
 
-- Category: Code Change
 - Changed files: `src/cartservice/src/services/CartService.cs`, `src/cartservice/src/cartstore/RedisCartStore.cs`, `src/frontend/handlers.go`
-- Injected defect: adding a product to the cart fails deterministically, preferably by returning a service error instead of storing the item.
-- Expected detecting area: cart add/view behavior from product detail; checkout and order flows may also fail because they depend on cart state.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect missed
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -121,10 +101,7 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-003: Product Detail Regression
 
-- Category: Code Change
 - Changed files: `src/productcatalogservice/product_catalog.go`, `src/productcatalogservice/products.json`, `src/frontend/templates/product.html`
-- Injected defect: valid product detail lookup fails or returns unusable product data while homepage product listing remains intact.
-- Expected detecting area: product detail pages and downstream flows that require product detail.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -132,10 +109,7 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-004: Payment Regression
 
-- Category: Code Change
 - Changed files: `src/paymentservice/charge.js`
-- Injected defect: paymentservice `Charge` always fails, so otherwise valid Visa or Mastercard payments are rejected after normal validation.
-- Expected detecting area: payment-aware successful order completion.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -143,13 +117,7 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-005: Currency Data Corruption
 
-- Category: Runtime Aware
 - Changed files: `src/currencyservice/data/currency_conversion.json`
-- Injected defect: the USD exchange rate is corrupted or zeroed, causing currencyservice conversion failures or invalid output for homepage price rendering.
-- Expected detecting area: direct homepage rendering checks.
-- Why code-change-only can miss it: History + Code Change receives only the currency data changed-file context; it does not receive runtime metrics or oracle detecting tests, and the direct homepage oracle tests map to frontend context rather than the changed data file.
-- Why runtime-aware selection can detect it: runtime observability can show elevated currencyservice and frontend error rates under standard traffic, connecting the data change to user-visible homepage failures.
-- What it validates: runtime observability value for defects whose user-visible blast radius is clearer in live service behavior than in changed-file mapping alone.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect missed
@@ -157,13 +125,7 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-006: Ad Service Latency Cascades Into Homepage Rendering
 
-- Category: Combined Signal
 - Changed files: `src/adservice/src/main/java/hipstershop/AdService.java`
-- Injected defect: the adservice `GetAds` path sleeps beyond the Playwright timeout or returns a deterministic gRPC error.
-- Expected detecting area: direct homepage rendering checks that observe frontend-visible latency or rendering failure.
-- Why code-change-only can miss it: the code change points to adservice, and the canonical 51-test library has no direct adservice tests, so homepage smoke tests are not reachable from adservice changed-file context alone.
-- Why combined selection can detect it: runtime observability can show adservice degradation together with frontend homepage latency or failures under the same traffic window.
-- What it validates: combined code-change plus runtime observability selection when the changed service and user-visible failure surface are different parts of the system.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect missed
