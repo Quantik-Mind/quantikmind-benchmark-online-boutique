@@ -23,7 +23,7 @@ Key outputs are written to:
 - `docs/final-benchmark-comparison.md`
 - `benchmark-results/final-comparison/*-selection.json`
 - `benchmark-results/final-comparison/*-evaluation.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json` through `qmind-selection-ob-006.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-001.json` through `qmind-selection-ob-006.json`
 - `benchmark-runs/baseline-validation/` when baseline validation is run
 
 ## QMind CLI reproducibility
@@ -54,17 +54,17 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 
 `generate-final-comparison.ps1` is the main benchmark entry point. In normal mode it invokes `run-qmind-subset.ps1` once per benchmark case, derives changed files from `benchmark-pipeline/scenarios.json`, writes per-case QMind selections, evaluates every method against the matching case oracle, and regenerates the final comparison artifacts.
 
-Use `-UseExistingQMindSelections` only when the six per-case QMind selection artifacts already exist and you want to verify the committed comparison without contacting QMind.
+Use `-UseExistingQMindSelections` to verify the committed comparison from the six canonical per-case QMind selection artifacts under `benchmark-results/qmind-selections/` without contacting QMind.
 
 `run-qmind-subset.ps1` can also be run directly for debugging a single QMind changed-files subset:
 
 ```powershell
-.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-001 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json
-.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-002 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json
-.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-003 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json
-.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-004 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json
-.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-005 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-005.json
-.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-006 -SelectionOutput benchmark-runs/qmind-online-boutique/qmind-selection-ob-006.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-001 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-001.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-002 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-002.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-003 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-003.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-004 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-004.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-005 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-005.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-006 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-006.json
 ```
 
 It writes normalized canonical IDs without a UTF-8 BOM and validates them against `qmind-test-library/online-boutique-playwright-51.json`. For OB-004 it fails if `payment-order-completion-confirms-success` is missing.
@@ -176,6 +176,8 @@ The generator treats OB-001 through OB-006 as benchmark cases. OB-001 through OB
 
 Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report and not a vendor head-to-head: History + Code Change gets 4/6 recall with 15 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 15.5 average tests and 69.6% execution reduction. Under these defined scenarios, Quantik Mind spends 0.5 extra tests on average to cover runtime-aware and combined-signal defect classes that static signals alone did not select.
 
+The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This is retained transparently in the artifacts and should not be presented as independent proof of an additional runtime-aware win until distinct OB-006 live runtime evidence is captured.
+
 ### Scenario quick reference
 
 | Scenario | Category | Changed area | Injected defect | Expected detecting area |
@@ -189,24 +191,24 @@ Interpret final comparison output as recall first, execution reduction second, w
 
 For OB-005, History + Code Change receives only currency data changed-file context; it does not receive runtime metrics or oracle detecting tests. QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates. For OB-006, the changed file points to adservice and the canonical library has no direct adservice tests; QMind detection must come from combined adservice degradation and frontend homepage impact.
 
-QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates:
+QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates canonical artifacts at:
 
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-005.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-006.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-001.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-002.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-003.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-004.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-005.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-006.json`
 
 It fails clearly if QMind configuration is missing, the CLI is unavailable, the API is unreachable, observability is not configured, or the library/project state is not synced. It also fails if a QMind selection contains non-canonical test IDs, or if the OB-004 QMind selection does not include `payment-order-completion-confirms-success`.
 
-To reuse previously generated per-case QMind selections instead of calling live QMind:
+To reuse committed per-case QMind selections instead of calling live QMind:
 
 ```powershell
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
 ```
 
-That mode requires all six per-case QMind artifacts to exist and validate.
+That mode requires all six committed per-case QMind artifacts to exist and validate.
 
 ### Random Approach selector
 

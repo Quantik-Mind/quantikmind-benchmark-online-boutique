@@ -72,11 +72,11 @@ Aggregate expected benchmark results after OB-006 from local artifacts:
 | Full Suite | 6/6 | 51.0 | 0.0% |
 | Random | 5/6 | 26.0 | 49.0% |
 | History + Code Change | 4/6 | 15.0 | 70.6% |
-| Quantik Mind | 6/6 | 16.2 | 68.3% |
+| Quantik Mind | 6/6 | 15.5 | 69.6% |
 
 ## Live Runtime Validation
 
-Live runtime validation is the missing publication evidence for OB-006. It must capture Prometheus movement for both `adservice` and `frontend` in the same validation window used for homepage traffic and the live OB-006 QMind subset.
+Live runtime validation is the missing independent publication evidence for OB-006. It must capture Prometheus movement for both `adservice` and `frontend` in the same validation window used for homepage traffic and the live OB-006 QMind subset. The committed OB-006 QMind selection currently matches OB-005 exactly and reports identical business metrics, so it must not be presented as independent proof of an additional runtime-aware win until distinct live evidence is captured.
 
 Current live runtime evidence status: `TBD`.
 
@@ -122,7 +122,7 @@ kubectl -n <namespace> get deployment adservice -o jsonpath="{.spec.template.spe
 9. Deploys the injected image with `kubectl set image` and waits for rollout.
 10. Runs injected homepage traffic and captures injected Prometheus snapshots.
 11. Prints and saves a runtime movement summary.
-12. Backs up any existing `benchmark-runs/qmind-online-boutique/qmind-selection-ob-006.json`.
+12. Backs up any existing `benchmark-results/qmind-selections/qmind-selection-ob-006.json`.
 13. Runs `run-qmind-subset.ps1 -BenchmarkCase OB-006`.
 14. Verifies QMind detection by intersecting selected tests with OB-006 oracle detectors. At least one detector is required; missing non-selected detectors are warnings.
 15. Regenerates final comparison artifacts with `generate-final-comparison.ps1 -UseExistingQMindSelections`.
@@ -161,7 +161,7 @@ Required evidence fields:
 | Baseline homepage traffic | TBD | `baseline-homepage-traffic.json` |
 | Injected homepage traffic | TBD | `injected-homepage-traffic.json` |
 | Runtime movement summary | TBD | `runtime-movement-summary.json` |
-| QMind selected tests | TBD | `benchmark-runs/qmind-online-boutique/qmind-selection-ob-006.json` |
+| QMind selected tests | TBD | `benchmark-results/qmind-selections/qmind-selection-ob-006.json` |
 | QMind detection summary | TBD | `qmind-ob006-detection-summary.json` |
 | Final comparison result | TBD | `benchmark-results/final-comparison/final-comparison.json` |
 
@@ -192,11 +192,12 @@ OB-006 can be published externally only if all of the following are true:
 - Full suite detects OB-006.
 - History + Code Change misses OB-006.
 - QMind detects OB-006 using a live `qmind subset` artifact generated during the validation window.
+- The live OB-006 selection and business metrics are reviewed against OB-005 so any duplicate-selection behavior is disclosed.
 - Prometheus shows adservice movement and frontend movement in the same validation window.
 
 Until those conditions are met from live runtime evidence, OB-006 must be described as implemented and locally artifact-validated, with external publication readiness marked `pending`.
 
-## Hostile-Review Defense
+## Benchmark Integrity Controls
 
 - No Quantik Mind algorithm code was changed.
 - No benchmark scoring logic was changed.

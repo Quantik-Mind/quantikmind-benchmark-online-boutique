@@ -60,7 +60,7 @@ For each benchmark case, the generator:
 2. Runs QMind for the same case and writes one per-case QMind selection artifact.
 3. Evaluates each selection against only that case's oracle entry.
 4. Records selected tests, execution reduction, whether the defect was detected, and case recall.
-5. Aggregates detected cases across all five benchmark cases and by category.
+5. Aggregates detected cases across all six benchmark cases and by category.
 
 This is closer to a CI/CD workflow: a commit arrives with changed files, a selector chooses tests, then test execution and oracle validation determine whether the defect was caught.
 
@@ -89,15 +89,16 @@ Quantik Mind uses:
 - runtime metrics
 - observability
 
-QMind produces one artifact per benchmark case in normal generator mode:
+QMind produces one canonical artifact per benchmark case in normal generator mode:
 
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-002.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-003.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-004.json`
-- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-005.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-001.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-002.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-003.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-004.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-005.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-006.json`
 
-The generator does not reuse `benchmark-runs/qmind-online-boutique/qmind-current-selection.json` for all cases. Existing per-case artifacts may be reused only with `-UseExistingQMindSelections`.
+The generator does not reuse `benchmark-runs/qmind-online-boutique/qmind-current-selection.json` for all cases. Existing committed per-case artifacts may be reused only with `-UseExistingQMindSelections`.
 
 ## Oracle Inputs
 
@@ -119,16 +120,18 @@ The aggregate result for each method is:
 - average selected tests
 - average execution reduction
 
-The aggregate should be interpreted as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" comparison. After OB-006, History + Code Change is more aggressive at 15 average tests, 70.6% execution reduction, and 4/6 recall. Quantik Mind is slightly more conservative at 16.2 average tests, 68.3% execution reduction, and 6/6 recall.
+The aggregate should be interpreted as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" comparison. After OB-006, History + Code Change is more aggressive at 15 average tests, 70.6% execution reduction, and 4/6 recall. Quantik Mind is slightly more conservative at 15.5 average tests, 69.6% execution reduction, and 6/6 recall.
 
 | Method | Recall | Avg tests | Execution reduction | Interpretation |
 |---|---:|---:|---:|---|
 | H+CC | 4/6 | 15 | 70.6% | More aggressive, misses runtime-aware and combined-signal defects |
-| QMind | 6/6 | 16.2 | 68.3% | Slightly more conservative, preserves full recall |
+| QMind | 6/6 | 15.5 | 69.6% | Slightly more conservative, preserves full recall |
 
-Quantik Mind spends 1.2 extra tests on average to recover defect classes that History + Code Change misses entirely. In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 1/1 vs 0/1. In combined-signal scenarios, QMind adds coverage: 1/1 vs 0/1. The value claim is not "QMind always runs fewer tests"; it is that QMind keeps execution reduction high while avoiding blind spots from code-change-only selection.
+Quantik Mind spends 0.5 extra tests on average to recover cases that History + Code Change misses entirely. In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 1/1 vs 0/1. In combined-signal scenarios, QMind adds coverage: 1/1 vs 0/1. The value claim is not "QMind always runs fewer tests"; it is that QMind keeps execution reduction high while avoiding blind spots from code-change-only selection.
 
-Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all five benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the five per-case QMind artifacts before scoring them.
+Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all six benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the six committed per-case QMind artifacts before scoring them.
+
+The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This supports a transparent combined-signal case, but it should not be described as independent proof of an additional runtime-aware win until distinct live OB-006 runtime evidence is captured.
 
 ## Benchmark Limitations
 
@@ -144,7 +147,7 @@ That command requires a configured QMind CLI, synced library, imported history, 
 Missing required QMIND_API_URL in .env.
 ```
 
-After a successful normal run, the five QMind selection artifacts may be reused for reproducibility checks with:
+The committed QMind selection artifacts may be reused for reproducibility checks with:
 
 ```powershell
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
@@ -170,4 +173,4 @@ This makes the comparison more defensible:
 - aggregate recall is computed from case outcomes
 - generated artifacts can be regenerated from committed inputs with one script
 
-If a reviewer argues that H+CC has better savings, the response is: yes, but it achieves that by missing OB-005. The meaningful comparison is not saving alone; it is recall at a given execution budget. QMind trades 1.4 additional tests on average for one additional detected scenario.
+If a reviewer argues that H+CC has better savings, the response is: yes, but it achieves that by missing OB-005 and OB-006. The meaningful comparison is not saving alone; it is recall at a given execution budget. QMind trades 0.5 additional tests on average for two additional detected cases in the current six-case artifact set, while OB-006 remains subject to the duplicate-selection limitation above.

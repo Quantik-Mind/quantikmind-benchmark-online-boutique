@@ -21,7 +21,7 @@ param(
     [int]$TrafficTimeoutSec = 45,
     [int]$StabilizationSeconds = 30,
     [string]$RunDir = "benchmark-runs/ob-006-live-runtime-validation",
-    [string]$QMindSelectionOutput = "benchmark-runs/qmind-online-boutique/qmind-selection-ob-006.json",
+    [string]$QMindSelectionOutput = "benchmark-results/qmind-selections/qmind-selection-ob-006.json",
     [string]$Oracle = "defect-oracle/online-boutique-defect-oracle.v2.json",
     [string]$Library = "qmind-test-library/online-boutique-playwright-51.json",
     [string]$Scenarios = "benchmark-pipeline/scenarios.json"

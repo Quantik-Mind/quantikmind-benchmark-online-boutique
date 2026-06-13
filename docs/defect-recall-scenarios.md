@@ -174,7 +174,7 @@ Expected unaffected tests:
 
 Risk notes:
 
-- Validated on 2026-06-11 against the full 50-test Playwright suite: 4 failed, 46 passed.
+- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 4 failed, 46 passed. The current canonical benchmark library has 51 tests.
 - Validated external scenario commit `e5234240` against baseline commit `5096a85b`.
 - If implemented by renaming only one label, the signal may be too narrow.
 - If implemented as a service crash, unrelated tests may fail through HTTP 500s or slow recovery.
@@ -218,7 +218,7 @@ Validated failing tests:
 
 Validation notes:
 
-- Validated on 2026-06-11 against the full 50-test Playwright suite: 5 failed, 45 passed.
+- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 5 failed, 45 passed. The current canonical benchmark library has 51 tests.
 - Validated external scenario commit `f7bac607` against baseline commit `5096a85b`.
 - Only one direct cart assertion failed; several expected cart tests remained green, so broad/soft cart tests should not be treated as validated detecting tests.
 
@@ -292,7 +292,7 @@ Risk notes:
 
 Validation notes:
 
-- Validated on 2026-06-11 against the full 50-test Playwright suite: 20 failed, 30 passed.
+- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 20 failed, 30 passed. The current canonical benchmark library has 51 tests.
 - External scenario commit `381043a6`; baseline commit `5096a85b`.
 - Failure scope is product detail and downstream flows depending on product detail; homepage/catalog listing remained sufficiently healthy because 30 tests passed.
 
@@ -457,10 +457,10 @@ Overall defect recall:
 detected_scenarios / scenarios_detected_by_full_suite
 ```
 
-Because each scenario should contain exactly one defect, the denominator is five after all scenarios are validated:
+Because each scenario should contain exactly one defect, the denominator is six after all current benchmark scenarios are validated:
 
 ```text
-detected_scenarios / 5
+detected_scenarios / 6
 ```
 
 Execution reduction should be reported beside recall:
