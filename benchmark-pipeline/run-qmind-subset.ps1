@@ -125,6 +125,54 @@ function Get-CanonicalLibraryIds {
     return $ids
 }
 
+function Get-ObjectPropertyValue {
+    param(
+        [object]$Object,
+        [string]$Name
+    )
+
+    if ($null -eq $Object) {
+        return $null
+    }
+
+    $property = $Object.PSObject.Properties[$Name]
+    if ($null -eq $property) {
+        return $null
+    }
+    return $property.Value
+}
+
+function Get-NumericObjectPropertyValue {
+    param(
+        [object]$Object,
+        [string]$Name
+    )
+
+    $value = Get-ObjectPropertyValue $Object $Name
+    if ($null -eq $value -or [string]::IsNullOrWhiteSpace([string]$value)) {
+        return $null
+    }
+
+    try {
+        return [double]$value
+    }
+    catch {
+        return $null
+    }
+}
+
+function Add-PropertyIfPresent {
+    param(
+        [System.Collections.Specialized.OrderedDictionary]$Target,
+        [string]$Name,
+        [object]$Value
+    )
+
+    if ($null -ne $Value) {
+        $Target[$Name] = $Value
+    }
+}
+
 $caseId = $null
 if (-not [string]::IsNullOrWhiteSpace($BenchmarkCase)) {
     $caseId = $BenchmarkCase.ToUpperInvariant()
@@ -235,12 +283,32 @@ if ($caseId -eq "OB-004" -and $selection.selected_tests -notcontains "payment-or
     throw "QMind selection is missing required detector: payment-order-completion-confirms-success"
 }
 
-$canonicalPayload = @{
+$businessMetrics = Get-ObjectPropertyValue $selection "business_metrics"
+$canonicalBusinessMetrics = [ordered]@{}
+foreach ($field in @("risk_coverage", "top_risk_coverage", "residual_risk", "risk_efficiency")) {
+    $value = Get-NumericObjectPropertyValue $businessMetrics $field
+    if ($null -eq $value) {
+        $value = Get-NumericObjectPropertyValue $selection $field
+    }
+    Add-PropertyIfPresent $canonicalBusinessMetrics $field $value
+}
+
+$canonicalPayload = [ordered]@{
     method = "qmind"
     benchmark_case = $caseId
     changed_files_file = $ChangedFilesFile
     selected_tests = @($selectedTests | Sort-Object)
-} | ConvertTo-Json -Depth 5
+}
+
+foreach ($field in @("risk_coverage", "risk_efficiency")) {
+    $value = Get-NumericObjectPropertyValue $selection $field
+    Add-PropertyIfPresent $canonicalPayload $field $value
+}
+if ($canonicalBusinessMetrics.Count -gt 0) {
+    $canonicalPayload["business_metrics"] = $canonicalBusinessMetrics
+}
+
+$canonicalPayload = $canonicalPayload | ConvertTo-Json -Depth 10
 Write-TextUtf8NoBom -Path $SelectionOutput -Text ($canonicalPayload + [Environment]::NewLine)
 
 $bytes = [System.IO.File]::ReadAllBytes((Join-Path (Get-Location) $SelectionOutput))

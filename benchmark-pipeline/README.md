@@ -41,6 +41,8 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 
 It writes normalized canonical IDs without a UTF-8 BOM and validates them against `qmind-test-library/online-boutique-playwright-51.json`. For OB-004 it fails if `payment-order-completion-confirms-success` is missing.
 
+When the QMind CLI/API returns dynamic risk diagnostics, `run-qmind-subset.ps1` preserves `business_metrics.risk_coverage`, `business_metrics.top_risk_coverage`, `business_metrics.residual_risk`, and `business_metrics.risk_efficiency` in the saved selection artifact. These diagnostics are not synthesized by the benchmark pipeline; they require QMind CLI/API subset artifacts that include `business_metrics` or equivalent risk fields.
+
 `evaluate-qmind.ps1` writes a QMind evaluation JSON. Pass `-Scenario OB-001` to evaluate one benchmark case.
 
 Use `-DryRun` on the QMind-facing scripts to inspect the command path without contacting the API. Dry runs warn when `.env` still contains placeholders.
@@ -71,7 +73,7 @@ The selected tests input can be a JSON object with `selected_tests`, a JSON arra
 
 ### Normalizing qmind subset output
 
-`normalize-qmind-selection.py` converts raw qmind subset output into the canonical `selected_tests` JSON consumed by the benchmark comparator.
+`normalize-qmind-selection.py` converts raw qmind subset output into the canonical `selected_tests` JSON consumed by the benchmark comparator. If raw JSON contains QMind dynamic risk diagnostics, the normalizer carries those fields through alongside the normalized test IDs.
 
 ```powershell
 python benchmark-pipeline/normalize-qmind-selection.py `

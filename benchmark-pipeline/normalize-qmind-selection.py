@@ -23,6 +23,13 @@ SELECTION_FIELDS = (
     "items",
 )
 NESTED_SELECTION_FIELDS = ("data", "result", "selection", "payload")
+BUSINESS_METRIC_FIELDS = (
+    "risk_coverage",
+    "top_risk_coverage",
+    "residual_risk",
+    "risk_efficiency",
+)
+TOP_LEVEL_RISK_FIELDS = BUSINESS_METRIC_FIELDS
 NUMERIC_ID_PATTERN = re.compile(r"^\d+$")
 CANONICAL_TEXT_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 
@@ -138,6 +145,84 @@ def extract_selected_tests(raw: Any) -> list[str]:
     )
 
 
+def first_object_with_key(data: Any, key: str) -> dict[str, Any] | None:
+    if isinstance(data, dict):
+        if key in data and isinstance(data[key], dict):
+            return data[key]
+        for value in data.values():
+            found = first_object_with_key(value, key)
+            if found is not None:
+                return found
+    elif isinstance(data, list):
+        for item in data:
+            found = first_object_with_key(item, key)
+            if found is not None:
+                return found
+    return None
+
+
+def first_value_for_key(data: Any, key: str) -> Any:
+    if isinstance(data, dict):
+        if key in data:
+            return data[key]
+        for value in data.values():
+            found = first_value_for_key(value, key)
+            if found is not None:
+                return found
+    elif isinstance(data, list):
+        for item in data:
+            found = first_value_for_key(item, key)
+            if found is not None:
+                return found
+    return None
+
+
+def numeric_or_none(value: Any) -> int | float | None:
+    if value is None or isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return value
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return None
+        try:
+            return int(text)
+        except ValueError:
+            try:
+                return float(text)
+            except ValueError:
+                return None
+    return None
+
+
+def extract_dynamic_risk_fields(raw: Any) -> dict[str, Any]:
+    if not isinstance(raw, dict):
+        return {}
+
+    payload: dict[str, Any] = {}
+    raw_business_metrics = first_object_with_key(raw, "business_metrics")
+    business_metrics: dict[str, Any] = {}
+
+    if raw_business_metrics:
+        for field in BUSINESS_METRIC_FIELDS:
+            value = numeric_or_none(raw_business_metrics.get(field))
+            if value is not None:
+                business_metrics[field] = value
+
+    for field in TOP_LEVEL_RISK_FIELDS:
+        value = numeric_or_none(raw.get(field))
+        if value is None:
+            value = numeric_or_none(first_value_for_key(raw, field))
+        if value is not None:
+            payload[field] = value
+            business_metrics.setdefault(field, value)
+
+    if business_metrics:
+        payload["business_metrics"] = business_metrics
+    return payload
+
+
 def mapping_items(data: Any) -> Iterable[Any]:
     if isinstance(data, list):
         return data
@@ -194,8 +279,10 @@ def normalize_ids(selected: list[str], library_api: str | None) -> list[str]:
     return sorted(set(normalized))
 
 
-def write_output(path: Path, selected: list[str]) -> str:
-    payload = json.dumps({"selected_tests": selected}, indent=2)
+def write_output(path: Path, selected: list[str], dynamic_risk_fields: dict[str, Any]) -> str:
+    output = {"selected_tests": selected}
+    output.update(dynamic_risk_fields)
+    payload = json.dumps(output, indent=2)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(payload + "\n", encoding="utf-8")
     return payload
@@ -206,6 +293,7 @@ def main() -> int:
     raw = read_raw_selection(Path(args.raw))
     selected = extract_selected_tests(raw)
     selected = normalize_ids(selected, args.library_api)
+    dynamic_risk_fields = extract_dynamic_risk_fields(raw)
 
     if not selected:
         raise SystemExit(
@@ -213,7 +301,7 @@ def main() -> int:
             "Inspect qmind subset output and update normalize-qmind-selection.py."
         )
 
-    print(write_output(Path(args.output), selected))
+    print(write_output(Path(args.output), selected, dynamic_risk_fields))
     return 0
 
 
