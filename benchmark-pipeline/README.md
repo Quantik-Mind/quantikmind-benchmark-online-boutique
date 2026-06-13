@@ -1,5 +1,31 @@
 # Benchmark Pipeline
 
+## Reproducibility checklist
+
+This pipeline regenerates the committed Online Boutique benchmark comparison from repository inputs. It does not define new scenarios, change oracle definitions, or alter benchmark scoring.
+
+This pipeline is not a vendor head-to-head evaluation. It does not run or model any third-party proprietary test-selection product. The History + Code Change method is a strong transparent baseline for static history/code-change-aware selection; Quantik Mind is evaluated for the additional runtime-risk signal it contributes.
+
+External reviewers should have:
+
+- PowerShell for `.ps1` orchestration.
+- Python for selector, evaluator, oracle-checker, and validation scripts.
+- Docker Compose for the benchmark-owned proxy, Prometheus, and traffic/helper containers.
+- A pinned upstream Online Boutique checkout deployed through Skaffold or equivalent Kubernetes commands.
+- `kubectl` access to expose the upstream frontend to the host.
+- Quantik Mind CLI/API access with `QMIND_API_URL`, `QMIND_API_KEY`, and `QMIND_PROJECT_ID` for normal live QMind regeneration.
+
+Product onboarding is not part of this pipeline, except for obtaining the project and API credentials required by the benchmark scripts. General onboarding instructions belong in the Quantik Mind product repository or product documentation.
+
+Key outputs are written to:
+
+- `benchmark-results/final-comparison/final-comparison.json`
+- `docs/final-benchmark-comparison.md`
+- `benchmark-results/final-comparison/*-selection.json`
+- `benchmark-results/final-comparison/*-evaluation.json`
+- `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json` through `qmind-selection-ob-006.json`
+- `benchmark-runs/baseline-validation/` when baseline validation is run
+
 ## QMind CLI reproducibility
 
 Run these scripts from the repository root after copying `.env.example` to `.env` and filling in `QMIND_API_URL`, `QMIND_API_KEY`, and `QMIND_PROJECT_ID`.
@@ -28,6 +54,8 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 
 `generate-final-comparison.ps1` is the main benchmark entry point. In normal mode it invokes `run-qmind-subset.ps1` once per benchmark case, derives changed files from `benchmark-pipeline/scenarios.json`, writes per-case QMind selections, evaluates every method against the matching case oracle, and regenerates the final comparison artifacts.
 
+Use `-UseExistingQMindSelections` only when the six per-case QMind selection artifacts already exist and you want to verify the committed comparison without contacting QMind.
+
 `run-qmind-subset.ps1` can also be run directly for debugging a single QMind changed-files subset:
 
 ```powershell
@@ -42,6 +70,17 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 It writes normalized canonical IDs without a UTF-8 BOM and validates them against `qmind-test-library/online-boutique-playwright-51.json`. For OB-004 it fails if `payment-order-completion-confirms-success` is missing.
 
 When the QMind CLI/API returns dynamic risk diagnostics, `run-qmind-subset.ps1` preserves `business_metrics.risk_coverage`, `business_metrics.top_risk_coverage`, `business_metrics.residual_risk`, and `business_metrics.risk_efficiency` in the saved selection artifact. These diagnostics are not synthesized by the benchmark pipeline; they require QMind CLI/API subset artifacts that include `business_metrics` or equivalent risk fields.
+
+Dynamic Risk Intelligence metrics are interpreted as follows:
+
+| Metric | Meaning |
+| --- | --- |
+| Observed Risk Coverage | Percentage of currently observed system risk covered by the selected tests |
+| Critical Risk Captured | Percentage of the highest-priority risk band captured by the selected tests |
+| Residual Risk | Observed risk left uncovered after selection |
+| Risk Density | Amount of risk information captured per executed test |
+
+Residual Risk is not random leftover risk and is not expected to be zero; it is mostly lower-priority risk intentionally left uncovered when execution cost outweighs expected value. Risk Density values above 1.0 mean the selected tests are denser in risk information than an average test set. In the final Online Boutique comparison, Quantik Mind executed 15.5 tests on average out of 51, reduced execution volume by 69.6%, detected 6/6 benchmark defects, and captured 80.56% of critical observed risk under the defined scenarios.
 
 `evaluate-qmind.ps1` writes a QMind evaluation JSON. Pass `-Scenario OB-001` to evaluate one benchmark case.
 
@@ -104,15 +143,22 @@ Use these four method names when publishing benchmark output:
 
 1. Traditional Approach (Full Suite)
    - Executes the full 51-test suite.
-   - Baseline for maximum defect recall and zero execution reduction.
+   - Performs no prioritization and uses no risk model.
+   - Serves as the recall baseline with zero execution reduction.
 2. Random Approach
    - Selects 26 tests, approximately 50% of the 51-test suite, with deterministic seed 42.
-   - Used as placebo/control.
+   - Uses no code-change, history, runtime, or risk information.
+   - Serves as the fixed statistical baseline.
 3. History + Code Change Approach
-   - Deterministic baseline based on historical risk metadata and changed-file matching.
-   - Represents classic test intelligence without runtime signals or adaptive entanglement.
+   - Uses historical test/failure metadata, test metadata, and changed files.
+   - Estimates risk from static history and code-change signals.
+   - Does not calculate dynamic runtime risk because it does not consume live observability signals.
+   - Represents a strong code-change-aware baseline, not a third-party proprietary product implementation.
 4. Quantik Mind
-   - Uses history, code change context, runtime signals, and adaptive entanglement.
+   - Uses history, code changes, test metadata, and live runtime observability.
+   - Dynamically recalculates risk at selection time using signals such as latency, error rate, request rate, and service health.
+   - Selects tests based on current system risk, not only static change impact.
+   - Complements history/code-change-based selection by adding runtime context.
 
 Machine-readable method slugs are `full-suite`, `random`, `history-code-change`, and `qmind`.
 
@@ -128,7 +174,20 @@ It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/fina
 
 The generator treats OB-001 through OB-006 as benchmark cases. OB-001 through OB-004 are code-change controls, OB-005 is runtime-aware, and OB-006 is combined-signal. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
 
-Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report: History + Code Change gets 4/6 recall with 15 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 16.2 average tests and 68.3% execution reduction. Quantik Mind spends 1.2 extra tests on average to recover runtime-aware and combined-signal defect classes that History + Code Change misses.
+Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report and not a vendor head-to-head: History + Code Change gets 4/6 recall with 15 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 15.5 average tests and 69.6% execution reduction. Under these defined scenarios, Quantik Mind spends 0.5 extra tests on average to cover runtime-aware and combined-signal defect classes that static signals alone did not select.
+
+### Scenario quick reference
+
+| Scenario | Category | Changed area | Injected defect | Expected detecting area |
+| --- | --- | --- | --- | --- |
+| OB-001 Checkout Regression | Code Change | `src/frontend/templates/cart.html`, `src/frontend/handlers.go` | Checkout fields/actions stop rendering after cart add | Checkout page and checkout form tests |
+| OB-002 Cart Regression | Code Change | `src/cartservice/src/services/CartService.cs`, `src/cartservice/src/cartstore/RedisCartStore.cs`, `src/frontend/handlers.go` | Add-to-cart fails deterministically | Cart add/view behavior from product detail |
+| OB-003 Product Detail Regression | Code Change | `src/productcatalogservice/product_catalog.go`, `src/productcatalogservice/products.json`, `src/frontend/templates/product.html` | Product detail lookup fails or returns unusable data | Product detail page tests |
+| OB-004 Payment Regression | Code Change | `src/paymentservice/charge.js` | Valid card payments are rejected | Payment-aware successful order completion |
+| OB-005 Currency Data Corruption | Runtime Aware | `src/currencyservice/data/currency_conversion.json` | Corrupted USD conversion data causes currencyservice/frontend homepage failures under standard traffic | Homepage rendering tests selected from runtime observability signals |
+| OB-006 Ad Service Latency Cascade | Combined Signal | `src/adservice/src/main/java/hipstershop/AdService.java` | Adservice latency or errors cascade into frontend homepage latency/rendering failure | Homepage rendering tests selected from combined adservice code-change and frontend runtime impact |
+
+For OB-005, History + Code Change receives only currency data changed-file context; it does not receive runtime metrics or oracle detecting tests. QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates. For OB-006, the changed file points to adservice and the canonical library has no direct adservice tests; QMind detection must come from combined adservice degradation and frontend homepage impact.
 
 QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates:
 
@@ -147,7 +206,7 @@ To reuse previously generated per-case QMind selections instead of calling live 
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
 ```
 
-That mode requires all five per-case QMind artifacts to exist and validate.
+That mode requires all six per-case QMind artifacts to exist and validate.
 
 ### Random Approach selector
 

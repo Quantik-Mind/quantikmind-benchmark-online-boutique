@@ -79,20 +79,6 @@ Current QMind selection artifacts include dynamic risk diagnostics for 6 of 6 be
 | OB-005 | 40.4564622350446 | 91.6666666666667 | 59.5435377649554 | 1.21369386705134 |
 | OB-006 | 40.4564622350446 | 91.6666666666667 | 59.5435377649554 | 1.21369386705134 |
 
-### How to interpret these risk metrics
-
-Observed Risk Coverage is the percentage of currently observed system risk covered by the selected tests.
-
-Critical Risk Captured is the percentage of the highest-priority risk band captured by the selected tests.
-
-Residual Risk is the observed risk left uncovered after selection. This is not random leftover risk; it is mostly lower-priority risk that Quantik Mind intentionally leaves uncovered when the execution cost outweighs the expected value.
-
-Risk Density is the amount of risk information captured per executed test. A value above 1.0 means the selected set is denser in risk information than an average test set.
-
-In this benchmark, Quantik Mind executed 15.5 tests on average out of 51, reduced execution by 69.6%, detected 6/6 benchmark defects, and captured 80.56% of critical observed risk. This shows that Quantik Mind is not simply executing fewer tests; it is concentrating execution on the tests that cover the highest-value dynamic risk.
-
-Full Suite executes everything and therefore does not prioritize risk. Random has no risk model. History + Code Change estimates risk from historical and code-change signals. Quantik Mind adds runtime observability, so it can evaluate risk based on what is happening in the system at selection time. The baseline approaches do not calculate dynamic runtime risk because they do not consume observability signals.
-
 These metrics are not included in the benchmark comparison table because equivalent dynamic risk diagnostics are not available for Full Suite, Random, or History + Code Change. They are reported as Quantik Mind product diagnostics.
 
 ## Benchmark Cases
