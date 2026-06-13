@@ -161,6 +161,32 @@ function Get-NumericObjectPropertyValue {
     }
 }
 
+function ConvertFrom-QMindJsonText {
+    param([string]$Text)
+
+    if ([string]::IsNullOrWhiteSpace($Text)) {
+        return $null
+    }
+
+    try {
+        return $Text | ConvertFrom-Json
+    }
+    catch {
+        $start = $Text.IndexOf("{")
+        $end = $Text.LastIndexOf("}")
+        if ($start -lt 0 -or $end -le $start) {
+            return $null
+        }
+
+        try {
+            return $Text.Substring($start, $end - $start + 1) | ConvertFrom-Json
+        }
+        catch {
+            return $null
+        }
+    }
+}
+
 function Add-PropertyIfPresent {
     param(
         [System.Collections.Specialized.OrderedDictionary]$Target,
@@ -222,7 +248,7 @@ if (-not (Test-Path -LiteralPath $ChangedFilesFile -PathType Leaf)) {
 Assert-ChangedFilesArray -Path $ChangedFilesFile
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
 $rawOutput = Join-Path $RunDir "qmind-subset-current.txt"
-$args = @("subset", "--changed-files-file", $ChangedFilesFile)
+$args = @("subset", "--json", "--changed-files-file", $ChangedFilesFile)
 Write-Host ("qmind " + ($args -join " "))
 
 if ($DryRun) {
@@ -270,6 +296,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $selection = Get-Content -LiteralPath $SelectionOutput -Raw | ConvertFrom-Json
+$qmindSubsetJson = ConvertFrom-QMindJsonText $text
 $canonicalIds = @(Get-CanonicalLibraryIds $Library)
 $selectedTests = @($selection.selected_tests | ForEach-Object { [string]$_ })
 if ($selectedTests.Count -eq 0) {
@@ -307,8 +334,11 @@ foreach ($field in @("risk_coverage", "risk_efficiency")) {
 if ($canonicalBusinessMetrics.Count -gt 0) {
     $canonicalPayload["business_metrics"] = $canonicalBusinessMetrics
 }
+if ($null -ne $qmindSubsetJson) {
+    $canonicalPayload["qmind_subset_json"] = $qmindSubsetJson
+}
 
-$canonicalPayload = $canonicalPayload | ConvertTo-Json -Depth 10
+$canonicalPayload = $canonicalPayload | ConvertTo-Json -Depth 30
 Write-TextUtf8NoBom -Path $SelectionOutput -Text ($canonicalPayload + [Environment]::NewLine)
 
 $bytes = [System.IO.File]::ReadAllBytes((Join-Path (Get-Location) $SelectionOutput))
