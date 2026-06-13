@@ -95,7 +95,8 @@ function Write-Json {
     )
 
     $json = $Value | ConvertTo-Json -Depth 30
-    [System.IO.File]::WriteAllText((Resolve-ParentPath $Path), $json + [Environment]::NewLine, [System.Text.UTF8Encoding]::new($false))
+    $json = $json.Replace("`r`n", "`n")
+    [System.IO.File]::WriteAllText((Resolve-ParentPath $Path), $json + "`n", [System.Text.UTF8Encoding]::new($false))
 }
 
 function Format-Percent {
@@ -348,6 +349,143 @@ function New-CategorySummary {
     }
 }
 
+function Get-ObjectPropertyValue {
+    param(
+        [object]$Object,
+        [string]$Name
+    )
+
+    if ($null -eq $Object) {
+        return $null
+    }
+
+    $property = $Object.PSObject.Properties[$Name]
+    if ($null -eq $property) {
+        return $null
+    }
+    return $property.Value
+}
+
+function Get-NumericObjectPropertyValue {
+    param(
+        [object]$Object,
+        [string]$Name
+    )
+
+    $value = Get-ObjectPropertyValue $Object $Name
+    if ($null -eq $value -or [string]::IsNullOrWhiteSpace([string]$value)) {
+        return $null
+    }
+
+    try {
+        return [double]$value
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-QMindDynamicRiskDiagnostic {
+    param(
+        [string]$CaseId,
+        [string]$SelectionArtifact,
+        [object]$Selection
+    )
+
+    $businessMetrics = Get-ObjectPropertyValue $Selection "business_metrics"
+    $observedRiskCoverage = Get-NumericObjectPropertyValue $Selection "risk_coverage"
+    if ($null -eq $observedRiskCoverage) {
+        $observedRiskCoverage = Get-NumericObjectPropertyValue $businessMetrics "risk_coverage"
+    }
+
+    $criticalRiskCaptured = Get-NumericObjectPropertyValue $businessMetrics "top_risk_coverage"
+    if ($null -eq $criticalRiskCaptured) {
+        $criticalRiskCaptured = Get-NumericObjectPropertyValue $Selection "top_risk_coverage"
+    }
+
+    $residualRisk = Get-NumericObjectPropertyValue $businessMetrics "residual_risk"
+    if ($null -eq $residualRisk -and $null -ne $observedRiskCoverage) {
+        if ($observedRiskCoverage -gt 1) {
+            $residualRisk = 100 - $observedRiskCoverage
+        }
+        else {
+            $residualRisk = 1 - $observedRiskCoverage
+        }
+    }
+
+    $riskDensity = Get-NumericObjectPropertyValue $Selection "risk_efficiency"
+    if ($null -eq $riskDensity) {
+        $riskDensity = Get-NumericObjectPropertyValue $businessMetrics "risk_efficiency"
+    }
+
+    $missing = @()
+    if ($null -eq $observedRiskCoverage) { $missing += "observed_risk_coverage" }
+    if ($null -eq $criticalRiskCaptured) { $missing += "critical_risk_captured" }
+    if ($null -eq $residualRisk) { $missing += "residual_risk" }
+    if ($null -eq $riskDensity) { $missing += "risk_density" }
+
+    return [ordered]@{
+        benchmark_case = $CaseId
+        selection_artifact = To-RepoPath $SelectionArtifact
+        metrics_present = ($missing.Count -eq 0)
+        observed_risk_coverage = $observedRiskCoverage
+        critical_risk_captured = $criticalRiskCaptured
+        residual_risk = $residualRisk
+        risk_density = $riskDensity
+        missing_fields = $missing
+        warning = if ($missing.Count -gt 0) { "QMind dynamic risk diagnostics are missing from this selection artifact." } else { $null }
+    }
+}
+
+function Get-AverageNullableMetric {
+    param(
+        [object[]]$Diagnostics,
+        [string]$Metric
+    )
+
+    $values = @($Diagnostics | ForEach-Object { $_[$Metric] } | Where-Object { $null -ne $_ })
+    if ($values.Count -eq 0) {
+        return $null
+    }
+    return [Math]::Round([double](($values | Measure-Object -Average).Average), 4)
+}
+
+function New-QMindDynamicRiskDiagnostics {
+    param([object[]]$Diagnostics)
+
+    $complete = @($Diagnostics | Where-Object { [bool]$_.metrics_present })
+    $withAnyValues = @($Diagnostics | Where-Object {
+        $null -ne $_.observed_risk_coverage -or
+        $null -ne $_.critical_risk_captured -or
+        $null -ne $_.residual_risk -or
+        $null -ne $_.risk_density
+    })
+    return [ordered]@{
+        description = "Quantik Mind-only dynamic risk diagnostics from QMind selection/business_metrics payloads."
+        availability = if ($withAnyValues.Count -gt 0) { "present" } else { "missing" }
+        per_scenario = $Diagnostics
+        aggregate = [ordered]@{
+            benchmark_cases = [int]$Diagnostics.Count
+            scenarios_with_complete_metrics = [int]$complete.Count
+            scenarios_missing_metrics = [int]($Diagnostics.Count - $complete.Count)
+            average_observed_risk_coverage = Get-AverageNullableMetric $Diagnostics "observed_risk_coverage"
+            average_critical_risk_captured = Get-AverageNullableMetric $Diagnostics "critical_risk_captured"
+            average_residual_risk = Get-AverageNullableMetric $Diagnostics "residual_risk"
+            average_risk_density = Get-AverageNullableMetric $Diagnostics "risk_density"
+            warning = if ($withAnyValues.Count -eq 0) { "No current QMind selection artifacts include dynamic risk diagnostics. These fields will populate when future artifacts include business_metrics or equivalent risk fields." } else { $null }
+        }
+    }
+}
+
+function Format-RiskDiagnosticValue {
+    param([object]$Value)
+
+    if ($null -eq $Value) {
+        return "not present"
+    }
+    return [string]$Value
+}
+
 foreach ($path in @($Oracle, $Library, $Scenarios)) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         throw "Missing required input: $path"
@@ -478,6 +616,7 @@ $fullSuiteSelection = [ordered]@{
 }
 
 $caseResults = @()
+$qmindDynamicRiskPerScenario = @()
 foreach ($caseId in $CaseIds) {
     $caseLower = $caseId.ToLowerInvariant()
     $scenario = $scenarioMap[$caseId]
@@ -496,6 +635,7 @@ foreach ($caseId in $CaseIds) {
     $randomSelectionData = Read-Json $randomSelectionPath
     $historySelectionData = Read-Json $historySelectionPath
     $qmindCaseSelectionData = Read-Json $qmindCaseSelectionPath
+    $qmindDynamicRiskPerScenario += Get-QMindDynamicRiskDiagnostic $caseId $qmindCaseSelectionPath $qmindCaseSelectionData
 
     $caseResult = [ordered]@{
         id = $caseId
@@ -529,6 +669,7 @@ $aggregateMethods = @(
     New-AggregateResult "history-code-change" "History + Code Change" $caseResults
     New-AggregateResult "qmind" "Quantik Mind" $caseResults
 )
+$qmindDynamicRiskDiagnostics = New-QMindDynamicRiskDiagnostics $qmindDynamicRiskPerScenario
 
 $categorySummaries = @()
 foreach ($category in @("code-change", "runtime-aware", "combined-signal")) {
@@ -554,6 +695,7 @@ $comparison = [ordered]@{
     benchmark_cases = $caseResults
     aggregate_methods = $aggregateMethods
     category_summaries = $categorySummaries
+    qmind_dynamic_risk_diagnostics = $qmindDynamicRiskDiagnostics
     selector_input_policy = [ordered]@{
         full_suite = @("test library")
         random = @("test library", "seed")
@@ -619,6 +761,31 @@ foreach ($summary in $categorySummaries) {
 }
 $categoryTableRows = $categoryRows -join [Environment]::NewLine
 
+$riskRows = @()
+$riskDiagnosticsWithValues = @($qmindDynamicRiskPerScenario | Where-Object {
+    $null -ne $_.observed_risk_coverage -or
+    $null -ne $_.critical_risk_captured -or
+    $null -ne $_.residual_risk -or
+    $null -ne $_.risk_density
+})
+foreach ($diagnostic in $riskDiagnosticsWithValues) {
+    $riskRows += "| $($diagnostic.benchmark_case) | $(Format-RiskDiagnosticValue $diagnostic.observed_risk_coverage) | $(Format-RiskDiagnosticValue $diagnostic.critical_risk_captured) | $(Format-RiskDiagnosticValue $diagnostic.residual_risk) | $(Format-RiskDiagnosticValue $diagnostic.risk_density) |"
+}
+$riskDiagnosticsText = if ($riskRows.Count -gt 0) {
+@"
+Current QMind selection artifacts include dynamic risk diagnostics for $($riskRows.Count) of $($qmindDynamicRiskPerScenario.Count) benchmark cases.
+
+| Scenario | Observed Risk Coverage | Critical Risk Captured | Residual Risk | Risk Density |
+| --- | ---: | ---: | ---: | ---: |
+$($riskRows -join [Environment]::NewLine)
+"@
+}
+else {
+@"
+Current QMind selection artifacts do not include ``business_metrics`` or equivalent dynamic risk fields, so the generated JSON reports null values and per-scenario warnings. Dynamic risk diagnostics are shown here when present in QMind selection artifacts.
+"@
+}
+
 $doc = @"
 # Final Benchmark Comparison
 
@@ -662,6 +829,22 @@ $scenarioTableRows
 | --- | --- | ---: | ---: | ---: | ---: |
 $categoryTableRows
 
+## Quantik Mind Dynamic Risk Intelligence
+
+Unlike baseline approaches, Quantik Mind also evaluates dynamic risk at selection time using historical signals, code changes and live runtime observability.
+
+Observed Risk Coverage: How much of the currently observed risk mass is covered by the selected tests.
+
+Critical Risk Captured: How much of the highest-priority risk band is captured by the selected tests.
+
+Residual Risk: How much observed risk remains uncovered after the selected tests.
+
+Risk Density: How much risk information is captured per executed test. A value above 1.0 means the selected tests are denser in risk information than the average test set.
+
+$riskDiagnosticsText
+
+These metrics are not included in the benchmark comparison table because equivalent dynamic risk diagnostics are not available for Full Suite, Random, or History + Code Change. They are reported as Quantik Mind product diagnostics.
+
 ## Benchmark Cases
 
 $caseText
@@ -704,7 +887,8 @@ To reuse previously generated per-case QMind selections instead of calling live 
 ``````
 "@
 
-[System.IO.File]::WriteAllText((Resolve-ParentPath $FinalComparisonDoc), $doc + [Environment]::NewLine, [System.Text.UTF8Encoding]::new($false))
+$doc = $doc.Replace("`r`n", "`n")
+[System.IO.File]::WriteAllText((Resolve-ParentPath $FinalComparisonDoc), $doc + "`n", [System.Text.UTF8Encoding]::new($false))
 
 Write-Host "Final benchmark-case comparison generated:"
 foreach ($method in $aggregateMethods) {

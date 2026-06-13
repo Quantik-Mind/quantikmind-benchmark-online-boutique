@@ -34,7 +34,7 @@ The defect oracle uses minimal direct validated detecting tests for each benchma
 | Traditional Approach / Full Suite | 51 | 0.0% | 6/6 | 100.0% |
 | Random Approach | 26 | 49.0% | 5/6 | 83.3% |
 | History + Code Change | 15 | 70.6% | 4/6 | 66.7% |
-| Quantik Mind | 16.2 | 68.3% | 6/6 | 100.0% |
+| Quantik Mind | 16.5 | 67.6% | 6/6 | 100.0% |
 
 ## Per-Scenario Results
 
@@ -55,6 +55,22 @@ The defect oracle uses minimal direct validated detecting tests for each benchma
 | Runtime Aware | OB-005 | 1/1 | 1/1 | 0/1 | 1/1 |
 | Combined Signal | OB-006 | 1/1 | 1/1 | 0/1 | 1/1 |
 | Overall | OB-001, OB-002, OB-003, OB-004, OB-005, OB-006 | 6/6 | 5/6 | 4/6 | 6/6 |
+
+## Quantik Mind Dynamic Risk Intelligence
+
+Unlike baseline approaches, Quantik Mind also evaluates dynamic risk at selection time using historical signals, code changes and live runtime observability.
+
+Observed Risk Coverage: How much of the currently observed risk mass is covered by the selected tests.
+
+Critical Risk Captured: How much of the highest-priority risk band is captured by the selected tests.
+
+Residual Risk: How much observed risk remains uncovered after the selected tests.
+
+Risk Density: How much risk information is captured per executed test. A value above 1.0 means the selected tests are denser in risk information than the average test set.
+
+Current QMind selection artifacts do not include `business_metrics` or equivalent dynamic risk fields, so the generated JSON reports null values and per-scenario warnings. Dynamic risk diagnostics are shown here when present in QMind selection artifacts.
+
+These metrics are not included in the benchmark comparison table because equivalent dynamic risk diagnostics are not available for Full Suite, Random, or History + Code Change. They are reported as Quantik Mind product diagnostics.
 
 ## Benchmark Cases
 
@@ -104,7 +120,7 @@ The defect oracle uses minimal direct validated detecting tests for each benchma
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect missed
-- Quantik Mind: 15 tests, 70.6% reduction, defect detected
+- Quantik Mind: 17 tests, 66.7% reduction, defect detected
 
 ## Method Notes
 
@@ -114,7 +130,7 @@ Random uses only the canonical test library and deterministic seed 42. It produc
 
 History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is `src/currencyservice/data/currency_conversion.json`; the six direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is `src/adservice/src/main/java/hipstershop/AdService.java`; the canonical 51-test library has no direct adservice tests, so the same homepage smoke tests are not reachable from code-change context alone.
 
-Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by `benchmark-pipeline/run-qmind-subset.ps1` in normal mode. The aggregate QMind result averages 16.2 selected tests, gives 68.3% average execution reduction, and detects 6/6 cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to adservice while runtime observability points to frontend homepage impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime or combined signals are required.
+Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by `benchmark-pipeline/run-qmind-subset.ps1` in normal mode. The aggregate QMind result averages 16.5 selected tests, gives 67.6% average execution reduction, and detects 6/6 cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to adservice while runtime observability points to frontend homepage impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and adds coverage when runtime or combined signals are required.
 
 ## Hostile-Review Defense
 
