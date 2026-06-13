@@ -130,6 +130,19 @@ The generator treats OB-001 through OB-006 as benchmark cases. OB-001 through OB
 
 Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report: History + Code Change gets 4/6 recall with 15 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 15.5 average tests and 69.6% execution reduction. Quantik Mind spends 0.5 extra tests on average to recover runtime-aware and combined-signal defect classes that History + Code Change misses.
 
+### Scenario quick reference
+
+| Scenario | Category | Changed area | Injected defect | Expected detecting area |
+| --- | --- | --- | --- | --- |
+| OB-001 Checkout Regression | Code Change | `src/frontend/templates/cart.html`, `src/frontend/handlers.go` | Checkout fields/actions stop rendering after cart add | Checkout page and checkout form tests |
+| OB-002 Cart Regression | Code Change | `src/cartservice/src/services/CartService.cs`, `src/cartservice/src/cartstore/RedisCartStore.cs`, `src/frontend/handlers.go` | Add-to-cart fails deterministically | Cart add/view behavior from product detail |
+| OB-003 Product Detail Regression | Code Change | `src/productcatalogservice/product_catalog.go`, `src/productcatalogservice/products.json`, `src/frontend/templates/product.html` | Product detail lookup fails or returns unusable data | Product detail page tests |
+| OB-004 Payment Regression | Code Change | `src/paymentservice/charge.js` | Valid card payments are rejected | Payment-aware successful order completion |
+| OB-005 Currency Data Corruption | Runtime Aware | `src/currencyservice/data/currency_conversion.json` | Corrupted USD conversion data causes currencyservice/frontend homepage failures under standard traffic | Homepage rendering tests selected from runtime observability signals |
+| OB-006 Ad Service Latency Cascade | Combined Signal | `src/adservice/src/main/java/hipstershop/AdService.java` | Adservice latency or errors cascade into frontend homepage latency/rendering failure | Homepage rendering tests selected from combined adservice code-change and frontend runtime impact |
+
+For OB-005, History + Code Change receives only currency data changed-file context; it does not receive runtime metrics or oracle detecting tests. QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates. For OB-006, the changed file points to adservice and the canonical library has no direct adservice tests; QMind detection must come from combined adservice degradation and frontend homepage impact.
+
 QMind is also evaluated per benchmark case. Normal mode calls the live QMind subset path and creates:
 
 - `benchmark-runs/qmind-online-boutique/qmind-selection-ob-001.json`
@@ -147,7 +160,7 @@ To reuse previously generated per-case QMind selections instead of calling live 
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
 ```
 
-That mode requires all five per-case QMind artifacts to exist and validate.
+That mode requires all six per-case QMind artifacts to exist and validate.
 
 ### Random Approach selector
 

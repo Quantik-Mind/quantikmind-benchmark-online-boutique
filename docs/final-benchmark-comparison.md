@@ -99,7 +99,10 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-001: Checkout Regression
 
+- Category: Code Change
 - Changed files: `src/frontend/templates/cart.html`, `src/frontend/handlers.go`
+- Injected defect: after a product is added to the cart, the checkout form no longer renders the required checkout fields or actions while homepage, product listing, and basic cart access remain healthy.
+- Expected detecting area: checkout page access and checkout form rendering.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -107,7 +110,10 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-002: Cart Regression
 
+- Category: Code Change
 - Changed files: `src/cartservice/src/services/CartService.cs`, `src/cartservice/src/cartstore/RedisCartStore.cs`, `src/frontend/handlers.go`
+- Injected defect: adding a product to the cart fails deterministically, preferably by returning a service error instead of storing the item.
+- Expected detecting area: cart add/view behavior from product detail; checkout and order flows may also fail because they depend on cart state.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect missed
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -115,7 +121,10 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-003: Product Detail Regression
 
+- Category: Code Change
 - Changed files: `src/productcatalogservice/product_catalog.go`, `src/productcatalogservice/products.json`, `src/frontend/templates/product.html`
+- Injected defect: valid product detail lookup fails or returns unusable product data while homepage product listing remains intact.
+- Expected detecting area: product detail pages and downstream flows that require product detail.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -123,7 +132,10 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-004: Payment Regression
 
+- Category: Code Change
 - Changed files: `src/paymentservice/charge.js`
+- Injected defect: paymentservice `Charge` always fails, so otherwise valid Visa or Mastercard payments are rejected after normal validation.
+- Expected detecting area: payment-aware successful order completion.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect detected
@@ -131,7 +143,13 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-005: Currency Data Corruption
 
+- Category: Runtime Aware
 - Changed files: `src/currencyservice/data/currency_conversion.json`
+- Injected defect: the USD exchange rate is corrupted or zeroed, causing currencyservice conversion failures or invalid output for homepage price rendering.
+- Expected detecting area: direct homepage rendering checks.
+- Why code-change-only can miss it: History + Code Change receives only the currency data changed-file context; it does not receive runtime metrics or oracle detecting tests, and the direct homepage oracle tests map to frontend context rather than the changed data file.
+- Why runtime-aware selection can detect it: runtime observability can show elevated currencyservice and frontend error rates under standard traffic, connecting the data change to user-visible homepage failures.
+- What it validates: runtime observability value for defects whose user-visible blast radius is clearer in live service behavior than in changed-file mapping alone.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect missed
@@ -139,7 +157,13 @@ These metrics are not included in the benchmark comparison table because equival
 
 ### OB-006: Ad Service Latency Cascades Into Homepage Rendering
 
+- Category: Combined Signal
 - Changed files: `src/adservice/src/main/java/hipstershop/AdService.java`
+- Injected defect: the adservice `GetAds` path sleeps beyond the Playwright timeout or returns a deterministic gRPC error.
+- Expected detecting area: direct homepage rendering checks that observe frontend-visible latency or rendering failure.
+- Why code-change-only can miss it: the code change points to adservice, and the canonical 51-test library has no direct adservice tests, so homepage smoke tests are not reachable from adservice changed-file context alone.
+- Why combined selection can detect it: runtime observability can show adservice degradation together with frontend homepage latency or failures under the same traffic window.
+- What it validates: combined code-change plus runtime observability selection when the changed service and user-visible failure surface are different parts of the system.
 - Traditional Approach / Full Suite: 51 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 49.0% reduction, defect detected
 - History + Code Change: 15 tests, 70.6% reduction, defect missed

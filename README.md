@@ -10,6 +10,21 @@ Quantik Mind additionally reports dynamic risk diagnostics such as observed risk
 
 Read the final comparison as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" benchmark: History + Code Change reaches 4/6 recall with 15 average tests and 70.6% execution reduction, while Quantik Mind reaches 6/6 recall with 15.5 average tests and 69.6% execution reduction. Quantik Mind spends 0.5 extra tests on average to recover runtime-aware and combined-signal defect classes that History + Code Change misses.
 
+## Scenario Overview
+
+The six benchmark cases are intentionally small and independently scored:
+
+| Scenario | Category | Changed area | Injected defect | Expected detecting area |
+| --- | --- | --- | --- | --- |
+| OB-001 Checkout Regression | Code Change | Frontend cart template and handlers | Checkout fields/actions no longer render after a product is added to the cart | Checkout page and checkout form rendering |
+| OB-002 Cart Regression | Code Change | Cart service storage/add-item path plus frontend handler | Adding a product to the cart fails deterministically | Cart add/view behavior from product detail |
+| OB-003 Product Detail Regression | Code Change | Product catalog service data/lookup and product template | Valid product detail lookup fails or returns unusable product data while listing remains healthy | Product detail pages and downstream flows that require product detail |
+| OB-004 Payment Regression | Code Change | Payment service charge path | Valid Visa or Mastercard payments are rejected | Successful payment/order completion |
+| OB-005 Currency Data Corruption | Runtime Aware | Currency conversion data | Corrupted USD conversion data causes currencyservice/frontend homepage failures under standard traffic | Homepage rendering checks informed by runtime error signals |
+| OB-006 Ad Service Latency Cascade | Combined Signal | Ad service GetAds path | Ad service latency or errors cascade into frontend homepage latency/rendering failure | Homepage rendering checks informed by adservice plus frontend runtime signals |
+
+OB-005 validates the value of runtime observability because a code-change-only selector sees only a currency data file and does not receive runtime metrics or oracle tests. Runtime-aware selection can connect elevated currencyservice and frontend errors to the user-visible homepage checks. OB-006 validates combined-signal selection because the code change points to adservice, while the direct user-visible impact appears through frontend homepage behavior.
+
 ## Fresh-User Flow
 
 1. Create or log in to Quantik Mind.
@@ -212,7 +227,7 @@ Regenerate the supporting evaluations and `docs/final-benchmark-comparison.md` f
 .\benchmark-pipeline\generate-final-comparison.ps1
 ```
 
-Normal mode calls the live QMind subset path for each benchmark case. If QMind configuration is missing, the generator fails clearly with the missing variable or CLI/API prerequisite. Use `-UseExistingQMindSelections` only after a prior normal run has produced all five per-case QMind selection artifacts.
+Normal mode calls the live QMind subset path for each benchmark case. If QMind configuration is missing, the generator fails clearly with the missing variable or CLI/API prerequisite. Use `-UseExistingQMindSelections` only after a prior normal run has produced all six per-case QMind selection artifacts.
 
 Evaluation helpers and runbook details live in `benchmark-pipeline/README.md`.
 
