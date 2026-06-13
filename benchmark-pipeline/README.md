@@ -82,7 +82,7 @@ Dynamic Risk Intelligence metrics are interpreted as follows:
 | Residual Risk | Observed risk left uncovered after selection |
 | Risk Density | Amount of risk information captured per executed test |
 
-Residual Risk is not random leftover risk and is not expected to be zero; it is mostly lower-priority risk intentionally left uncovered when execution cost outweighs expected value. Risk Density values above 1.0 mean the selected tests are denser in risk information than an average test set. In the final Online Boutique comparison, Quantik Mind executed 15.5 tests on average out of 51, reduced execution volume by 69.6%, detected 6/6 benchmark defects, and captured 80.56% of critical observed risk under the defined scenarios.
+Residual Risk is not random leftover risk and is not expected to be zero; it is mostly lower-priority risk intentionally left uncovered when execution cost outweighs expected value. Risk Density values above 1.0 mean the selected tests are denser in risk information than an average test set. In the final Online Boutique comparison, Quantik Mind executed 15.8 tests on average out of 51, reduced execution volume by 69.0%, detected 6/6 benchmark defects, and captured 77.78% average critical observed risk under the defined scenarios.
 
 `evaluate-qmind.ps1` writes a QMind evaluation JSON. Pass `-Scenario OB-001` to evaluate one benchmark case.
 
@@ -176,7 +176,7 @@ It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/fina
 
 The generator treats OB-001 through OB-006 as benchmark cases. OB-001 through OB-004 are code-change controls, OB-005 is runtime-aware, and OB-006 is combined-signal. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
 
-Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report and not a vendor head-to-head: History + Code Change gets 4/6 recall with 15 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 15.5 average tests and 69.6% execution reduction. Under these defined scenarios, Quantik Mind spends 0.5 extra tests on average to cover runtime-aware and combined-signal defect classes that static signals alone did not select.
+Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report and not a vendor head-to-head: History + Code Change gets 5/6 recall with 15.0 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 15.8 average tests and 69.0% execution reduction. Under these defined scenarios, Quantik Mind spends 0.8 more tests on average to cover the runtime-aware defect class that static signals alone did not select.
 
 The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This is retained transparently in the artifacts and should not be presented as independent proof of an additional runtime-aware win until distinct OB-006 live runtime evidence is captured.
 
