@@ -120,14 +120,14 @@ The aggregate result for each method is:
 - average selected tests
 - average execution reduction
 
-The aggregate should be interpreted as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" comparison. After OB-006, History + Code Change is more aggressive at 15 average tests, 70.6% execution reduction, and 4/6 recall. Quantik Mind is slightly more conservative at 15.5 average tests, 69.6% execution reduction, and 6/6 recall.
+The aggregate should be interpreted as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" comparison. After OB-006, History + Code Change is more aggressive at 15.0 average tests, 70.6% execution reduction, and 5/6 recall. Quantik Mind is slightly more conservative at 15.8 average tests, 69.0% execution reduction, and 6/6 recall.
 
 | Method | Recall | Avg tests | Execution reduction | Interpretation |
 |---|---:|---:|---:|---|
-| H+CC | 4/6 | 15 | 70.6% | More aggressive, misses runtime-aware and combined-signal defects |
-| QMind | 6/6 | 15.5 | 69.6% | Slightly more conservative, preserves full recall |
+| H+CC | 5/6 | 15.0 | 70.6% | More aggressive, misses the runtime-aware defect |
+| QMind | 6/6 | 15.8 | 69.0% | Slightly more conservative, preserves full recall |
 
-Quantik Mind spends 0.5 extra tests on average to recover cases that History + Code Change misses entirely. In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 1/1 vs 0/1. In combined-signal scenarios, QMind adds coverage: 1/1 vs 0/1. The value claim is not "QMind always runs fewer tests"; it is that QMind keeps execution reduction high while avoiding blind spots from code-change-only selection.
+Quantik Mind spends 0.8 more tests on average to recover the case that History + Code Change misses entirely. In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 1/1 vs 0/1. In combined-signal scenarios, QMind matches H+CC: 1/1 vs 1/1. The value claim is not "QMind always runs fewer tests"; it is that QMind keeps execution reduction high while avoiding blind spots from code-change-only selection.
 
 Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all six benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the six committed per-case QMind artifacts before scoring them.
 
