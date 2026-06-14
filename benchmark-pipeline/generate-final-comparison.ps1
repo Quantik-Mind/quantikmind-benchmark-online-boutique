@@ -8,6 +8,7 @@ param(
     [string]$QMindLibraryApi,
     [string]$OutputDir = "benchmark-results/final-comparison",
     [string]$RuntimeEvidenceDir = "benchmark-results/runtime-evidence/ob-006",
+    [string]$RuntimeEvidenceOb007Dir = "benchmark-results/runtime-evidence/ob-007",
     [int]$RandomSeed = 42,
     [int]$RandomSize = 26,
     [int]$TargetedSize = 15,
@@ -21,6 +22,9 @@ $FinalComparison = Join-Path $OutputDir "final-comparison.json"
 $FinalComparisonDoc = "docs/final-benchmark-comparison.md"
 $FullSuiteEvaluation = Join-Path $OutputDir "full-suite-evaluation.json"
 $CaseIds = @("OB-001", "OB-002", "OB-003", "OB-004", "OB-005", "OB-006")
+$ob007ManifestPath = Join-Path $RuntimeEvidenceOb007Dir "evidence-manifest.json"
+$IncludeOb007 = Test-Path -LiteralPath $ob007ManifestPath -PathType Leaf
+if ($IncludeOb007) { $CaseIds += "OB-007" }
 
 function Resolve-ParentPath {
     param([string]$Path)
@@ -345,6 +349,83 @@ function Assert-Ob006RuntimeEvidence {
     }
 }
 
+function Assert-Ob007RuntimeEvidence {
+    param(
+        [string]$EvidenceDir,
+        [string]$Ob006SelectionPath,
+        [string]$Ob007SelectionPath
+    )
+
+    $requiredFiles = @(
+        "evidence-manifest.json",
+        "baseline-prometheus-snapshot.json",
+        "injected-prometheus-snapshot.json",
+        "runtime-movement-summary.json",
+        "baseline-product-detail-traffic.json",
+        "injected-product-detail-traffic.json",
+        "qmind-ob007-detection-summary.json",
+        "scenario-ob-007-changed-files.json",
+        "qmind-selection-ob-007.json"
+    )
+    foreach ($fileName in $requiredFiles) {
+        $path = Join-Path $EvidenceDir $fileName
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            throw "Missing required OB-007 runtime evidence artifact: $(To-RepoPath $path)"
+        }
+    }
+
+    $manifest = Read-Json (Join-Path $EvidenceDir "evidence-manifest.json")
+    if ([string]$manifest.evidence_status -ne "verified") {
+        throw "OB-007 evidence manifest must set evidence_status=verified."
+    }
+
+    $movement = Read-Json (Join-Path $EvidenceDir "runtime-movement-summary.json")
+    if ([string]$movement.publication_runtime_evidence -ne "CONFIRMED") {
+        throw "OB-007 runtime movement summary must set publication_runtime_evidence=CONFIRMED."
+    }
+    if ([bool]$movement.recommendationservice_behavioral_signal_confirmed -ne $true) {
+        throw "OB-007 runtime evidence must confirm recommendationservice behavioral degradation."
+    }
+    if ([bool]$movement.recommendationservice_prometheus_signal_confirmed -ne $true) {
+        throw "OB-007 runtime evidence must confirm a Prometheus-visible recommendationservice latency signal."
+    }
+    if ([bool]$movement.graceful_degradation_confirmed -ne $true) {
+        throw "OB-007 runtime evidence must confirm graceful degradation (product detail pages remain accessible)."
+    }
+    if ([bool]$movement.playwright_section_signal_confirmed -ne $true) {
+        throw "OB-007 runtime evidence must confirm the recommendation section is absent at Playwright level."
+    }
+
+    $changedFiles = @(Read-Json (Join-Path $EvidenceDir "scenario-ob-007-changed-files.json") | ForEach-Object { [string]$_ })
+    if ($changedFiles.Count -ne 1 -or $changedFiles[0] -ne "src/recommendationservice/logger.py") {
+        throw "OB-007 runtime evidence changed-files artifact must contain only src/recommendationservice/logger.py."
+    }
+
+    $detection = Read-Json (Join-Path $EvidenceDir "qmind-ob007-detection-summary.json")
+    if ([bool]$detection.detected -ne $true) {
+        throw "OB-007 QMind detection summary must set detected=true."
+    }
+    if ([bool]$detection.observability_enabled -ne $true -or [bool]$detection.has_runtime_signal -ne $true) {
+        throw "OB-007 QMind detection summary must show observability_enabled=true and has_runtime_signal=true."
+    }
+    if ([string]$detection.signal_state -eq "historical_only") {
+        throw "OB-007 QMind detection summary must be runtime-aware, not historical_only."
+    }
+
+    $ob006 = Read-Json $Ob006SelectionPath
+    $ob007 = Read-Json $Ob007SelectionPath
+    $sameSelectedTests = ((@($ob006.selected_tests) -join "|") -eq (@($ob007.selected_tests) -join "|"))
+    $sameBusinessMetrics = ((Get-CanonicalJson $ob006.business_metrics) -eq (Get-CanonicalJson $ob007.business_metrics))
+    if ($sameSelectedTests -and $sameBusinessMetrics) {
+        throw "OB-007 QMind selection is substantively identical to OB-006. Regenerate OB-007 from distinct live runtime evidence."
+    }
+
+    $evidenceSelection = Read-Json (Join-Path $EvidenceDir "qmind-selection-ob-007.json")
+    if ((Get-SelectionRunId $evidenceSelection) -ne (Get-SelectionRunId $ob007)) {
+        throw "Tracked OB-007 evidence selection run_id does not match benchmark-results/qmind-selections/qmind-selection-ob-007.json."
+    }
+}
+
 function Get-CaseDetection {
     param([object]$Evaluation)
 
@@ -607,6 +688,17 @@ Assert-Ob006RuntimeEvidence `
 $ob006EvidenceManifest = Read-Json (Join-Path $RuntimeEvidenceDir "evidence-manifest.json")
 $ob006RuntimeMovement = Read-Json (Join-Path $RuntimeEvidenceDir "runtime-movement-summary.json")
 
+$ob007EvidenceManifest = $null
+$ob007RuntimeMovement = $null
+if ($IncludeOb007) {
+    Assert-Ob007RuntimeEvidence `
+        -EvidenceDir $RuntimeEvidenceOb007Dir `
+        -Ob006SelectionPath (Get-QMindSelectionPath "OB-006") `
+        -Ob007SelectionPath (Get-QMindSelectionPath "OB-007")
+    $ob007EvidenceManifest = Read-Json (Join-Path $RuntimeEvidenceOb007Dir "evidence-manifest.json")
+    $ob007RuntimeMovement = Read-Json (Join-Path $RuntimeEvidenceOb007Dir "runtime-movement-summary.json")
+}
+
 if (-not $SkipRun) {
     Invoke-Python @(
         "benchmark-pipeline/evaluate-defect-recall.py",
@@ -782,30 +874,58 @@ $categorySummaries += New-CategorySummary "overall" $caseResults
 
 $comparison = [ordered]@{
     benchmark = "online-boutique-defect-recall"
-    run_id = "final-comparison-006"
+    run_id = if ($IncludeOb007) { "final-comparison-007" } else { "final-comparison-006" }
     comparison_status = "measured"
     methodology = "benchmark-case-ci-validation"
-    created_at = "2026-06-12"
+    created_at = ([datetime]::UtcNow.ToString("yyyy-MM-dd"))
     generator = "benchmark-pipeline/generate-final-comparison.ps1"
     oracle = $Oracle
     oracle_mode = "validated_detecting_tests"
     oracle_detecting_test_counts = $oracleDetectingTestCounts
     canonical_library = $Library
-    full_suite_size = 51
+    full_suite_size = 52
     benchmark_cases = $caseResults
     aggregate_methods = $aggregateMethods
     category_summaries = $categorySummaries
     qmind_dynamic_risk_diagnostics = $qmindDynamicRiskDiagnostics
-    runtime_evidence = [ordered]@{
-        "OB-006" = [ordered]@{
-            evidence_dir = To-RepoPath $RuntimeEvidenceDir
-            evidence_status = [string]$ob006EvidenceManifest.evidence_status
-            qmind_run_id = [string]$ob006EvidenceManifest.qmind_run_id
-            publication_runtime_evidence = [string]$ob006RuntimeMovement.publication_runtime_evidence
-            productcatalogservice_signal_confirmed = [bool]$ob006RuntimeMovement.productcatalogservice_signal_confirmed
-            frontend_signal_confirmed = [bool]$ob006RuntimeMovement.frontend_signal_confirmed
-            changed_files = @($ob006EvidenceManifest.changed_files | ForEach-Object { [string]$_ })
-            published_files = @($ob006EvidenceManifest.published_files | ForEach-Object { [string]$_ })
+    runtime_evidence = if ($IncludeOb007) {
+        [ordered]@{
+            "OB-006" = [ordered]@{
+                evidence_dir = To-RepoPath $RuntimeEvidenceDir
+                evidence_status = [string]$ob006EvidenceManifest.evidence_status
+                qmind_run_id = [string]$ob006EvidenceManifest.qmind_run_id
+                publication_runtime_evidence = [string]$ob006RuntimeMovement.publication_runtime_evidence
+                productcatalogservice_signal_confirmed = [bool]$ob006RuntimeMovement.productcatalogservice_signal_confirmed
+                frontend_signal_confirmed = [bool]$ob006RuntimeMovement.frontend_signal_confirmed
+                changed_files = @($ob006EvidenceManifest.changed_files | ForEach-Object { [string]$_ })
+                published_files = @($ob006EvidenceManifest.published_files | ForEach-Object { [string]$_ })
+            }
+            "OB-007" = [ordered]@{
+                evidence_dir = To-RepoPath $RuntimeEvidenceOb007Dir
+                evidence_status = [string]$ob007EvidenceManifest.evidence_status
+                qmind_run_id = [string]$ob007EvidenceManifest.qmind_run_id
+                publication_runtime_evidence = [string]$ob007RuntimeMovement.publication_runtime_evidence
+                recommendationservice_behavioral_signal_confirmed = [bool]$ob007RuntimeMovement.recommendationservice_behavioral_signal_confirmed
+                recommendationservice_prometheus_signal_confirmed = [bool]$ob007RuntimeMovement.recommendationservice_prometheus_signal_confirmed
+                graceful_degradation_confirmed = [bool]$ob007RuntimeMovement.graceful_degradation_confirmed
+                playwright_section_signal_confirmed = [bool]$ob007RuntimeMovement.playwright_section_signal_confirmed
+                frontend_signal_confirmed = $false
+                changed_files = @($ob007EvidenceManifest.changed_files | ForEach-Object { [string]$_ })
+                published_files = @($ob007EvidenceManifest.published_files | ForEach-Object { [string]$_ })
+            }
+        }
+    } else {
+        [ordered]@{
+            "OB-006" = [ordered]@{
+                evidence_dir = To-RepoPath $RuntimeEvidenceDir
+                evidence_status = [string]$ob006EvidenceManifest.evidence_status
+                qmind_run_id = [string]$ob006EvidenceManifest.qmind_run_id
+                publication_runtime_evidence = [string]$ob006RuntimeMovement.publication_runtime_evidence
+                productcatalogservice_signal_confirmed = [bool]$ob006RuntimeMovement.productcatalogservice_signal_confirmed
+                frontend_signal_confirmed = [bool]$ob006RuntimeMovement.frontend_signal_confirmed
+                changed_files = @($ob006EvidenceManifest.changed_files | ForEach-Object { [string]$_ })
+                published_files = @($ob006EvidenceManifest.published_files | ForEach-Object { [string]$_ })
+            }
         }
     }
     selector_input_policy = [ordered]@{
@@ -821,6 +941,7 @@ $comparison = [ordered]@{
         "QMind is evaluated from one canonical selection artifact per benchmark case under benchmark-results/qmind-selections/qmind-selection-ob-*.json.",
         "Normal generator mode creates QMind selections by invoking benchmark-pipeline/run-qmind-subset.ps1 for each case; -UseExistingQMindSelections reuses committed canonical per-case artifacts.",
         "OB-006 headline inclusion requires tracked runtime evidence under benchmark-results/runtime-evidence/ob-006 and a QMind selection that is not substantively identical to OB-005.",
+        "OB-007 is conditionally included: present only when benchmark-results/runtime-evidence/ob-007/evidence-manifest.json exists and passes Assert-Ob007RuntimeEvidence validation.",
         "History + Code Change uses changed files and library/history metadata only; oracle detecting tests are used only by the evaluator.",
         "No canonical test library content was changed; oracle changes are limited to minimal direct detecting test lists."
     )
@@ -904,7 +1025,11 @@ $doc = @"
 
 ## Scope
 
-This comparison models Online Boutique as six independent CI/CD benchmark cases. OB-001 through OB-004 are the code-change control group. OB-005 is the first runtime-aware scenario. OB-006 is the first combined-signal scenario, where code change and runtime observability point to different parts of the system. Each case has commit context, changed files, an injected defect, and oracle detecting tests. Selectors run before scoring and do not receive defect identity, oracle detecting tests, or expected benchmark outcomes.
+$(if ($IncludeOb007) {
+"This comparison models Online Boutique as seven independent CI/CD benchmark cases. OB-001 through OB-004 are the code-change control group. OB-005 and OB-007 are runtime-aware scenarios where the changed file does not token-match the oracle test, so History + Code Change misses them. OB-006 is the combined-signal scenario. Each case has commit context, changed files, an injected defect, and oracle detecting tests. Selectors run before scoring and do not receive defect identity, oracle detecting tests, or expected benchmark outcomes."
+} else {
+"This comparison models Online Boutique as six independent CI/CD benchmark cases. OB-001 through OB-004 are the code-change control group. OB-005 is the first runtime-aware scenario. OB-006 is the first combined-signal scenario, where code change and runtime observability point to different parts of the system. Each case has commit context, changed files, an injected defect, and oracle detecting tests. Selectors run before scoring and do not receive defect identity, oracle detecting tests, or expected benchmark outcomes."
+})
 
 - Canonical library: ``$Library``
 - Defect oracle: ``$Oracle``
@@ -913,9 +1038,10 @@ This comparison models Online Boutique as six independent CI/CD benchmark cases.
 - Random seed: $RandomSeed
 - Random size: $RandomSize tests
 - History + Code Change size: $TargetedSize tests per case
-- QMind selection artifacts: ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-006.json``
+- QMind selection artifacts: ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-001.json`` through ``$(To-RepoPath $QMindSelectionDir)/qmind-selection-ob-$(if ($IncludeOb007) { "007" } else { "006" }).json``
 - QMind selection mode: ``$($comparison.qmind_selection_mode)``
 - OB-006 runtime evidence: ``$(To-RepoPath $RuntimeEvidenceDir)``
+$(if ($IncludeOb007) { "- OB-007 runtime evidence: ``$(To-RepoPath $RuntimeEvidenceOb007Dir)``" })
 
 ## Oracle Precision
 

@@ -3,7 +3,7 @@
   "method_label": "Random Approach",
   "selection_size": 26,
   "seed": 42,
-  "benchmark_case": "OB-006",
+  "benchmark_case": "OB-007",
   "source_library": "qmind-test-library\\online-boutique-playwright-51.json",
   "selector_inputs": {
     "uses_test_library": true,

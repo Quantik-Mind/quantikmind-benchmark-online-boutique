@@ -1,9 +1,9 @@
 {
   "method": "qmind",
   "benchmark_case": "OB-001",
-  "full_suite_size": 51,
-  "selected_test_count": 9,
-  "execution_reduction": 0.8235294117647058,
+  "full_suite_size": 52,
+  "selected_test_count": 18,
+  "execution_reduction": 0.6538461538461539,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
@@ -14,7 +14,7 @@
       "name": "Checkout Regression",
       "detected": true,
       "selected_detecting_tests": [
-        "checkout-page-accessible-from-cart"
+        "checkout-form-fields-visible"
       ],
       "detecting_tests_used": [
         "checkout-form-fields-visible",

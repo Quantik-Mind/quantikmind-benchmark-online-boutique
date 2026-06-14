@@ -1,8 +1,8 @@
 {
   "method": "full-suite",
   "benchmark_case": "OB-003",
-  "full_suite_size": 51,
-  "selected_test_count": 51,
+  "full_suite_size": 52,
+  "selected_test_count": 52,
   "execution_reduction": 0.0,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,

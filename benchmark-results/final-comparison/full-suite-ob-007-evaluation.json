@@ -1,6 +1,6 @@
 {
   "method": "full-suite",
-  "benchmark_case": "OB-002",
+  "benchmark_case": "OB-007",
   "full_suite_size": 52,
   "selected_test_count": 52,
   "execution_reduction": 0.0,
@@ -10,16 +10,16 @@
   "defect_recall": 1.0,
   "per_scenario": [
     {
-      "id": "OB-002",
-      "name": "Cart Regression",
+      "id": "OB-007",
+      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
       "detected": true,
       "selected_detecting_tests": [
-        "cart-add-from-product-detail-keeps-price-context"
+        "recommendation-section-visible-on-detail"
       ],
       "detecting_tests_used": [
-        "cart-add-from-product-detail-keeps-price-context"
+        "recommendation-section-visible-on-detail"
       ],
-      "validation_status": "validated"
+      "validation_status": "validated-runtime-oracle"
     }
   ]
 }

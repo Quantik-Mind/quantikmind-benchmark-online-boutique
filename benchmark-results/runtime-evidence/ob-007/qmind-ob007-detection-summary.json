@@ -1,0 +1,30 @@
+{
+    "detected":  true,
+    "scenario":  "OB-007",
+    "qmind_run_id":  "5c2033d5-64a4-4f7b-b1d3-90929a78a882",
+    "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-007.json",
+    "has_runtime_signal":  true,
+    "signal_state":  "full",
+    "skip_reason":  "",
+    "business_metrics":  {
+                             "risk_coverage":  47.416469775181866,
+                             "top_risk_coverage":  76.923076923076934,
+                             "residual_risk":  52.583530224818134,
+                             "risk_efficiency":  1.174122108718789
+                         },
+    "observability_enabled":  true,
+    "changed_files_file":  "benchmark-runs/scenario-ob-007-changed-files.json",
+    "changed_files":  [
+                          "src/recommendationservice/logger.py"
+                      ],
+    "expected_detector_ids":  [
+                                  "recommendation-section-visible-on-detail"
+                              ],
+    "selected_detector_ids":  "recommendation-section-visible-on-detail",
+    "missing_detector_ids":  {
+
+                             },
+    "recommendationservice_prometheus_signal_confirmed":  true,
+    "playwright_section_confirmed":  true,
+    "graceful_degradation_confirmed":  true
+}

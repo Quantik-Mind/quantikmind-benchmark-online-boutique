@@ -1,9 +1,9 @@
 {
   "method": "random",
   "benchmark_case": "OB-003",
-  "full_suite_size": 51,
+  "full_suite_size": 52,
   "selected_test_count": 26,
-  "execution_reduction": 0.4901960784313726,
+  "execution_reduction": 0.5,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
@@ -17,8 +17,6 @@
         "catalog-open-first-product-detail",
         "catalog-product-detail-can-be-opened-twice",
         "catalog-product-detail-has-price",
-        "product-detail-page-has-add-to-cart-button",
-        "product-detail-page-has-non-empty-body",
         "product-detail-page-has-price",
         "product-detail-refresh-keeps-content"
       ],

@@ -1,0 +1,148 @@
+{
+    "prometheus_window":  "2m",
+    "namespace":  "default",
+    "prometheus_url":  "http://localhost:19090",
+    "scenario":  "OB-007",
+    "metrics":  [
+                    {
+                        "value":  0.47259900990099013,
+                        "name":  "recommendationservice latency p95",
+                        "promql":  "histogram_quantile(0.95, sum by (deployment, le) (rate(inbound_http_response_duration_seconds_bucket{namespace=\"default\",deployment=\"recommendationservice\"}[2m])))",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "recommendationservice"
+                                                      },
+                                           "value":  [
+                                                         1781473900.279,
+                                                         "0.47259900990099013"
+                                                     ]
+                                       }
+                                   ],
+                        "key":  "recommendationservice.latency_p95",
+                        "no_data":  false
+                    },
+                    {
+                        "value":  0,
+                        "name":  "recommendationservice error rate",
+                        "promql":  "1 - (sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"recommendationservice\",status=~\"2..|3..\"}[2m])) / sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"recommendationservice\"}[2m])))",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "recommendationservice"
+                                                      },
+                                           "value":  [
+                                                         1781473900.320,
+                                                         "0"
+                                                     ]
+                                       }
+                                   ],
+                        "key":  "recommendationservice.error_rate",
+                        "no_data":  false
+                    },
+                    {
+                        "value":  2.2363636363636363,
+                        "name":  "recommendationservice request rate",
+                        "promql":  "sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"recommendationservice\"}[2m]))",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "recommendationservice"
+                                                      },
+                                           "value":  [
+                                                         1781473900.367,
+                                                         "2.2363636363636363"
+                                                     ]
+                                       }
+                                   ],
+                        "key":  "recommendationservice.request_rate",
+                        "no_data":  false
+                    },
+                    {
+                        "value":  null,
+                        "name":  "recommendationservice gRPC failure response rate",
+                        "promql":  "sum(rate(response_total{dst_namespace=\"default\",dst_deployment=\"recommendationservice\",direction=\"inbound\",classification=\"failure\"}[2m]))",
+                        "result":  [
+
+                                   ],
+                        "key":  "recommendationservice.grpc_failure_rate",
+                        "no_data":  true
+                    },
+                    {
+                        "value":  null,
+                        "name":  "recommendationservice gRPC non-OK response rate",
+                        "promql":  "sum(rate(response_total{dst_namespace=\"default\",dst_deployment=\"recommendationservice\",direction=\"inbound\",grpc_status!~\"OK|\"}[2m]))",
+                        "result":  [
+
+                                   ],
+                        "key":  "recommendationservice.grpc_non_ok_rate",
+                        "no_data":  true
+                    },
+                    {
+                        "value":  null,
+                        "name":  "recommendationservice gRPC response rate",
+                        "promql":  "sum(rate(response_total{dst_namespace=\"default\",dst_deployment=\"recommendationservice\",direction=\"inbound\"}[2m]))",
+                        "result":  [
+
+                                   ],
+                        "key":  "recommendationservice.grpc_request_rate",
+                        "no_data":  true
+                    },
+                    {
+                        "value":  0.46745535714285713,
+                        "name":  "frontend latency p95",
+                        "promql":  "histogram_quantile(0.95, sum by (deployment, le) (rate(inbound_http_response_duration_seconds_bucket{namespace=\"default\",deployment=\"frontend\"}[2m])))",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "frontend"
+                                                      },
+                                           "value":  [
+                                                         1781473900.548,
+                                                         "0.46745535714285713"
+                                                     ]
+                                       }
+                                   ],
+                        "key":  "frontend.latency_p95",
+                        "no_data":  false
+                    },
+                    {
+                        "value":  0.05555555555555558,
+                        "name":  "frontend error rate",
+                        "promql":  "1 - (sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\",status=~\"2..|3..\"}[2m])) / sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\"}[2m])))",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "frontend"
+                                                      },
+                                           "value":  [
+                                                         1781473900.594,
+                                                         "0.05555555555555558"
+                                                     ]
+                                       }
+                                   ],
+                        "key":  "frontend.error_rate",
+                        "no_data":  false
+                    },
+                    {
+                        "value":  2.9454545454545453,
+                        "name":  "frontend request rate",
+                        "promql":  "sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\"}[2m]))",
+                        "result":  [
+                                       {
+                                           "metric":  {
+                                                          "deployment":  "frontend"
+                                                      },
+                                           "value":  [
+                                                         1781473900.636,
+                                                         "2.9454545454545453"
+                                                     ]
+                                       }
+                                   ],
+                        "key":  "frontend.request_rate",
+                        "no_data":  false
+                    }
+                ],
+    "phase":  "injected",
+    "captured_at_utc":  "2026-06-14T21:51:37.7065776Z"
+}

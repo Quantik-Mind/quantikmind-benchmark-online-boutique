@@ -1,21 +1,19 @@
 {
   "method": "random",
   "benchmark_case": "OB-004",
-  "full_suite_size": 51,
+  "full_suite_size": 52,
   "selected_test_count": 26,
-  "execution_reduction": 0.4901960784313726,
+  "execution_reduction": 0.5,
   "total_scenarios": 1,
-  "detected_scenarios_count": 1,
-  "missed_scenarios_count": 0,
-  "defect_recall": 1.0,
+  "detected_scenarios_count": 0,
+  "missed_scenarios_count": 1,
+  "defect_recall": 0.0,
   "per_scenario": [
     {
       "id": "OB-004",
       "name": "Payment Regression",
-      "detected": true,
-      "selected_detecting_tests": [
-        "payment-order-completion-confirms-success"
-      ],
+      "detected": false,
+      "selected_detecting_tests": [],
       "detecting_tests_used": [
         "payment-order-completion-confirms-success"
       ],

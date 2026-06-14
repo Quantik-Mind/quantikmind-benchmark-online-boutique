@@ -230,6 +230,57 @@
       ]
     },
     {
+      "id": "OB-007",
+      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
+      "category": "runtime-aware",
+      "signal_type": "runtime",
+      "description": "Recommendationservice is behaviorally degraded so ListRecommendations adds a small calibrated delay and returns an empty response. Prometheus records the recommendationservice latency signal while the frontend gracefully hides the recommendation section on product detail pages and keeps the core page functional with HTTP 200 responses.",
+      "target_domain": "Recommendation section on product detail pages",
+      "target_service": "recommendationservice",
+      "external_repo": "microservices-demo",
+      "baseline_ref": "benchmark-baseline",
+      "scenario_ref": "runtime-scenarios/ob-007-recommendation-logging-overhead",
+      "expected_changed_files": [
+        "src/recommendationservice/logger.py"
+      ],
+      "defect_behavior": [
+        "The declared changed file remains src/recommendationservice/logger.py so History + Code Change receives a harmless recommendationservice logger context.",
+        "The runtime injection is applied to src/recommendationservice/recommendation_server.py: ListRecommendations sleeps for a small calibrated interval after logging the sampled product ids, then returns an empty ListRecommendationsResponse.",
+        "Check and Watch health methods remain unchanged and healthy.",
+        "The frontend gracefully degrades: handlers.go renders the product detail page without the recommendation section when the recommendation RPC fails.",
+        "All frontend HTTP responses remain 200 — there is no cascading frontend error rate increase.",
+        "The only user-visible effect is that the 'You May Also Like' recommendation section disappears from product detail pages."
+      ],
+      "signal_breadth": "runtime-narrow",
+      "expected_runtime_effect": [
+        "Product detail HTTP probes remain successful for at least 80% of requests.",
+        "The Playwright oracle recommendation-section-visible-on-detail fails because section.recommendations is missing.",
+        "Prometheus records a recommendationservice latency p95 increase from the injected ListRecommendations-only delay.",
+        "Latency snapshots are retained as informational evidence, not publication gates."
+      ],
+      "expected_user_visible_effect": "The 'You May Also Like' recommendation section disappears from product detail pages. Core page content (price, add-to-cart button, product name) remains fully functional.",
+      "expected_detecting_tests": [
+        "recommendation-section-visible-on-detail"
+      ],
+      "expected_unaffected_tests": [
+        "homepage-tests",
+        "catalog-browsing-tests",
+        "cart-tests",
+        "checkout-tests",
+        "payment-tests",
+        "product-detail-core-tests-excluding-recommendation-section"
+      ],
+      "validation_status": "planned",
+      "notes": [
+        "OB-007 is the second runtime-aware scenario and uses recommendation runtime behavioral degradation.",
+        "The declared changed file is intentionally harmless: src/recommendationservice/logger.py. The live runtime patch is applied to recommendation_server.py so runtime behavior, not code-token overlap, reveals the degraded recommendation path.",
+        "The changed file (logger.py) does not contain the token 'recommendation' as a standalone regex token — only 'recommendationservice' and 'logger' are extracted. Neither appears in the oracle test_id 'recommendation-section-visible-on-detail', so History + Code Change scores the oracle test at 40 points (rank ~33/52) and misses it.",
+        "QMind detection must come from Prometheus-visible recommendationservice latency evidence plus behavioral evidence showing the recommendation section disappeared while core product detail pages stayed functional.",
+        "The defect demonstrates graceful degradation: frontend HTTP responses are intentionally stable, proving the signal is service-specific rather than a cascade.",
+        "Use runtime-scenarios/ob-007-recommendation-logging-overhead/apply-ob007-recommendation-logging-overhead.ps1 to inject or restore the defect."
+      ]
+    },
+    {
       "id": "OB-006",
       "name": "Product Catalog ListProducts Cascades Into Homepage Rendering",
       "category": "combined-signal",

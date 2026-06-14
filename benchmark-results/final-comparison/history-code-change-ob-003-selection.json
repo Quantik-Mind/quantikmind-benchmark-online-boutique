@@ -544,6 +544,13 @@
         "scenario metadata token match: frontend",
         "changed-code mapping match: frontend"
       ]
+    },
+    {
+      "test_id": "recommendation-section-visible-on-detail",
+      "score": 10,
+      "reasons": [
+        "historical risk criticality: medium"
+      ]
     }
   ]
 }

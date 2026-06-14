@@ -1,11 +1,11 @@
 {
   "method": "full-suite",
   "benchmark_case": null,
-  "full_suite_size": 51,
-  "selected_test_count": 51,
+  "full_suite_size": 52,
+  "selected_test_count": 52,
   "execution_reduction": 0.0,
-  "total_scenarios": 6,
-  "detected_scenarios_count": 6,
+  "total_scenarios": 7,
+  "detected_scenarios_count": 7,
   "missed_scenarios_count": 0,
   "defect_recall": 1.0,
   "per_scenario": [
@@ -144,6 +144,18 @@
         "smoke-product-links-visible"
       ],
       "validation_status": "validated-combined-oracle"
+    },
+    {
+      "id": "OB-007",
+      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
+      "detected": true,
+      "selected_detecting_tests": [
+        "recommendation-section-visible-on-detail"
+      ],
+      "detecting_tests_used": [
+        "recommendation-section-visible-on-detail"
+      ],
+      "validation_status": "validated-runtime-oracle"
     }
   ]
 }

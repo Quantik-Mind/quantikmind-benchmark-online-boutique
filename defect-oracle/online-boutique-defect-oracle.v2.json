@@ -185,6 +185,38 @@
       ]
     },
     {
+      "id": "OB-007",
+      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
+      "category": "runtime-aware",
+      "signal_type": "runtime",
+      "affected_domain": "Recommendation section on product detail pages",
+      "affected_service": "recommendationservice",
+      "scenario_ref": "runtime-scenarios/ob-007-recommendation-logging-overhead",
+      "expected_detecting_tests": [
+        "recommendation-section-visible-on-detail"
+      ],
+      "validated_detecting_tests": [
+        "recommendation-section-visible-on-detail"
+      ],
+      "expected_unaffected_tests": [
+        "homepage-tests",
+        "catalog-browsing-tests",
+        "product-detail-core-tests-excluding-recommendation-section",
+        "cart-tests",
+        "checkout-tests",
+        "payment-tests"
+      ],
+      "validated_at": "2026-06-14",
+      "validation_status": "validated-runtime-oracle",
+      "severity": "medium",
+      "notes": [
+        "The declared changed file remains src/recommendationservice/logger.py, but the runtime injection is applied to src/recommendationservice/recommendation_server.py so ListRecommendations adds a small calibrated delay and returns an empty ListRecommendationsResponse.",
+        "The frontend gracefully degrades: the recommendation section disappears silently while core product detail content remains functional.",
+        "History + Code Change scores the oracle test at 40 points (rank ~33/52) because the changed file logger.py only yields 'recommendationservice' and 'logger' tokens — neither appears in the test_id 'recommendation-section-visible-on-detail'.",
+        "QMind detection must come from Prometheus-visible runtime evidence: recommendationservice latency p95 increases while product detail pages remain accessible and the recommendation section is absent."
+      ]
+    },
+    {
       "id": "OB-006",
       "name": "ProductCatalog ListProducts Cascade Into Homepage Rendering",
       "category": "combined-signal",

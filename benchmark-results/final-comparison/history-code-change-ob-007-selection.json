@@ -2,7 +2,7 @@
   "method": "history-code-change",
   "method_label": "History + Code Change Approach",
   "selection_size": 15,
-  "benchmark_case": "OB-004",
+  "benchmark_case": "OB-007",
   "source_library": "qmind-test-library\\online-boutique-playwright-51.json",
   "source_scenarios": "benchmark-pipeline\\scenarios.json",
   "selector_inputs": {
@@ -13,18 +13,18 @@
     "uses_runtime": false
   },
   "case_context": {
-    "id": "OB-004",
+    "id": "OB-007",
     "expected_changed_files": [
-      "src/paymentservice/charge.js"
+      "src/recommendationservice/logger.py"
     ]
   },
   "selected_tests": [
-    "payment-order-completion-confirms-success",
     "checkout-empty-cart-does-not-complete-order",
     "frontend-basic-user-journey-home-product-cart",
     "checkout-page-accessible-from-cart",
     "checkout-page-does-not-crash-with-empty-cart",
     "order-form-requires-payment-data",
+    "payment-order-completion-confirms-success",
     "cart-add-from-product-detail-keeps-price-context",
     "cart-add-from-product-detail-shows-cart-context",
     "cart-add-product-and-view-cart",
@@ -36,16 +36,6 @@
     "catalog-open-first-product-detail"
   ],
   "scores": [
-    {
-      "test_id": "payment-order-completion-confirms-success",
-      "score": 90,
-      "reasons": [
-        "high-risk id keyword match: order, payment",
-        "historical risk criticality: high",
-        "scenario metadata token match: paymentservice",
-        "changed-code mapping match: paymentservice"
-      ]
-    },
     {
       "test_id": "checkout-empty-cart-does-not-complete-order",
       "score": 80,
@@ -80,6 +70,14 @@
     },
     {
       "test_id": "order-form-requires-payment-data",
+      "score": 60,
+      "reasons": [
+        "high-risk id keyword match: order, payment",
+        "historical risk criticality: high"
+      ]
+    },
+    {
+      "test_id": "payment-order-completion-confirms-success",
       "score": 60,
       "reasons": [
         "high-risk id keyword match: order, payment",
@@ -295,6 +293,15 @@
       ]
     },
     {
+      "test_id": "recommendation-section-visible-on-detail",
+      "score": 40,
+      "reasons": [
+        "historical risk criticality: medium",
+        "scenario metadata token match: recommendationservice",
+        "changed-code mapping match: recommendationservice"
+      ]
+    },
+    {
       "test_id": "frontend-logo-or-home-link-visible",
       "score": 30,
       "reasons": [
@@ -428,13 +435,6 @@
     },
     {
       "test_id": "homepage-title-is-available",
-      "score": 10,
-      "reasons": [
-        "historical risk criticality: medium"
-      ]
-    },
-    {
-      "test_id": "recommendation-section-visible-on-detail",
       "score": 10,
       "reasons": [
         "historical risk criticality: medium"

@@ -203,7 +203,7 @@ $caseId = $null
 if (-not [string]::IsNullOrWhiteSpace($BenchmarkCase)) {
     $caseId = $BenchmarkCase.ToUpperInvariant()
     if ($caseId -notmatch "^OB-\d{3}$") {
-        throw "BenchmarkCase must look like OB-001 through OB-006. Found: $BenchmarkCase"
+        throw "BenchmarkCase must look like OB-001 through OB-007. Found: $BenchmarkCase"
     }
     if (-not (Test-Path -LiteralPath $Scenarios -PathType Leaf)) {
         throw "Missing scenarios file: $Scenarios"

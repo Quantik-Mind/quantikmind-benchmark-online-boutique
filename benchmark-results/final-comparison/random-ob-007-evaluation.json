@@ -1,6 +1,6 @@
 {
   "method": "random",
-  "benchmark_case": "OB-001",
+  "benchmark_case": "OB-007",
   "full_suite_size": 52,
   "selected_test_count": 26,
   "execution_reduction": 0.5,
@@ -10,17 +10,16 @@
   "defect_recall": 1.0,
   "per_scenario": [
     {
-      "id": "OB-001",
-      "name": "Checkout Regression",
+      "id": "OB-007",
+      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
       "detected": true,
       "selected_detecting_tests": [
-        "checkout-form-fields-visible"
+        "recommendation-section-visible-on-detail"
       ],
       "detecting_tests_used": [
-        "checkout-form-fields-visible",
-        "checkout-page-accessible-from-cart"
+        "recommendation-section-visible-on-detail"
       ],
-      "validation_status": "validated"
+      "validation_status": "validated-runtime-oracle"
     }
   ]
 }

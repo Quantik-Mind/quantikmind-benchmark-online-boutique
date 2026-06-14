@@ -1,9 +1,9 @@
 {
   "method": "random",
   "benchmark_case": "OB-002",
-  "full_suite_size": 51,
+  "full_suite_size": 52,
   "selected_test_count": 26,
-  "execution_reduction": 0.4901960784313726,
+  "execution_reduction": 0.5,
   "total_scenarios": 1,
   "detected_scenarios_count": 0,
   "missed_scenarios_count": 1,

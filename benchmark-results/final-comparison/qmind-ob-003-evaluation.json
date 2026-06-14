@@ -1,9 +1,9 @@
 {
   "method": "qmind",
   "benchmark_case": "OB-003",
-  "full_suite_size": 51,
-  "selected_test_count": 15,
-  "execution_reduction": 0.7058823529411764,
+  "full_suite_size": 52,
+  "selected_test_count": 16,
+  "execution_reduction": 0.6923076923076923,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
@@ -16,9 +16,7 @@
       "selected_detecting_tests": [
         "catalog-first-product-opens-detail-page",
         "catalog-open-first-product-detail",
-        "catalog-product-detail-keeps-product-context",
-        "product-detail-page-has-add-to-cart-button",
-        "product-detail-page-has-price"
+        "product-detail-page-has-add-to-cart-button"
       ],
       "detecting_tests_used": [
         "catalog-first-product-opens-detail-page",

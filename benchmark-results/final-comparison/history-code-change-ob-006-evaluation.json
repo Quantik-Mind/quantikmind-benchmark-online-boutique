@@ -1,9 +1,9 @@
 {
   "method": "history-code-change",
   "benchmark_case": "OB-006",
-  "full_suite_size": 51,
+  "full_suite_size": 52,
   "selected_test_count": 15,
-  "execution_reduction": 0.7058823529411764,
+  "execution_reduction": 0.7115384615384616,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
