@@ -131,7 +131,7 @@ Quantik Mind spends 0.8 more tests on average to recover the case that History +
 
 Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all six benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the six committed per-case QMind artifacts before scoring them.
 
-The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This supports a transparent combined-signal case, but it should not be described as independent proof of an additional runtime-aware win until distinct live OB-006 runtime evidence is captured.
+The committed OB-005 and OB-006 QMind artifacts are distinct. OB-005 selects 17 tests; OB-006 selects 19 tests and reports different risk metrics. OB-006 should be described as the productcatalogservice ListProducts combined-signal case, not as a reused OB-005 selection.
 
 ## Benchmark Limitations
 
@@ -173,4 +173,4 @@ This makes the comparison more defensible:
 - aggregate recall is computed from case outcomes
 - generated artifacts can be regenerated from committed inputs with one script
 
-If a reviewer argues that H+CC has better savings, the response is: yes, but it achieves that by missing OB-005 and OB-006. The meaningful comparison is not saving alone; it is recall at a given execution budget. QMind trades 0.5 additional tests on average for two additional detected cases in the current six-case artifact set, while OB-006 remains subject to the duplicate-selection limitation above.
+If a reviewer argues that H+CC has better savings, the response is: yes, but it achieves that by missing OB-005 in the current six-case artifact set. The meaningful comparison is not saving alone; it is recall at a given execution budget. QMind trades 0.8 additional tests on average for one additional detected case, while OB-006 is retained as a distinct productcatalogservice combined-signal case.

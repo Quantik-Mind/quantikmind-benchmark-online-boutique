@@ -349,7 +349,26 @@ OB-005 is the first runtime-aware scenario. It corrupts the real committed Onlin
 
 The changed file is not application code. Under standard traffic, the expected runtime effect is elevated currencyservice error rate plus elevated frontend error rate because homepage price rendering depends on currency conversion. The expected user-visible effect is that the homepage fails to load correctly or renders invalid content.
 
-The direct oracle is limited to homepage, product-grid, and product catalog tests:
+The direct oracle is limited to homepage tests:
+
+- `smoke-homepage-loads`
+- `homepage-body-is-not-empty`
+- `homepage-title-is-available`
+- `homepage-has-visible-text-content`
+- `homepage-shows-google-cloud-branding`
+- `homepage-has-multiple-links`
+
+This scenario demonstrates a class of defects that code-change-only selection cannot reach structurally. History + Code Change sees `src/currencyservice/data/currency_conversion.json`; the direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and do not contain high-risk ID keywords. Their score is therefore only 10, below the top-15 checkout/cart/order/payment/product/catalog-heavy tests. QMind should detect OB-005 only through runtime observability, not oracle leakage.
+
+### OB-006 Product Catalog ListProducts Cascades Into Homepage Rendering
+
+OB-006 is the first combined-signal scenario. It injects deterministic latency or failure into the upstream Online Boutique file `src/productcatalogservice/product_catalog.go`.
+
+The code-change signal points to `productcatalogservice`, but the direct user-visible failure is frontend homepage/product-grid rendering. The scenario is defensible only when runtime evidence shows both sides of the cascade: elevated productcatalogservice latency and/or errors, plus elevated frontend latency and/or homepage rendering failure during the same traffic window.
+
+Product catalog listing is homepage-critical because `homeHandler` calls `getProducts`, which calls `ProductCatalogService/ListProducts`; a failure there returns an error before the product grid is built.
+
+The direct oracle contains 19 homepage, product-grid, catalog, and product-detail detectors:
 
 - `frontend-homepage-has-product-grid`
 - `frontend-products-have-prices`
@@ -370,25 +389,6 @@ The direct oracle is limited to homepage, product-grid, and product catalog test
 - `product-detail-page-has-price`
 - `product-detail-page-has-non-empty-body`
 - `product-detail-refresh-keeps-content`
-
-This scenario demonstrates a class of defects that code-change-only selection cannot reach structurally. History + Code Change sees `src/currencyservice/data/currency_conversion.json`; the direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and do not contain high-risk ID keywords. Their score is therefore only 10, below the top-15 checkout/cart/order/payment/product/catalog-heavy tests. QMind should detect OB-005 only through runtime observability, not oracle leakage.
-
-### OB-006 Product Catalog ListProducts Cascades Into Homepage Rendering
-
-OB-006 is the first combined-signal scenario. It injects deterministic latency or failure into the upstream Online Boutique file `src/productcatalogservice/product_catalog.go`.
-
-The code-change signal points to `productcatalogservice`, but the direct user-visible failure is frontend homepage/product-grid rendering. The scenario is defensible only when runtime evidence shows both sides of the cascade: elevated productcatalogservice latency and/or errors, plus elevated frontend latency and/or homepage rendering failure during the same traffic window.
-
-Product catalog listing is homepage-critical because `homeHandler` calls `getProducts`, which calls `ProductCatalogService/ListProducts`; a failure there returns an error before the product grid is built.
-
-The direct oracle is limited to homepage tests:
-
-- `smoke-homepage-loads`
-- `homepage-body-is-not-empty`
-- `homepage-title-is-available`
-- `homepage-has-visible-text-content`
-- `homepage-shows-google-cloud-branding`
-- `homepage-has-multiple-links`
 
 History + Code Change sees `src/productcatalogservice/product_catalog.go` without runtime observability or oracle detecting tests. QMind should detect OB-006 only by combining the productcatalogservice code-change context with runtime observability showing frontend homepage/product-grid impact.
 
