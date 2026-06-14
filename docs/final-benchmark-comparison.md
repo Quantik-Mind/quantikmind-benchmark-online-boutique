@@ -60,31 +60,43 @@ The defect oracle uses minimal direct validated detecting tests for each benchma
 | Combined Signal | OB-006 | 1/1 | 1/1 | 1/1 | 1/1 |
 | Overall | OB-001, OB-002, OB-003, OB-004, OB-005, OB-006, OB-007 | 7/7 | 5/7 | 5/7 | 7/7 |
 
-## Quantik Mind Dynamic Risk Intelligence
+## Quantik Mind Runtime Risk Analysis
 
-Unlike baseline approaches, Quantik Mind also evaluates dynamic risk at selection time using historical signals, code changes and live runtime observability.
+Quantik Mind uses runtime observability as part of a broader multi-signal risk model. In the committed benchmark artifacts, selected tests expose dynamic risk fields — including observed risk coverage, critical risk captured, residual risk, and risk density — that reflect how the final selected suite was produced. These fields show Quantik Mind's internal risk view but should not be interpreted as proving that runtime observability was the sole cause of every selected test. Quantik Mind is a multi-signal selector that may combine runtime observability with code-change impact, historical evidence, service dependency context, adaptive entanglement, risk scoring, guardrails, and uncertainty handling.
 
-Observed Risk Coverage: How much of the currently observed risk mass is covered by the selected tests.
+The baseline selectors (Full Suite, Random, History + Code Change) do not produce a comparable dynamic runtime risk model. This is therefore a Quantik Mind product capability view, not an additional competitive scoring metric.
 
-Critical Risk Captured: How much of the highest-priority risk band is captured by the selected tests.
+**Metric definitions:**
 
-Residual Risk: How much observed risk remains uncovered after the selected tests.
+- **Observed Risk Coverage**: Percentage of currently observed system risk mass covered by the selected tests.
+- **Critical Risk Captured**: Percentage of the highest-priority risk band captured by the selected tests.
+- **Residual Risk**: Observed risk that remains uncovered after the selected tests run. This is not random leftover risk and is not expected to be zero; it is mostly lower-priority risk intentionally left uncovered when execution cost outweighs expected value.
+- **Risk Density**: Risk information captured per executed test. A value above 1.0 means the selected tests are denser in risk information than the average test set would be.
 
-Risk Density: How much risk information is captured per executed test. A value above 1.0 means the selected tests are denser in risk information than the average test set.
+The committed QMind selection artifacts include dynamic risk diagnostics for all 7 of 7 benchmark cases, sourced from the `business_metrics` fields in each `benchmark-results/qmind-selections/qmind-selection-ob-*.json` artifact.
 
-Current QMind selection artifacts include dynamic risk diagnostics for 7 of 7 benchmark cases.
+**Aggregate (across 7 benchmark cases):**
+
+| Metric | Average |
+| --- | ---: |
+| Observed Risk Coverage | 45.2% |
+| Critical Risk Captured | 72.5% |
+| Residual Risk | 54.8% |
+| Risk Density | 1.23 |
+
+**Per-scenario:**
 
 | Scenario | Observed Risk Coverage | Critical Risk Captured | Residual Risk | Risk Density |
 | --- | ---: | ---: | ---: | ---: |
-| OB-001 | 42.2% | 38.5% | 57.8% | 1.2 |
-| OB-002 | 38.7% | 84.6% | 61.3% | 1.3 |
-| OB-003 | 39.1% | 76.9% | 60.9% | 1.3 |
-| OB-004 | 47.7% | 76.9% | 52.3% | 1.2 |
-| OB-005 | 48.6% | 84.6% | 51.4% | 1.2 |
-| OB-006 | 50.3% | 61.5% | 49.7% | 1.2 |
-| OB-007 | 50.0% | 84.6% | 50.0% | 1.2 |
+| OB-001 | 42.2% | 38.5% | 57.8% | 1.22 |
+| OB-002 | 38.7% | 84.6% | 61.3% | 1.34 |
+| OB-003 | 39.1% | 76.9% | 60.9% | 1.27 |
+| OB-004 | 47.7% | 76.9% | 52.3% | 1.18 |
+| OB-005 | 48.6% | 84.6% | 51.4% | 1.20 |
+| OB-006 | 50.3% | 61.5% | 49.7% | 1.19 |
+| OB-007 | 50.0% | 84.6% | 50.0% | 1.18 |
 
-These metrics are not included in the benchmark comparison table because equivalent dynamic risk diagnostics are not available for Full Suite, Random, or History + Code Change. They are reported as Quantik Mind product diagnostics.
+These metrics are not included in the main benchmark comparison table because the other selectors do not produce a comparable dynamic runtime risk model. They are Quantik Mind product diagnostics derived from the committed selection artifacts.
 
 ## Benchmark Cases
 
@@ -146,9 +158,9 @@ These metrics are not included in the benchmark comparison table because equival
 
 ## Method Notes
 
-Full Suite always selects all 51 tests.
+Full Suite always selects all 52 tests from the canonical library.
 
-Random uses only the canonical test library and deterministic seed 42. It produces a per-case selection artifact and selects 26 tests, approximately 50% of the 51-test suite.
+Random uses only the canonical test library and deterministic seed 42. It produces a per-case selection artifact and selects 26 tests, exactly 50% of the 52-test suite.
 
 History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is `src/currencyservice/data/currency_conversion.json`; the six direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is `src/productcatalogservice/product_catalog.go`; QMind must use the productcatalogservice code-change signal together with live frontend impact rather than oracle detecting tests.
 
