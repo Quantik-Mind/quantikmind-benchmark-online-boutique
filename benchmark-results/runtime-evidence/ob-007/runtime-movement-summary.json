@@ -1,0 +1,95 @@
+{
+    "captured_at_utc":  "2026-06-14T21:51:45.2692312Z",
+    "scenario":  "OB-007",
+    "validation_thresholds":  {
+                                  "product_detail_ok_rate_min":  0.8,
+                                  "recommendation_section_must_be_absent":  true,
+                                  "recommendationservice_latency_min_delta_seconds":  0.05,
+                                  "recommendationservice_latency_min_ratio":  1.5
+                              },
+    "recommendationservice_latency":  {
+                                          "key":  "recommendationservice.latency_p95",
+                                          "baseline":  0.0475,
+                                          "injected":  0.47259900990099013,
+                                          "delta":  0.42509900990099014,
+                                          "min_delta":  0.05,
+                                          "has_data":  true,
+                                          "passed":  true,
+                                          "ratio":  9.9494528400208448,
+                                          "min_ratio":  1.5,
+                                          "delta_passed":  true,
+                                          "ratio_passed":  true,
+                                          "note":  "Primary Prometheus signal for OB-007: small ListRecommendations-only latency increase without affecting health checks."
+                                      },
+    "recommendationservice_runtime_signal":  {
+                                                 "confirmed":  true,
+                                                 "primary":  "recommendationservice.latency_p95",
+                                                 "accepted_signals":  [
+                                                                          "recommendationservice.latency_p95"
+                                                                      ],
+                                                 "informational_signals":  [
+                                                                               "recommendationservice.grpc_failure_rate",
+                                                                               "recommendationservice.grpc_non_ok_rate",
+                                                                               "recommendationservice.error_rate"
+                                                                           ],
+                                                 "grpc_failure_rate":  {
+                                                                           "key":  "recommendationservice.grpc_failure_rate",
+                                                                           "baseline":  0,
+                                                                           "injected":  0,
+                                                                           "delta":  0,
+                                                                           "min_delta":  0.01,
+                                                                           "min_injected":  0.01,
+                                                                           "has_baseline_data":  false,
+                                                                           "has_injected_data":  false,
+                                                                           "passed":  false,
+                                                                           "note":  "Informational only. Linkerd has reported recommendationservice grpc_status=0/classification=success for this scenario."
+                                                                       },
+                                                 "grpc_non_ok_rate":  {
+                                                                          "key":  "recommendationservice.grpc_non_ok_rate",
+                                                                          "baseline":  0,
+                                                                          "injected":  0,
+                                                                          "delta":  0,
+                                                                          "min_delta":  0.01,
+                                                                          "min_injected":  0.01,
+                                                                          "has_baseline_data":  false,
+                                                                          "has_injected_data":  false,
+                                                                          "passed":  false,
+                                                                          "note":  "Informational only. OB-007 no longer uses context.abort or gRPC non-OK status as the required signal."
+                                                                      },
+                                                 "http_error_rate":  {
+                                                                         "key":  "recommendationservice.error_rate",
+                                                                         "baseline":  0,
+                                                                         "injected":  0,
+                                                                         "delta":  0,
+                                                                         "min_delta":  0.01,
+                                                                         "min_injected":  0.01,
+                                                                         "has_baseline_data":  true,
+                                                                         "has_injected_data":  true,
+                                                                         "passed":  false,
+                                                                         "note":  "Informational only. OB-007 no longer gates publication on recommendationservice error rate."
+                                                                     }
+                                             },
+    "frontend_error_rate":  {
+                                "key":  "frontend.error_rate",
+                                "baseline":  0.047337278106508784,
+                                "injected":  0.05555555555555558,
+                                "delta":  0.0082182774490467958,
+                                "stable":  true,
+                                "note":  "Informational only; product detail HTTP probes are the graceful degradation gate.",
+                                "passed":  true
+                            },
+    "product_detail_ok_rate":  {
+                                   "baseline_ok_count":  20,
+                                   "injected_ok_count":  20,
+                                   "total_probes":  20,
+                                   "injected_ok_fraction":  1,
+                                   "note":  "Product detail pages must remain accessible (\u003e=80% 200s) to confirm graceful degradation",
+                                   "passed":  true
+                               },
+    "recommendationservice_prometheus_signal_confirmed":  true,
+    "recommendationservice_behavioral_signal_confirmed":  true,
+    "frontend_signal_confirmed":  false,
+    "graceful_degradation_confirmed":  true,
+    "playwright_section_signal_confirmed":  true,
+    "publication_runtime_evidence":  "CONFIRMED"
+}

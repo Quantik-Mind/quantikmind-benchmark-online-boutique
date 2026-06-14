@@ -1,0 +1,28 @@
+{
+    "scenario":  "OB-007",
+    "evidence_status":  "verified",
+    "published_at_utc":  "2026-06-14T21:52:51.8438238Z",
+    "source_run_dir":  "benchmark-runs",
+    "qmind_selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-007.json",
+    "qmind_run_id":  "5c2033d5-64a4-4f7b-b1d3-90929a78a882",
+    "changed_files":  [
+                          "src/recommendationservice/logger.py"
+                      ],
+    "required_runtime_chain":  [
+                                   "product detail pages remain accessible (HTTP 200 - graceful degradation confirmed)",
+                                   "recommendation section absent from product detail at Playwright level",
+                                   "recommendationservice Prometheus latency p95 signal confirmed",
+                                   "QMind selection generated after injected runtime window includes oracle test with has_runtime_signal=true",
+                                   "History + Code Change selection does not include oracle test"
+                               ],
+    "published_files":  [
+                            "benchmark-results/runtime-evidence/ob-007/baseline-prometheus-snapshot.json",
+                            "benchmark-results/runtime-evidence/ob-007/injected-prometheus-snapshot.json",
+                            "benchmark-results/runtime-evidence/ob-007/runtime-movement-summary.json",
+                            "benchmark-results/runtime-evidence/ob-007/baseline-product-detail-traffic.json",
+                            "benchmark-results/runtime-evidence/ob-007/injected-product-detail-traffic.json",
+                            "benchmark-results/runtime-evidence/ob-007/qmind-ob007-detection-summary.json",
+                            "benchmark-results/runtime-evidence/ob-007/scenario-ob-007-changed-files.json",
+                            "benchmark-results/runtime-evidence/ob-007/qmind-selection-ob-007.json"
+                        ]
+}

@@ -1,9 +1,9 @@
 {
   "method": "random",
   "benchmark_case": "OB-005",
-  "full_suite_size": 51,
+  "full_suite_size": 52,
   "selected_test_count": 26,
-  "execution_reduction": 0.4901960784313726,
+  "execution_reduction": 0.5,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
@@ -16,7 +16,7 @@
       "selected_detecting_tests": [
         "homepage-body-is-not-empty",
         "homepage-has-visible-text-content",
-        "homepage-title-is-available"
+        "homepage-shows-google-cloud-branding"
       ],
       "detecting_tests_used": [
         "homepage-body-is-not-empty",

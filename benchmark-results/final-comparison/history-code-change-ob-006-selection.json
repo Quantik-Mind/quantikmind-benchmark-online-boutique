@@ -509,6 +509,13 @@
       ]
     },
     {
+      "test_id": "recommendation-section-visible-on-detail",
+      "score": 10,
+      "reasons": [
+        "historical risk criticality: medium"
+      ]
+    },
+    {
       "test_id": "smoke-homepage-loads",
       "score": 10,
       "reasons": [

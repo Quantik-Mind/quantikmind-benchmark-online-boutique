@@ -1,6 +1,6 @@
 {
   "method": "history-code-change",
-  "benchmark_case": "OB-005",
+  "benchmark_case": "OB-007",
   "full_suite_size": 52,
   "selected_test_count": 15,
   "execution_reduction": 0.7115384615384616,
@@ -10,17 +10,12 @@
   "defect_recall": 0.0,
   "per_scenario": [
     {
-      "id": "OB-005",
-      "name": "Currency Data Corruption",
+      "id": "OB-007",
+      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
       "detected": false,
       "selected_detecting_tests": [],
       "detecting_tests_used": [
-        "homepage-body-is-not-empty",
-        "homepage-has-multiple-links",
-        "homepage-has-visible-text-content",
-        "homepage-shows-google-cloud-branding",
-        "homepage-title-is-available",
-        "smoke-homepage-loads"
+        "recommendation-section-visible-on-detail"
       ],
       "validation_status": "validated-runtime-oracle"
     }
