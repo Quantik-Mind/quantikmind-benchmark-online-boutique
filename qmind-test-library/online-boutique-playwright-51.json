@@ -716,6 +716,20 @@
       },
       "duration_ms": 1000,
       "avg_duration_ms": 1000
+    },
+    {
+      "test_id": "recommendation-section-visible-on-detail",
+      "name": "recommendation-section-visible-on-detail",
+      "framework": "playwright",
+      "service": "recommendationservice",
+      "criticality": "medium",
+      "code_mapping": {
+        "file_globs": [
+          "src/recommendationservice/**/*"
+        ]
+      },
+      "duration_ms": 1000,
+      "avg_duration_ms": 1000
     }
   ]
 }
