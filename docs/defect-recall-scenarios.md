@@ -50,7 +50,7 @@ The defect scenarios should be implemented later as Git states in the external O
 
 ## 3. Test/Domain Mapping
 
-The Playwright suite under `qmind-test-harness/playwright/tests` currently contains 51 E2E tests. The following grouping should be used as the benchmark's domain map.
+The Playwright suite under `qmind-test-harness/playwright/tests` currently contains 52 E2E tests (the canonical library `qmind-test-library/online-boutique-playwright-51.json` uses a historical name but holds 52 entries). The following grouping should be used as the benchmark's domain map.
 
 ### Frontend / Catalog Browsing
 
@@ -128,7 +128,7 @@ The Playwright suite under `qmind-test-harness/playwright/tests` currently conta
 
 ## 4. Scenario Catalog
 
-The benchmark uses six independent defect scenarios:
+The benchmark uses seven independent benchmark cases:
 
 - `OB-001 Checkout Regression`
 - `OB-002 Cart Regression`
@@ -136,6 +136,7 @@ The benchmark uses six independent defect scenarios:
 - `OB-004 Payment Regression`
 - `OB-005 Currency Data Corruption`
 - `OB-006 Product Catalog ListProducts Cascades Into Homepage Rendering`
+- `OB-007 Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance`
 
 Each scenario should be represented by a separate branch or tag in the external Online Boutique repository. Each scenario should contain exactly one intentionally introduced defect.
 
@@ -174,7 +175,7 @@ Expected unaffected tests:
 
 Risk notes:
 
-- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 4 failed, 46 passed. The current canonical benchmark library has 51 tests.
+- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 4 failed, 46 passed. The current canonical benchmark library has 52 tests.
 - Validated external scenario commit `e5234240` against baseline commit `5096a85b`.
 - If implemented by renaming only one label, the signal may be too narrow.
 - If implemented as a service crash, unrelated tests may fail through HTTP 500s or slow recovery.
@@ -218,7 +219,7 @@ Validated failing tests:
 
 Validation notes:
 
-- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 5 failed, 45 passed. The current canonical benchmark library has 51 tests.
+- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 5 failed, 45 passed. The current canonical benchmark library has 52 tests.
 - Validated external scenario commit `f7bac607` against baseline commit `5096a85b`.
 - Only one direct cart assertion failed; several expected cart tests remained green, so broad/soft cart tests should not be treated as validated detecting tests.
 
@@ -292,7 +293,7 @@ Risk notes:
 
 Validation notes:
 
-- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 20 failed, 30 passed. The current canonical benchmark library has 51 tests.
+- Historical validation on 2026-06-11 used the then-current 50-test Playwright suite: 20 failed, 30 passed. The current canonical benchmark library has 52 tests.
 - External scenario commit `381043a6`; baseline commit `5096a85b`.
 - Failure scope is product detail and downstream flows depending on product detail; homepage/catalog listing remained sufficiently healthy because 30 tests passed.
 
@@ -322,8 +323,8 @@ Validated failing tests:
 
 Validation notes:
 
-- Validated on 2026-06-11 against the full 51-test Playwright suite: 1 failed, 50 passed.
-- Baseline validation passed with 51 passed.
+- Validated on 2026-06-11 against the then-current 51-test Playwright suite: 1 failed, 50 passed.
+- Baseline validation passed with 51 passed at that time.
 - Validated external scenario commit `b7ecc963` on `benchmark/scenario-ob004`.
 - Failing test: `payment-order-completion-confirms-success`.
 - OB-004 originally exposed a real coverage gap: the payment service failed correctly, but the previous benchmark suite did not verify successful payment completion.
@@ -423,7 +424,7 @@ Scenario branches should not stack defects on top of each other.
 
 ## 7. Defect Oracle Strategy
 
-The current oracle has evolved from generic service defects into scenario-specific entries for `OB-001` through `OB-006`.
+The current oracle has evolved from generic service defects into scenario-specific entries for `OB-001` through `OB-007`.
 
 Each scenario entry should include:
 
@@ -472,10 +473,10 @@ Overall defect recall:
 detected_scenarios / scenarios_detected_by_full_suite
 ```
 
-Because each scenario should contain exactly one defect, the denominator is six after all current benchmark scenarios are validated:
+Because each scenario should contain exactly one defect, the denominator is seven after all current benchmark scenarios are validated:
 
 ```text
-detected_scenarios / 6
+detected_scenarios / 7
 ```
 
 Execution reduction should be reported beside recall:
@@ -519,11 +520,11 @@ No `.gitignore` change is currently required for this plan.
 
 1. Validate the external Online Boutique baseline.
    - Deploy the external app at the intended baseline.
-   - Run the full 51-test Playwright suite.
+   - Run the full 52-test Playwright suite.
    - Identify unstable or invalid baseline tests before introducing defects.
 
 2. Freeze canonical test metadata.
-   - Use the 51-test Playwright library for the final recall benchmark.
+   - Use the 52-test Playwright library for the final recall benchmark.
    - Correct service/domain metadata if needed before final evaluation.
 
 3. Create scenario metadata in the benchmark repo.
@@ -548,7 +549,7 @@ No `.gitignore` change is currently required for this plan.
    - Quantik Mind normalized selection.
 
 8. Run the full benchmark matrix.
-   - Five scenarios by four selection methods.
+   - Seven benchmark cases by four selection methods.
    - Keep raw outputs ignored.
    - Commit only source, config, oracle, and documentation.
 
@@ -578,6 +579,6 @@ Risk: Generated outputs or external app files could be committed accidentally.
 
 Mitigation: Keep generated paths ignored and run `git status --short` before any commit.
 
-Risk: qmind library metadata may not accurately represent all 51 tests.
+Risk: qmind library metadata may not accurately represent all 52 tests.
 
-Mitigation: Review and correct the 51-test library metadata before final benchmark runs, especially service mappings inferred from test names.
+Mitigation: Review and correct the 52-test library metadata before final benchmark runs, especially service mappings inferred from test names.

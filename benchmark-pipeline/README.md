@@ -23,7 +23,7 @@ Key outputs are written to:
 - `docs/final-benchmark-comparison.md`
 - `benchmark-results/final-comparison/*-selection.json`
 - `benchmark-results/final-comparison/*-evaluation.json`
-- `benchmark-results/qmind-selections/qmind-selection-ob-001.json` through `qmind-selection-ob-006.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-001.json` through `qmind-selection-ob-007.json`
 - `benchmark-runs/baseline-validation/` when baseline validation is run
 
 ## QMind CLI reproducibility
@@ -40,7 +40,7 @@ Run these scripts from the repository root after copying `.env.example` to `.env
 
 `setup-qmind.ps1` writes `qmind.yaml` from `qmind.example.yaml` with environment placeholders preserved, so secrets stay in `.env` and are not committed. The setup command prints the API key as `<redacted>`.
 
-`sync-library.ps1` syncs `qmind-test-library/online-boutique-playwright-51.json` and validates that it contains the expected 51 tests before invoking the CLI.
+`sync-library.ps1` syncs `qmind-test-library/online-boutique-playwright-51.json` and validates that it contains the expected 52 tests before invoking the CLI.
 
 `import-history.ps1` uses the existing synthetic history generators:
 
@@ -54,9 +54,9 @@ It then attempts `qmind history import --file <artifact>`. If your installed CLI
 
 `generate-final-comparison.ps1` is the main benchmark entry point. In normal mode it invokes `run-qmind-subset.ps1` once per benchmark case, derives changed files from `benchmark-pipeline/scenarios.json`, writes per-case QMind selections, evaluates every method against the matching case oracle, and regenerates the final comparison artifacts.
 
-OB-006 has an additional publication gate. The generator requires tracked runtime evidence under `benchmark-results/runtime-evidence/ob-006/`, material productcatalogservice and frontend runtime movement, and an OB-006 QMind selection that is not substantively identical to OB-005. If those checks fail, the generator refuses to publish the six-case headline comparison.
+OB-006 has an additional publication gate. The generator requires tracked runtime evidence under `benchmark-results/runtime-evidence/ob-006/`, material productcatalogservice and frontend runtime movement, and an OB-006 QMind selection that is not substantively identical to OB-005. OB-007 is conditionally included when `benchmark-results/runtime-evidence/ob-007/evidence-manifest.json` exists and passes validation. If those checks fail, the generator refuses to publish the headline comparison.
 
-Use `-UseExistingQMindSelections` to verify the committed comparison from the six canonical per-case QMind selection artifacts under `benchmark-results/qmind-selections/` without contacting QMind. This mode still enforces the OB-006 runtime-evidence gate.
+Use `-UseExistingQMindSelections` to verify the committed comparison from the seven canonical per-case QMind selection artifacts under `benchmark-results/qmind-selections/` without contacting QMind. This mode still enforces the OB-006 and OB-007 runtime-evidence gates.
 
 `run-qmind-subset.ps1` can also be run directly for debugging a single QMind changed-files subset:
 
@@ -67,9 +67,10 @@ Use `-UseExistingQMindSelections` to verify the committed comparison from the si
 .\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-004 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-004.json
 .\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-005 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-005.json
 .\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-006 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-006.json
+.\benchmark-pipeline\run-qmind-subset.ps1 -BenchmarkCase OB-007 -SelectionOutput benchmark-results/qmind-selections/qmind-selection-ob-007.json
 ```
 
-It writes normalized canonical IDs without a UTF-8 BOM and validates them against `qmind-test-library/online-boutique-playwright-51.json`. For OB-004 it fails if `payment-order-completion-confirms-success` is missing.
+It writes normalized canonical IDs without a UTF-8 BOM and validates them against `qmind-test-library/online-boutique-playwright-51.json` (52 tests). For OB-004 it fails if `payment-order-completion-confirms-success` is missing.
 
 When the QMind CLI/API returns dynamic risk diagnostics, `run-qmind-subset.ps1` preserves `business_metrics.risk_coverage`, `business_metrics.top_risk_coverage`, `business_metrics.residual_risk`, and `business_metrics.risk_efficiency` in the saved selection artifact. These diagnostics are not synthesized by the benchmark pipeline; they require QMind CLI/API subset artifacts that include `business_metrics` or equivalent risk fields.
 
@@ -82,7 +83,7 @@ Dynamic Risk Intelligence metrics are interpreted as follows:
 | Residual Risk | Observed risk left uncovered after selection |
 | Risk Density | Amount of risk information captured per executed test |
 
-Residual Risk is not random leftover risk and is not expected to be zero; it is mostly lower-priority risk intentionally left uncovered when execution cost outweighs expected value. Risk Density values above 1.0 mean the selected tests are denser in risk information than an average test set. In the final Online Boutique comparison, Quantik Mind executed 15.8 tests on average out of 51, reduced execution volume by 69.0%, detected 6/6 benchmark defects, and captured 77.78% average critical observed risk under the defined scenarios.
+Residual Risk is not random leftover risk and is not expected to be zero; it is mostly lower-priority risk intentionally left uncovered when execution cost outweighs expected value. Risk Density values above 1.0 mean the selected tests are denser in risk information than an average test set. In this benchmark, Quantik Mind executed 19.3 tests on average out of 52, reduced execution volume by 62.9%, detected 7/7 benchmark defects, and captured 72.5% average critical observed risk under the defined scenarios.
 
 `evaluate-qmind.ps1` writes a QMind evaluation JSON. Pass `-Scenario OB-001` to evaluate one benchmark case.
 
@@ -90,7 +91,7 @@ Use `-DryRun` on the QMind-facing scripts to inspect the command path without co
 
 ## Baseline validation
 
-Baseline validation runs the full canonical 51-test Playwright suite against a clean Online Boutique deployment before defect scenarios are implemented. This verifies that the test harness and deployed application are stable before any scenario-specific failures are used as benchmark evidence.
+Baseline validation runs the full canonical 52-test Playwright suite against a clean Online Boutique deployment before defect scenarios are implemented. This verifies that the test harness and deployed application are stable before any scenario-specific failures are used as benchmark evidence.
 
 Example:
 
@@ -144,11 +145,11 @@ Run this checker before publishing benchmark results so placeholder or stale ora
 Use these four method names when publishing benchmark output:
 
 1. Traditional Approach (Full Suite)
-   - Executes the full 51-test suite.
+   - Executes the full 52-test suite.
    - Performs no prioritization and uses no risk model.
    - Serves as the recall baseline with zero execution reduction.
 2. Random Approach
-   - Selects 26 tests, approximately 50% of the 51-test suite, with deterministic seed 42.
+   - Selects 26 tests, exactly 50% of the 52-test suite, with deterministic seed 42.
    - Uses no code-change, history, runtime, or risk information.
    - Serves as the fixed statistical baseline.
 3. History + Code Change Approach
@@ -172,13 +173,13 @@ Machine-readable method slugs are `full-suite`, `random`, `history-code-change`,
 .\benchmark-pipeline\generate-final-comparison.ps1
 ```
 
-It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/final-benchmark-comparison.md`, aggregate method evaluations, and per-case Full Suite, Random, History + Code Change, and QMind scoring artifacts for OB-001 through OB-006.
+It writes `benchmark-results/final-comparison/final-comparison.json`, `docs/final-benchmark-comparison.md`, aggregate method evaluations, and per-case Full Suite, Random, History + Code Change, and QMind scoring artifacts for OB-001 through OB-007.
 
-The generator treats OB-001 through OB-006 as benchmark cases. OB-001 through OB-004 are code-change controls, OB-005 is runtime-aware, and OB-006 is combined-signal. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
+The generator treats OB-001 through OB-007 as benchmark cases. OB-001 through OB-004 are code-change controls, OB-005 and OB-007 are runtime-aware, and OB-006 is combined-signal. Random uses 26 tests with seed 42 and writes a per-case selection artifact. History + Code Change uses 15 tests per case and reads only the canonical library, history-style metadata, and changed files from `benchmark-pipeline/scenarios.json`; oracle detecting tests are used only by `evaluate-defect-recall.py`.
 
-Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report and not a vendor head-to-head: History + Code Change gets 5/6 recall with 15.0 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 15.8 average tests and 69.0% execution reduction. Under these defined scenarios, Quantik Mind spends 0.8 more tests on average to cover the runtime-aware defect class that static signals alone did not select.
+Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report and not a vendor head-to-head: History + Code Change reaches 5/7 recall with 15 average tests and 71.2% execution reduction, while Quantik Mind reaches 7/7 recall with 19.3 average tests and 62.9% execution reduction. Quantik Mind detects the two runtime-aware cases (OB-005 and OB-007) that History + Code Change misses, at the cost of 4.3 more tests on average.
 
-The committed OB-005 and OB-006 QMind artifacts are distinct: OB-005 selects 17 tests, OB-006 selects 19 tests, and OB-006 reports different risk metrics. OB-006 should be interpreted as the productcatalogservice ListProducts combined-signal case, not as a reused OB-005 selection.
+The committed OB-005, OB-006, and OB-007 QMind artifacts are distinct: OB-005 selects 21 tests, OB-006 selects 22 tests, OB-007 selects 22 tests, and each reports different risk metrics. OB-006 should be interpreted as the productcatalogservice ListProducts combined-signal case. OB-007 should be interpreted as the recommendationservice runtime behavioral degradation case.
 
 ### Scenario quick reference
 
@@ -202,6 +203,7 @@ QMind is also evaluated per benchmark case. Normal mode calls the live QMind sub
 - `benchmark-results/qmind-selections/qmind-selection-ob-004.json`
 - `benchmark-results/qmind-selections/qmind-selection-ob-005.json`
 - `benchmark-results/qmind-selections/qmind-selection-ob-006.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-007.json`
 
 It fails clearly if QMind configuration is missing, the CLI is unavailable, the API is unreachable, observability is not configured, or the library/project state is not synced. It also fails if a QMind selection contains non-canonical test IDs, or if the OB-004 QMind selection does not include `payment-order-completion-confirms-success`.
 
@@ -211,7 +213,7 @@ To reuse committed per-case QMind selections instead of calling live QMind:
 .\benchmark-pipeline\generate-final-comparison.ps1 -UseExistingQMindSelections
 ```
 
-That mode requires all six committed per-case QMind artifacts to exist and validate.
+That mode requires all seven committed per-case QMind artifacts to exist and validate.
 
 ### Random Approach selector
 
@@ -243,9 +245,9 @@ python benchmark-pipeline/evaluate-defect-recall.py --oracle defect-oracle/onlin
 
 ## Expected recall matrix runner
 
-`run-expected-recall-matrix.py` runs a single expected-oracle comparison matrix across the four benchmark methods: Traditional Approach (Full Suite), Random Approach, History + Code Change Approach, and Quantik Mind. It loads the canonical 51-test library, infers the Quantik Mind selection size from the selected-test file, builds deterministic baseline selections, and reports expected defect recall and execution reduction.
+`run-expected-recall-matrix.py` runs a single expected-oracle comparison matrix across the four benchmark methods: Traditional Approach (Full Suite), Random Approach, History + Code Change Approach, and Quantik Mind. It loads the canonical 52-test library, infers the Quantik Mind selection size from the selected-test file, builds deterministic baseline selections, and reports expected defect recall and execution reduction.
 
-This runner uses `expected_detecting_tests` from the oracle. The final comparison path uses per-case validated oracle entries for OB-001 through OB-006; the expected runner is retained for pipeline validation only and must not be presented as the final benchmark result.
+This runner uses `expected_detecting_tests` from the oracle. The final comparison path uses per-case validated oracle entries for OB-001 through OB-007; the expected runner is retained for pipeline validation only and must not be presented as the final benchmark result.
 
 Example:
 

@@ -21,7 +21,7 @@ That made the History + Code Change baseline scientifically too strong: it could
 
 ## Changes Applied
 
-The benchmark now treats OB-001 through OB-006 as first-class benchmark cases. OB-001 through OB-004 form the code-change control group. OB-005 is the first runtime-aware case. OB-006 is the first combined-signal case.
+The benchmark treats OB-001 through OB-007 as first-class benchmark cases. OB-001 through OB-004 form the code-change control group. OB-005 and OB-007 are the runtime-aware cases. OB-006 is the combined-signal case.
 
 Each case has:
 
@@ -60,7 +60,7 @@ For each benchmark case, the generator:
 2. Runs QMind for the same case and writes one per-case QMind selection artifact.
 3. Evaluates each selection against only that case's oracle entry.
 4. Records selected tests, execution reduction, whether the defect was detected, and case recall.
-5. Aggregates detected cases across all six benchmark cases and by category.
+5. Aggregates detected cases across all seven benchmark cases and by category.
 
 This is closer to a CI/CD workflow: a commit arrives with changed files, a selector chooses tests, then test execution and oracle validation determine whether the defect was caught.
 
@@ -97,6 +97,7 @@ QMind produces one canonical artifact per benchmark case in normal generator mod
 - `benchmark-results/qmind-selections/qmind-selection-ob-004.json`
 - `benchmark-results/qmind-selections/qmind-selection-ob-005.json`
 - `benchmark-results/qmind-selections/qmind-selection-ob-006.json`
+- `benchmark-results/qmind-selections/qmind-selection-ob-007.json`
 
 The generator does not reuse `benchmark-runs/qmind-online-boutique/qmind-current-selection.json` for all cases. Existing committed per-case artifacts may be reused only with `-UseExistingQMindSelections`.
 
@@ -120,18 +121,18 @@ The aggregate result for each method is:
 - average selected tests
 - average execution reduction
 
-The aggregate should be interpreted as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" comparison. After OB-006, History + Code Change is more aggressive at 15.0 average tests, 70.6% execution reduction, and 5/6 recall. Quantik Mind is slightly more conservative at 15.8 average tests, 69.0% execution reduction, and 6/6 recall.
+The aggregate should be interpreted as recall first, execution reduction second, with the category breakdown always shown. It is not a "lowest test count wins" comparison. History + Code Change reaches 5/7 recall with 15 average tests and 71.2% execution reduction. Quantik Mind reaches 7/7 recall with 19.3 average tests and 62.9% execution reduction.
 
 | Method | Recall | Avg tests | Execution reduction | Interpretation |
 |---|---:|---:|---:|---|
-| H+CC | 5/6 | 15.0 | 70.6% | More aggressive, misses the runtime-aware defect |
-| QMind | 6/6 | 15.8 | 69.0% | Slightly more conservative, preserves full recall |
+| H+CC | 5/7 | 15 | 71.2% | More aggressive; misses the two runtime-aware cases |
+| QMind | 7/7 | 19.3 | 62.9% | Detects all seven cases including both runtime-aware cases |
 
-Quantik Mind spends 0.8 more tests on average to recover the case that History + Code Change misses entirely. In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 1/1 vs 0/1. In combined-signal scenarios, QMind matches H+CC: 1/1 vs 1/1. The value claim is not "QMind always runs fewer tests"; it is that QMind keeps execution reduction high while avoiding blind spots from code-change-only selection.
+Quantik Mind detects the two runtime-aware cases (OB-005 and OB-007) that History + Code Change misses entirely, at the cost of 4.3 more tests on average. In code-change scenarios, QMind matches H+CC: 4/4 vs 4/4. In runtime-aware scenarios, QMind adds coverage: 2/2 vs 0/2. In combined-signal scenarios, QMind matches H+CC: 1/1 vs 1/1. The value claim is not "QMind always runs fewer tests"; it is that QMind keeps execution reduction high while avoiding blind spots from code-change-only selection.
 
-Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all six benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the six committed per-case QMind artifacts before scoring them.
+Normal mode cannot produce a fresh live-QMind aggregate unless QMind configuration is available and QMind produces selections for all seven benchmark cases. Reusing the OB-004-oriented `qmind-current-selection.json` for other cases would make the aggregate QMind result invalid. The committed comparison can be regenerated with `-UseExistingQMindSelections`, which validates the seven committed per-case QMind artifacts before scoring them.
 
-The committed OB-005 and OB-006 QMind artifacts are distinct. OB-005 selects 17 tests; OB-006 selects 19 tests and reports different risk metrics. OB-006 should be described as the productcatalogservice ListProducts combined-signal case, not as a reused OB-005 selection.
+The committed OB-005, OB-006, and OB-007 QMind artifacts are distinct. OB-005 selects 21 tests; OB-006 selects 22 tests; OB-007 selects 22 tests; each reports different risk metrics. OB-006 should be described as the productcatalogservice ListProducts combined-signal case. OB-007 should be described as the recommendationservice runtime behavioral degradation case.
 
 ## Benchmark Limitations
 
@@ -155,7 +156,7 @@ The committed QMind selection artifacts may be reused for reproducibility checks
 
 That mode still validates that every QMind selection contains canonical test IDs and that OB-004 includes `payment-order-completion-confirms-success`.
 
-OB-005 is intentionally different from the code-change controls. Its changed file is `src/currencyservice/data/currency_conversion.json`, while the direct oracle tests are frontend homepage tests. The History + Code Change selector therefore misses OB-005 for transparent scoring reasons, while QMind can detect it only when runtime observability surfaces the currencyservice/frontend error signal.
+OB-005 and OB-007 are intentionally different from the code-change controls. OB-005's changed file is `src/currencyservice/data/currency_conversion.json`, while its direct oracle tests are frontend homepage tests. OB-007's declared changed file is the harmless `src/recommendationservice/logger.py`, while the oracle test detects a recommendation-section disappearance caused by runtime behavioral degradation. The History + Code Change selector misses both for transparent scoring reasons; QMind can detect them only when runtime observability surfaces the relevant signals.
 
 The History + Code Change baseline is deterministic and transparent, but it is still a simplified local proxy for a static history/code-change-aware selection service. It uses local test metadata and changed-file matching rather than a production-trained model.
 
@@ -173,4 +174,4 @@ This makes the comparison more defensible:
 - aggregate recall is computed from case outcomes
 - generated artifacts can be regenerated from committed inputs with one script
 
-If a reviewer argues that H+CC has better savings, the response is: yes, but it achieves that by missing OB-005 in the current six-case artifact set. The meaningful comparison is not saving alone; it is recall at a given execution budget. QMind trades 0.8 additional tests on average for one additional detected case, while OB-006 is retained as a distinct productcatalogservice combined-signal case.
+If a reviewer argues that H+CC has better savings, the response is: yes, but it achieves that by missing OB-005 and OB-007 in the seven-case benchmark. The meaningful comparison is not savings alone; it is recall at a given execution budget. Quantik Mind trades 4.3 additional tests on average for two additional detected cases, while OB-006 is retained as a distinct productcatalogservice combined-signal case.

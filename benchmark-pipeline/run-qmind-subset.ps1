@@ -232,11 +232,11 @@ if (-not [string]::IsNullOrWhiteSpace($BenchmarkCase)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($SelectionOutput)) {
-    throw "SelectionOutput is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-006 for benchmark reproduction."
+    throw "SelectionOutput is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-007 for benchmark reproduction."
 }
 
 if ([string]::IsNullOrWhiteSpace($ChangedFilesFile)) {
-    throw "ChangedFilesFile is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-006 for benchmark reproduction."
+    throw "ChangedFilesFile is required when BenchmarkCase is not provided. Use -BenchmarkCase OB-001 through OB-007 for benchmark reproduction."
 }
 
 $envValues = Read-DotEnv -Path $EnvFile

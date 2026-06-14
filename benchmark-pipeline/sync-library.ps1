@@ -2,7 +2,7 @@ param(
     [string]$EnvFile = ".env",
     [string]$Library = "qmind-test-library/online-boutique-playwright-51.json",
     [string]$RunDir = "benchmark-runs/qmind-online-boutique",
-    [int]$ExpectedLibrarySize = 51,
+    [int]$ExpectedLibrarySize = 52,
     [switch]$DryRun
 )
 
