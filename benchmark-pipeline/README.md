@@ -178,7 +178,7 @@ The generator treats OB-001 through OB-006 as benchmark cases. OB-001 through OB
 
 Interpret final comparison output as recall first, execution reduction second, with category breakdowns always shown. It is not a "lowest test count wins" report and not a vendor head-to-head: History + Code Change gets 5/6 recall with 15.0 average tests and 70.6% execution reduction, while QMind gets 6/6 recall with 15.8 average tests and 69.0% execution reduction. Under these defined scenarios, Quantik Mind spends 0.8 more tests on average to cover the runtime-aware defect class that static signals alone did not select.
 
-The committed OB-005 and OB-006 QMind artifacts currently select the same 17-test frontend/homepage risk cluster and report identical business metrics. This is retained transparently in the artifacts and should not be presented as independent proof of an additional runtime-aware win until distinct OB-006 live runtime evidence is captured.
+The committed OB-005 and OB-006 QMind artifacts are distinct: OB-005 selects 17 tests, OB-006 selects 19 tests, and OB-006 reports different risk metrics. OB-006 should be interpreted as the productcatalogservice ListProducts combined-signal case, not as a reused OB-005 selection.
 
 ### Scenario quick reference
 
@@ -189,7 +189,7 @@ The committed OB-005 and OB-006 QMind artifacts currently select the same 17-tes
 | OB-003 Product Detail Regression | Code Change | `src/productcatalogservice/product_catalog.go`, `src/productcatalogservice/products.json`, `src/frontend/templates/product.html` | Product detail lookup fails or returns unusable data | Product detail page tests |
 | OB-004 Payment Regression | Code Change | `src/paymentservice/charge.js` | Valid card payments are rejected | Payment-aware successful order completion |
 | OB-005 Currency Data Corruption | Runtime Aware | `src/currencyservice/data/currency_conversion.json` | Corrupted USD conversion data causes currencyservice/frontend homepage failures under standard traffic | Homepage rendering tests selected from runtime observability signals |
-| OB-006 Product Catalog ListProducts Cascade | Combined Signal | `src/productcatalogservice/product_catalog.go` | Product catalog ListProducts latency or errors cascade into frontend homepage/product-grid rendering failure | Homepage/product-grid tests selected from combined productcatalogservice code-change and frontend runtime impact |
+| OB-006 Product Catalog ListProducts Cascade | Combined Signal | `src/productcatalogservice/product_catalog.go` | Product catalog ListProducts latency or errors cascade into frontend homepage/product-grid rendering failure | Product catalog, product-detail, homepage, and product-grid tests selected from combined productcatalogservice code-change and frontend runtime impact |
 
 For OB-005, History + Code Change receives only currency data changed-file context; it does not receive runtime metrics or oracle detecting tests. QMind detection must come from runtime observability showing elevated currencyservice and frontend error rates. For OB-006, the changed file points to productcatalogservice and QMind detection must come from combined productcatalogservice degradation and frontend homepage/product-grid impact.
 

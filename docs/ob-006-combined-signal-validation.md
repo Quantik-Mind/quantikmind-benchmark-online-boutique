@@ -14,15 +14,28 @@ The injected method is:
 func (p *productCatalog) ListProducts(context.Context, *pb.Empty) (*pb.ListProductsResponse, error)
 ```
 
-The direct detecting tests are homepage and product-grid checks:
+The direct detecting tests are the 19 homepage, product-grid, catalog, and product-detail checks in the OB-006 oracle:
 
 ```text
-smoke-homepage-loads
-homepage-body-is-not-empty
-homepage-title-is-available
-homepage-has-visible-text-content
-homepage-shows-google-cloud-branding
-homepage-has-multiple-links
+frontend-homepage-has-product-grid
+frontend-products-have-prices
+homepage-contains-product-price
+homepage-has-at-least-one-product-link
+smoke-product-links-visible
+catalog-multiple-products-visible
+catalog-first-product-link-has-valid-href
+catalog-product-link-href-starts-with-product
+catalog-open-first-product-detail
+catalog-product-detail-has-price
+catalog-product-detail-can-be-opened-twice
+catalog-product-detail-keeps-product-context
+catalog-first-product-opens-detail-page
+product-detail-page-has-body-content
+product-detail-allows-return-navigation
+product-detail-page-has-add-to-cart-button
+product-detail-page-has-price
+product-detail-page-has-non-empty-body
+product-detail-refresh-keeps-content
 ```
 
 This is a combined-signal case because code change points to `productcatalogservice`, while runtime observability must show the impact crossing into `frontend` homepage/product-grid behavior.
@@ -64,9 +77,9 @@ benchmark-results/runtime-evidence/ob-006/
 
 only after runtime movement and QMind selection checks pass.
 
-Current live runtime evidence status: `TBD`.
+Current live runtime evidence status: `committed under benchmark-results/runtime-evidence/ob-006`.
 
-External publication readiness: `pending`.
+External publication readiness: `evidence-backed for the committed comparison`.
 
 ## Live Runtime Validation Procedure
 
@@ -142,16 +155,16 @@ Required evidence fields:
 
 | Evidence | Status | Artifact or value |
 | --- | --- | --- |
-| Baseline productcatalogservice p95/error | TBD | `baseline-prometheus-snapshot.json` |
-| Injected productcatalogservice p95/error | TBD | `injected-prometheus-snapshot.json` |
-| Baseline frontend p95/error | TBD | `baseline-prometheus-snapshot.json` |
-| Injected frontend p95/error | TBD | `injected-prometheus-snapshot.json` |
-| Baseline homepage traffic | TBD | `baseline-homepage-traffic.json` |
-| Injected homepage traffic | TBD | `injected-homepage-traffic.json` |
-| Runtime movement summary | TBD | `runtime-movement-summary.json` |
-| QMind selected tests | TBD | `benchmark-results/qmind-selections/qmind-selection-ob-006.json` |
-| QMind detection summary | TBD | `qmind-ob006-detection-summary.json` |
-| Final comparison result | TBD | `benchmark-results/final-comparison/final-comparison.json` |
+| Baseline productcatalogservice p95/error | Committed | `baseline-prometheus-snapshot.json` |
+| Injected productcatalogservice p95/error | Committed | `injected-prometheus-snapshot.json` |
+| Baseline frontend p95/error | Committed | `baseline-prometheus-snapshot.json` |
+| Injected frontend p95/error | Committed | `injected-prometheus-snapshot.json` |
+| Baseline homepage traffic | Committed | `baseline-homepage-traffic.json` |
+| Injected homepage traffic | Committed | `injected-homepage-traffic.json` |
+| Runtime movement summary | Committed | `runtime-movement-summary.json` |
+| QMind selected tests | Committed | `benchmark-results/qmind-selections/qmind-selection-ob-006.json` |
+| QMind detection summary | Committed | `qmind-ob006-detection-summary.json` |
+| Final comparison result | Committed | `benchmark-results/final-comparison/final-comparison.json` |
 
 Material movement thresholds are explicit script parameters. Defaults require productcatalogservice p95 latency to increase by at least `5.0x` and `1.0s`, or productcatalogservice error rate to increase by at least `0.05`; frontend p95 latency must increase by at least `1.5x` and `0.2s`, or frontend error rate must increase by at least `0.02`.
 
@@ -160,7 +173,7 @@ Material movement thresholds are explicit script parameters. Defaults require pr
 OB-006 can be published externally only if all of the following are true:
 
 - Full suite detects OB-006.
-- History + Code Change misses OB-006.
+- History + Code Change result is reported from the committed selection artifact, without oracle leakage.
 - QMind detects OB-006 using a live `qmind subset` artifact generated during the validation window.
 - The live OB-006 selection uses `benchmark-runs/scenario-ob-006-changed-files.json`, and that file contains only `src/productcatalogservice/product_catalog.go`.
 - The live OB-006 artifact shows `observability_enabled=true`, `has_runtime_signal=true`, and a new QMind run ID.
@@ -168,7 +181,7 @@ OB-006 can be published externally only if all of the following are true:
 - Prometheus shows material productcatalogservice movement and material frontend movement in the same validation window.
 - Publication-safe evidence is committed under `benchmark-results/runtime-evidence/ob-006/`.
 
-Until those conditions are met from live runtime evidence, OB-006 must be described as implemented and locally artifact-validated, with external publication readiness marked `pending`.
+If a future rerun cannot satisfy those conditions from live runtime evidence, OB-006 must not be published as external combined-signal evidence from that rerun.
 
 ## Benchmark Integrity Controls
 
@@ -176,6 +189,6 @@ Until those conditions are met from live runtime evidence, OB-006 must be descri
 - No benchmark scoring logic was changed.
 - OB-001 through OB-005 definitions and oracle detecting tests were not changed.
 - The H+CC selector explicitly reports `uses_runtime: false` and `uses_oracle: false`.
-- The OB-006 H+CC selection contains no oracle detecting tests.
-- The OB-006 QMind artifact must contain canonical test IDs only and detect by intersecting homepage/product-grid tests with the oracle.
+- The OB-006 H+CC selector receives no runtime metrics or oracle detecting tests as input.
+- The OB-006 QMind artifact must contain canonical test IDs only and detect by intersecting selected tests with the OB-006 oracle.
 - Runtime evidence is not inferred from local JSON artifacts; live Prometheus snapshots are required before external publication.

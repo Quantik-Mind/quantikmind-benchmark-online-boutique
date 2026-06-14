@@ -247,7 +247,7 @@
         "The productcatalogservice ListProducts path sleeps longer than the Playwright 30s test timeout or returns a deterministic gRPC error.",
         "The productcatalogservice degradation is visible as elevated productcatalogservice latency and/or error rate under standard homepage traffic.",
         "The frontend homepage path degrades because homepage rendering requires ListProducts before the product grid is built.",
-        "Catalog, cart, checkout, payment, and product detail tests that do not require homepage rendering should remain outside the direct oracle."
+        "Cart, checkout, and payment tests that do not require product listing or homepage rendering should remain outside the direct oracle."
       ],
       "signal_breadth": "combined-cross-service",
       "expected_runtime_effect": [
@@ -256,22 +256,34 @@
       ],
       "expected_user_visible_effect": "Homepage load, homepage content checks, or product-grid checks fail due to the frontend-visible productcatalogservice cascade.",
       "expected_detecting_tests": [
-        "smoke-homepage-loads",
-        "homepage-body-is-not-empty",
-        "homepage-title-is-available",
-        "homepage-has-visible-text-content",
-        "homepage-shows-google-cloud-branding",
-        "homepage-has-multiple-links"
+        "frontend-homepage-has-product-grid",
+        "frontend-products-have-prices",
+        "homepage-contains-product-price",
+        "homepage-has-at-least-one-product-link",
+        "smoke-product-links-visible",
+        "catalog-multiple-products-visible",
+        "catalog-first-product-link-has-valid-href",
+        "catalog-product-link-href-starts-with-product",
+        "catalog-open-first-product-detail",
+        "catalog-product-detail-has-price",
+        "catalog-product-detail-can-be-opened-twice",
+        "catalog-product-detail-keeps-product-context",
+        "catalog-first-product-opens-detail-page",
+        "product-detail-page-has-body-content",
+        "product-detail-allows-return-navigation",
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-price",
+        "product-detail-page-has-non-empty-body",
+        "product-detail-refresh-keeps-content"
       ],
       "expected_unaffected_tests": [
         "checkout-tests-without-homepage-rendering",
         "cart-tests-without-homepage-rendering",
-        "payment-tests-without-homepage-rendering",
-        "product-detail-tests-opened-directly"
+        "payment-tests-without-homepage-rendering"
       ],
       "validation_status": "validated-combined-oracle",
       "notes": [
-        "OB-006 is the first combined-signal scenario: code change points to productcatalogservice ListProducts, while the direct oracle is frontend homepage/product-grid coverage.",
+        "OB-006 is the first combined-signal scenario: code change points to productcatalogservice ListProducts, while the direct oracle covers frontend-visible homepage, product-grid, catalog, and product-detail behavior.",
         "History + Code Change receives only the productcatalogservice changed-file context; it does not receive runtime metrics or oracle detecting tests.",
         "QMind detection must come from runtime observability showing both productcatalogservice degradation and frontend impact, not from oracle leakage.",
         "Use runtime-scenarios/ob-006-productcatalog-listproducts-cascade/apply-ob006-productcatalog-listproducts.ps1 against an external Online Boutique checkout to inject or restore the defect."

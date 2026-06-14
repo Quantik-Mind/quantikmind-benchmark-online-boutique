@@ -237,15 +237,14 @@
       "expected_unaffected_tests": [
         "checkout-tests-without-homepage-rendering",
         "cart-tests-without-homepage-rendering",
-        "payment-tests-without-homepage-rendering",
-        "product-detail-tests-opened-directly"
+        "payment-tests-without-homepage-rendering"
       ],
       "validated_at": "2026-06-12",
       "validation_status": "validated-combined-oracle",
       "severity": "high",
       "notes": [
         "The defect is injected into the real upstream file src/productcatalogservice/product_catalog.go.",
-        "The direct oracle contains homepage, product-grid, and product catalog tests that observe frontend-visible ListProducts failure.",
+        "The direct oracle contains homepage, product-grid, catalog, and product-detail tests that observe frontend-visible ListProducts failure.",
         "History + Code Change has no runtime input and does not receive oracle detecting tests.",
         "QMind detection for this scenario must come from combined code-change and runtime observability: productcatalogservice degradation plus frontend impact under standard homepage traffic."
       ]
