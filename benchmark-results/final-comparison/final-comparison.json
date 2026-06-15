@@ -3,7 +3,7 @@
     "run_id":  "final-comparison-007",
     "comparison_status":  "measured",
     "methodology":  "benchmark-case-ci-validation",
-    "created_at":  "2026-06-14",
+    "created_at":  "2026-06-15",
     "generator":  "benchmark-pipeline/generate-final-comparison.ps1",
     "oracle":  "defect-oracle/online-boutique-defect-oracle.v2.json",
     "oracle_mode":  "validated_detecting_tests",
@@ -186,29 +186,25 @@
                                                               "method_label":  "Quantik Mind",
                                                               "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-001.json",
                                                               "evaluation_artifact":  "benchmark-results/final-comparison/qmind-ob-001-evaluation.json",
-                                                              "selected_test_count":  18,
+                                                              "selected_test_count":  14,
                                                               "selected_tests":  [
                                                                                      "cart-add-from-product-detail-keeps-price-context",
-                                                                                     "cart-add-from-product-detail-shows-cart-context",
                                                                                      "cart-add-product-from-detail-page",
-                                                                                     "catalog-first-product-opens-detail-page",
-                                                                                     "catalog-open-first-product-detail",
-                                                                                     "catalog-product-detail-keeps-product-context",
-                                                                                     "catalog-two-product-links-visible-if-present",
+                                                                                     "cart-page-has-cart-context",
                                                                                      "checkout-form-fields-visible",
-                                                                                     "checkout-page-does-not-crash-with-empty-cart",
                                                                                      "frontend-basic-user-journey-home-product-cart",
                                                                                      "frontend-homepage-has-product-grid",
+                                                                                     "frontend-logo-or-home-link-visible",
                                                                                      "frontend-page-loads-under-basic-navigation",
                                                                                      "frontend-products-have-prices",
                                                                                      "homepage-body-is-not-empty",
-                                                                                     "homepage-contains-product-price",
+                                                                                     "homepage-has-visible-text-content",
                                                                                      "homepage-title-is-available",
                                                                                      "order-flow-does-not-complete-with-empty-data",
                                                                                      "product-detail-page-has-add-to-cart-button"
                                                                                  ],
-                                                              "execution_reduction":  0.65384615384615385,
-                                                              "execution_reduction_percent":  65.4,
+                                                              "execution_reduction":  0.73076923076923084,
+                                                              "execution_reduction_percent":  73.1,
                                                               "defect_detected":  true,
                                                               "defect_recall":  1,
                                                               "selected_detecting_tests":  [
@@ -384,7 +380,7 @@
                                                               "method_label":  "Quantik Mind",
                                                               "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-002.json",
                                                               "evaluation_artifact":  "benchmark-results/final-comparison/qmind-ob-002-evaluation.json",
-                                                              "selected_test_count":  15,
+                                                              "selected_test_count":  20,
                                                               "selected_tests":  [
                                                                                      "cart-add-from-product-detail-keeps-price-context",
                                                                                      "cart-empty-page-shows-cart-context",
@@ -393,17 +389,22 @@
                                                                                      "cart-page-is-accessible",
                                                                                      "cart-survives-home-navigation",
                                                                                      "checkout-empty-cart-does-not-complete-order",
+                                                                                     "checkout-form-fields-visible",
                                                                                      "checkout-page-accessible-from-cart",
                                                                                      "checkout-page-does-not-crash-with-empty-cart",
                                                                                      "frontend-basic-user-journey-home-product-cart",
                                                                                      "frontend-homepage-has-product-grid",
+                                                                                     "frontend-logo-or-home-link-visible",
                                                                                      "frontend-page-loads-under-basic-navigation",
                                                                                      "frontend-products-have-prices",
+                                                                                     "homepage-has-visible-text-content",
+                                                                                     "homepage-title-is-available",
                                                                                      "navigation-cart-to-home",
+                                                                                     "order-complete-happy-path",
                                                                                      "order-form-requires-payment-data"
                                                                                  ],
-                                                              "execution_reduction":  0.71153846153846156,
-                                                              "execution_reduction_percent":  71.2,
+                                                              "execution_reduction":  0.61538461538461542,
+                                                              "execution_reduction_percent":  61.5,
                                                               "defect_detected":  true,
                                                               "defect_recall":  1,
                                                               "selected_detecting_tests":  [
@@ -595,7 +596,7 @@
                                                               "method_label":  "Quantik Mind",
                                                               "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-003.json",
                                                               "evaluation_artifact":  "benchmark-results/final-comparison/qmind-ob-003-evaluation.json",
-                                                              "selected_test_count":  16,
+                                                              "selected_test_count":  19,
                                                               "selected_tests":  [
                                                                                      "cart-add-from-product-detail-shows-cart-context",
                                                                                      "cart-add-product-from-detail-page",
@@ -610,18 +611,22 @@
                                                                                      "homepage-contains-product-price",
                                                                                      "homepage-has-multiple-links",
                                                                                      "homepage-has-visible-text-content",
+                                                                                     "order-complete-happy-path",
+                                                                                     "order-form-requires-payment-data",
                                                                                      "product-detail-page-has-add-to-cart-button",
+                                                                                     "product-detail-page-has-price",
                                                                                      "smoke-homepage-loads",
                                                                                      "smoke-product-links-visible"
                                                                                  ],
-                                                              "execution_reduction":  0.69230769230769229,
-                                                              "execution_reduction_percent":  69.2,
+                                                              "execution_reduction":  0.63461538461538458,
+                                                              "execution_reduction_percent":  63.5,
                                                               "defect_detected":  true,
                                                               "defect_recall":  1,
                                                               "selected_detecting_tests":  [
                                                                                                "catalog-first-product-opens-detail-page",
                                                                                                "catalog-open-first-product-detail",
-                                                                                               "product-detail-page-has-add-to-cart-button"
+                                                                                               "product-detail-page-has-add-to-cart-button",
+                                                                                               "product-detail-page-has-price"
                                                                                            ]
                                                           }
                                             }
@@ -796,17 +801,17 @@
                                                                                      "cart-add-from-product-detail-keeps-price-context",
                                                                                      "cart-link-is-reachable-from-homepage",
                                                                                      "cart-page-has-cart-context",
+                                                                                     "catalog-two-product-links-visible-if-present",
                                                                                      "checkout-empty-cart-does-not-complete-order",
+                                                                                     "checkout-form-fields-visible",
                                                                                      "checkout-page-accessible-from-cart",
                                                                                      "checkout-page-does-not-crash-with-empty-cart",
                                                                                      "frontend-basic-user-journey-home-product-cart",
                                                                                      "frontend-homepage-has-product-grid",
                                                                                      "frontend-logo-or-home-link-visible",
                                                                                      "frontend-page-has-navigation-links",
-                                                                                     "frontend-page-loads-under-basic-navigation",
                                                                                      "frontend-products-have-prices",
                                                                                      "homepage-has-multiple-links",
-                                                                                     "homepage-has-visible-text-content",
                                                                                      "navigation-cart-to-home",
                                                                                      "order-complete-happy-path",
                                                                                      "order-flow-does-not-complete-with-empty-data",
@@ -1002,6 +1007,7 @@
                                                                                      "cart-add-from-product-detail-keeps-price-context",
                                                                                      "cart-link-is-reachable-from-homepage",
                                                                                      "cart-page-has-cart-context",
+                                                                                     "catalog-two-product-links-visible-if-present",
                                                                                      "checkout-empty-cart-does-not-complete-order",
                                                                                      "checkout-form-fields-visible",
                                                                                      "checkout-page-accessible-from-cart",
@@ -1013,7 +1019,6 @@
                                                                                      "frontend-page-loads-under-basic-navigation",
                                                                                      "frontend-products-have-prices",
                                                                                      "homepage-has-multiple-links",
-                                                                                     "homepage-has-visible-text-content",
                                                                                      "navigation-cart-to-home",
                                                                                      "order-complete-happy-path",
                                                                                      "order-flow-does-not-complete-with-empty-data",
@@ -1027,7 +1032,6 @@
                                                               "defect_recall":  1,
                                                               "selected_detecting_tests":  [
                                                                                                "homepage-has-multiple-links",
-                                                                                               "homepage-has-visible-text-content",
                                                                                                "smoke-homepage-loads"
                                                                                            ]
                                                           }
@@ -1233,54 +1237,48 @@
                                                               "method_label":  "Quantik Mind",
                                                               "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-006.json",
                                                               "evaluation_artifact":  "benchmark-results/final-comparison/qmind-ob-006-evaluation.json",
-                                                              "selected_test_count":  22,
+                                                              "selected_test_count":  19,
                                                               "selected_tests":  [
                                                                                      "cart-add-from-product-detail-shows-cart-context",
                                                                                      "cart-add-product-from-detail-page",
+                                                                                     "cart-link-is-reachable-from-homepage",
                                                                                      "cart-page-has-cart-context",
-                                                                                     "cart-page-loads-without-product",
                                                                                      "catalog-first-product-opens-detail-page",
-                                                                                     "catalog-multiple-products-visible",
                                                                                      "catalog-open-first-product-detail",
-                                                                                     "catalog-product-detail-can-be-opened-twice",
                                                                                      "catalog-product-detail-has-price",
                                                                                      "catalog-product-detail-keeps-product-context",
-                                                                                     "catalog-two-product-links-visible-if-present",
                                                                                      "checkout-empty-cart-does-not-complete-order",
                                                                                      "checkout-form-fields-visible",
+                                                                                     "checkout-page-accessible-from-cart",
                                                                                      "checkout-page-does-not-crash-with-empty-cart",
                                                                                      "frontend-basic-user-journey-home-product-cart",
                                                                                      "frontend-homepage-has-product-grid",
-                                                                                     "frontend-page-loads-under-basic-navigation",
                                                                                      "frontend-products-have-prices",
                                                                                      "homepage-contains-product-price",
-                                                                                     "order-flow-does-not-complete-with-empty-data",
-                                                                                     "product-detail-page-has-add-to-cart-button",
-                                                                                     "product-detail-refresh-keeps-content"
+                                                                                     "order-complete-happy-path",
+                                                                                     "order-form-requires-payment-data",
+                                                                                     "product-detail-page-has-add-to-cart-button"
                                                                                  ],
-                                                              "execution_reduction":  0.57692307692307687,
-                                                              "execution_reduction_percent":  57.7,
+                                                              "execution_reduction":  0.63461538461538458,
+                                                              "execution_reduction_percent":  63.5,
                                                               "defect_detected":  true,
                                                               "defect_recall":  1,
                                                               "selected_detecting_tests":  [
                                                                                                "catalog-first-product-opens-detail-page",
-                                                                                               "catalog-multiple-products-visible",
                                                                                                "catalog-open-first-product-detail",
-                                                                                               "catalog-product-detail-can-be-opened-twice",
                                                                                                "catalog-product-detail-has-price",
                                                                                                "catalog-product-detail-keeps-product-context",
                                                                                                "frontend-homepage-has-product-grid",
                                                                                                "frontend-products-have-prices",
                                                                                                "homepage-contains-product-price",
-                                                                                               "product-detail-page-has-add-to-cart-button",
-                                                                                               "product-detail-refresh-keeps-content"
+                                                                                               "product-detail-page-has-add-to-cart-button"
                                                                                            ]
                                                           }
                                             }
                             },
                             {
                                 "id":  "OB-007",
-                                "name":  "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
+                                "name":  "Runtime Observability Gap",
                                 "category":  "runtime-aware",
                                 "category_label":  "Runtime Aware",
                                 "signal_type":  "runtime",
@@ -1289,7 +1287,7 @@
                                                        "baseline_ref":  "benchmark-baseline",
                                                        "scenario_ref":  "runtime-scenarios/ob-007-recommendation-logging-overhead",
                                                        "changed_files":  [
-                                                                             "src/recommendationservice/logger.py"
+                                                                             "src/adservice/src/main/java/hipstershop/AdService.java"
                                                                          ]
                                                    },
                                 "oracle":  {
@@ -1443,11 +1441,12 @@
                                                               "method_label":  "Quantik Mind",
                                                               "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-007.json",
                                                               "evaluation_artifact":  "benchmark-results/final-comparison/qmind-ob-007-evaluation.json",
-                                                              "selected_test_count":  22,
+                                                              "selected_test_count":  23,
                                                               "selected_tests":  [
                                                                                      "cart-add-from-product-detail-keeps-price-context",
                                                                                      "cart-link-is-reachable-from-homepage",
                                                                                      "cart-page-has-cart-context",
+                                                                                     "catalog-two-product-links-visible-if-present",
                                                                                      "checkout-empty-cart-does-not-complete-order",
                                                                                      "checkout-form-fields-visible",
                                                                                      "checkout-page-accessible-from-cart",
@@ -1456,7 +1455,6 @@
                                                                                      "frontend-homepage-has-product-grid",
                                                                                      "frontend-logo-or-home-link-visible",
                                                                                      "frontend-page-has-navigation-links",
-                                                                                     "frontend-page-loads-under-basic-navigation",
                                                                                      "frontend-products-have-prices",
                                                                                      "homepage-has-multiple-links",
                                                                                      "homepage-has-visible-text-content",
@@ -1464,12 +1462,13 @@
                                                                                      "order-complete-happy-path",
                                                                                      "order-flow-does-not-complete-with-empty-data",
                                                                                      "order-form-requires-payment-data",
+                                                                                     "product-detail-page-has-price",
                                                                                      "recommendation-section-visible-on-detail",
                                                                                      "smoke-homepage-loads",
                                                                                      "smoke-product-links-visible"
                                                                                  ],
-                                                              "execution_reduction":  0.57692307692307687,
-                                                              "execution_reduction_percent":  57.7,
+                                                              "execution_reduction":  0.55769230769230771,
+                                                              "execution_reduction_percent":  55.8,
                                                               "defect_detected":  true,
                                                               "defect_recall":  1,
                                                               "selected_detecting_tests":  [
@@ -1524,9 +1523,9 @@
                                   "missed_cases":  0,
                                   "recall_fraction":  "7/7",
                                   "defect_recall":  1,
-                                  "average_selected_tests":  19.3,
-                                  "average_execution_reduction":  0.629120879120879,
-                                  "average_execution_reduction_percent":  62.9
+                                  "average_selected_tests":  19.6,
+                                  "average_execution_reduction":  0.62362637362637374,
+                                  "average_execution_reduction_percent":  62.4
                               }
                           ],
     "category_summaries":  [
@@ -1713,10 +1712,10 @@
                                                                     "benchmark_case":  "OB-001",
                                                                     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-001.json",
                                                                     "metrics_present":  true,
-                                                                    "observed_risk_coverage":  42.153951961886015,
+                                                                    "observed_risk_coverage":  34.244212855778933,
                                                                     "critical_risk_captured":  38.461538461538467,
-                                                                    "residual_risk":  57.846048038113985,
-                                                                    "risk_density":  1.2177808344544847,
+                                                                    "residual_risk":  65.755787144221074,
+                                                                    "risk_density":  1.271927906071789,
                                                                     "missing_fields":  [
 
                                                                                        ],
@@ -1726,10 +1725,10 @@
                                                                     "benchmark_case":  "OB-002",
                                                                     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-002.json",
                                                                     "metrics_present":  true,
-                                                                    "observed_risk_coverage":  38.714777074353862,
-                                                                    "critical_risk_captured":  84.615384615384613,
-                                                                    "residual_risk":  61.285222925646138,
-                                                                    "risk_density":  1.342112271910934,
+                                                                    "observed_risk_coverage":  49.159071451822058,
+                                                                    "critical_risk_captured":  76.923076923076934,
+                                                                    "residual_risk":  50.840928548177942,
+                                                                    "risk_density":  1.2781358577473734,
                                                                     "missing_fields":  [
 
                                                                                        ],
@@ -1739,10 +1738,10 @@
                                                                     "benchmark_case":  "OB-003",
                                                                     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-003.json",
                                                                     "metrics_present":  true,
-                                                                    "observed_risk_coverage":  39.063020026444477,
+                                                                    "observed_risk_coverage":  45.208567336091939,
                                                                     "critical_risk_captured":  76.923076923076934,
-                                                                    "residual_risk":  60.936979973555523,
-                                                                    "risk_density":  1.2695481508594455,
+                                                                    "residual_risk":  54.791432663908061,
+                                                                    "risk_density":  1.2372871060404111,
                                                                     "missing_fields":  [
 
                                                                                        ],
@@ -1752,10 +1751,10 @@
                                                                     "benchmark_case":  "OB-004",
                                                                     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-004.json",
                                                                     "metrics_present":  true,
-                                                                    "observed_risk_coverage":  47.721026783264762,
+                                                                    "observed_risk_coverage":  47.668773280377579,
                                                                     "critical_risk_captured":  76.923076923076934,
-                                                                    "residual_risk":  52.278973216735238,
-                                                                    "risk_density":  1.1816635203475083,
+                                                                    "residual_risk":  52.331226719622421,
+                                                                    "risk_density":  1.18036962408554,
                                                                     "missing_fields":  [
 
                                                                                        ],
@@ -1765,10 +1764,10 @@
                                                                     "benchmark_case":  "OB-005",
                                                                     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-005.json",
                                                                     "metrics_present":  true,
-                                                                    "observed_risk_coverage":  48.615013230322859,
+                                                                    "observed_risk_coverage":  48.523926401746046,
                                                                     "critical_risk_captured":  84.615384615384613,
-                                                                    "residual_risk":  51.384986769677141,
-                                                                    "risk_density":  1.2038003276079945,
+                                                                    "residual_risk":  51.476073598253954,
+                                                                    "risk_density":  1.2015448442337116,
                                                                     "missing_fields":  [
 
                                                                                        ],
@@ -1778,10 +1777,10 @@
                                                                     "benchmark_case":  "OB-006",
                                                                     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-006.json",
                                                                     "metrics_present":  true,
-                                                                    "observed_risk_coverage":  50.299661658544061,
-                                                                    "critical_risk_captured":  61.53846153846154,
-                                                                    "residual_risk":  49.700338341455939,
-                                                                    "risk_density":  1.1889010937474052,
+                                                                    "observed_risk_coverage":  45.297853023094781,
+                                                                    "critical_risk_captured":  75,
+                                                                    "residual_risk":  54.702146976905219,
+                                                                    "risk_density":  1.2158897390409651,
                                                                     "missing_fields":  [
 
                                                                                        ],
@@ -1791,10 +1790,10 @@
                                                                     "benchmark_case":  "OB-007",
                                                                     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-007.json",
                                                                     "metrics_present":  true,
-                                                                    "observed_risk_coverage":  50.012267777675312,
-                                                                    "critical_risk_captured":  84.615384615384613,
-                                                                    "residual_risk":  49.987732222324688,
-                                                                    "risk_density":  1.1821081474723256,
+                                                                    "observed_risk_coverage":  50.850400949180752,
+                                                                    "critical_risk_captured":  76.923076923076934,
+                                                                    "residual_risk":  49.149599050819248,
+                                                                    "risk_density":  1.1496612388510432,
                                                                     "missing_fields":  [
 
                                                                                        ],
@@ -1805,10 +1804,10 @@
                                                              "benchmark_cases":  7,
                                                              "scenarios_with_complete_metrics":  7,
                                                              "scenarios_missing_metrics":  0,
-                                                             "average_observed_risk_coverage":  45.2257,
-                                                             "average_critical_risk_captured":  72.5275,
-                                                             "average_residual_risk":  54.7743,
-                                                             "average_risk_density":  1.2266,
+                                                             "average_observed_risk_coverage":  45.8504,
+                                                             "average_critical_risk_captured":  72.2527,
+                                                             "average_residual_risk":  54.1496,
+                                                             "average_risk_density":  1.2193,
                                                              "warning":  null
                                                          }
                                        },
@@ -1837,7 +1836,7 @@
                              "OB-007":  {
                                             "evidence_dir":  "benchmark-results/runtime-evidence/ob-007",
                                             "evidence_status":  "verified",
-                                            "qmind_run_id":  "5c2033d5-64a4-4f7b-b1d3-90929a78a882",
+                                            "qmind_run_id":  "5e153640-3ce1-4f39-aec2-3e54e411c511",
                                             "publication_runtime_evidence":  "CONFIRMED",
                                             "recommendationservice_behavioral_signal_confirmed":  true,
                                             "recommendationservice_prometheus_signal_confirmed":  true,
@@ -1845,7 +1844,7 @@
                                             "playwright_section_signal_confirmed":  true,
                                             "frontend_signal_confirmed":  false,
                                             "changed_files":  [
-                                                                  "src/recommendationservice/logger.py"
+                                                                  "src/adservice/src/main/java/hipstershop/AdService.java"
                                                               ],
                                             "published_files":  [
                                                                     "benchmark-results/runtime-evidence/ob-007/baseline-prometheus-snapshot.json",
@@ -1885,7 +1884,7 @@
                                                       "expected benchmark outcome"
                                                   ]
                               },
-    "qmind_selection_mode":  "generated-by-run-qmind-subset",
+    "qmind_selection_mode":  "generated-with-pinned-runtime-evidence-ob006-ob007",
     "supporting_artifacts":  [
                                  "benchmark-results/final-comparison/full-suite-evaluation.json",
                                  "benchmark-results/final-comparison/full-suite-ob-001-evaluation.json",
@@ -1940,7 +1939,7 @@
                              ],
     "limitations":  [
                         "QMind is evaluated from one canonical selection artifact per benchmark case under benchmark-results/qmind-selections/qmind-selection-ob-*.json.",
-                        "Normal generator mode creates QMind selections by invoking benchmark-pipeline/run-qmind-subset.ps1 for each case; -UseExistingQMindSelections reuses committed canonical per-case artifacts.",
+                        "Normal generator mode invokes benchmark-pipeline/run-qmind-subset.ps1 for standard cases and pins runtime-evidence selections for OB-006/OB-007; -UseExistingQMindSelections reuses committed canonical per-case artifacts.",
                         "OB-006 headline inclusion requires tracked runtime evidence under benchmark-results/runtime-evidence/ob-006 and a QMind selection that is not substantively identical to OB-005.",
                         "OB-007 is conditionally included: present only when benchmark-results/runtime-evidence/ob-007/evidence-manifest.json exists and passes Assert-Ob007RuntimeEvidence validation.",
                         "History + Code Change uses changed files and library/history metadata only; oracle detecting tests are used only by the evaluator.",

@@ -5,124 +5,124 @@
                        "ok":  true,
                        "index":  1,
                        "status_code":  200,
-                       "elapsed_ms":  344
+                       "elapsed_ms":  352
                    },
                    {
                        "ok":  true,
                        "index":  2,
                        "status_code":  200,
-                       "elapsed_ms":  335
+                       "elapsed_ms":  462
                    },
                    {
                        "ok":  true,
                        "index":  3,
                        "status_code":  200,
-                       "elapsed_ms":  322
+                       "elapsed_ms":  415
                    },
                    {
                        "ok":  true,
                        "index":  4,
                        "status_code":  200,
-                       "elapsed_ms":  341
+                       "elapsed_ms":  337
                    },
                    {
                        "ok":  true,
                        "index":  5,
                        "status_code":  200,
-                       "elapsed_ms":  412
+                       "elapsed_ms":  416
                    },
                    {
                        "ok":  true,
                        "index":  6,
                        "status_code":  200,
-                       "elapsed_ms":  408
+                       "elapsed_ms":  321
                    },
                    {
                        "ok":  true,
                        "index":  7,
                        "status_code":  200,
-                       "elapsed_ms":  418
+                       "elapsed_ms":  348
                    },
                    {
                        "ok":  true,
                        "index":  8,
                        "status_code":  200,
-                       "elapsed_ms":  423
+                       "elapsed_ms":  408
                    },
                    {
                        "ok":  true,
                        "index":  9,
                        "status_code":  200,
-                       "elapsed_ms":  375
+                       "elapsed_ms":  312
                    },
                    {
                        "ok":  true,
                        "index":  10,
                        "status_code":  200,
-                       "elapsed_ms":  414
+                       "elapsed_ms":  311
                    },
                    {
                        "ok":  true,
                        "index":  11,
                        "status_code":  200,
-                       "elapsed_ms":  290
+                       "elapsed_ms":  405
                    },
                    {
                        "ok":  true,
                        "index":  12,
                        "status_code":  200,
-                       "elapsed_ms":  432
+                       "elapsed_ms":  404
                    },
                    {
                        "ok":  true,
                        "index":  13,
                        "status_code":  200,
-                       "elapsed_ms":  354
+                       "elapsed_ms":  321
                    },
                    {
                        "ok":  true,
                        "index":  14,
                        "status_code":  200,
-                       "elapsed_ms":  283
+                       "elapsed_ms":  309
                    },
                    {
                        "ok":  true,
                        "index":  15,
                        "status_code":  200,
-                       "elapsed_ms":  394
+                       "elapsed_ms":  399
                    },
                    {
                        "ok":  true,
                        "index":  16,
                        "status_code":  200,
-                       "elapsed_ms":  402
+                       "elapsed_ms":  406
                    },
                    {
                        "ok":  true,
                        "index":  17,
                        "status_code":  200,
-                       "elapsed_ms":  315
+                       "elapsed_ms":  416
                    },
                    {
                        "ok":  true,
                        "index":  18,
                        "status_code":  200,
-                       "elapsed_ms":  397
+                       "elapsed_ms":  313
                    },
                    {
                        "ok":  true,
                        "index":  19,
                        "status_code":  200,
-                       "elapsed_ms":  409
+                       "elapsed_ms":  358
                    },
                    {
                        "ok":  true,
                        "index":  20,
                        "status_code":  200,
-                       "elapsed_ms":  436
+                       "elapsed_ms":  355
                    }
                ],
     "phase":  "injected",
     "probe_url":  "http://34.185.198.67/product/OLJCESPC7Z",
-    "captured_at_utc":  "2026-06-14T21:51:45.2198442Z"
+    "captured_at_utc":  "2026-06-15T11:53:54.5019867Z"
 }

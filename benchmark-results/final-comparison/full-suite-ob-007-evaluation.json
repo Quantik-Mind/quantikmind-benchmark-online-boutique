@@ -11,7 +11,7 @@
   "per_scenario": [
     {
       "id": "OB-007",
-      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
+      "name": "Runtime Observability Gap",
       "detected": true,
       "selected_detecting_tests": [
         "recommendation-section-visible-on-detail"

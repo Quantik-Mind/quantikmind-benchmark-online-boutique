@@ -1,10 +1,10 @@
 {
     "scenario":  "OB-007",
     "evidence_status":  "verified",
-    "published_at_utc":  "2026-06-14T21:52:51.8438238Z",
+    "published_at_utc":  "2026-06-15T11:55:05.6540917Z",
     "source_run_dir":  "benchmark-runs",
     "qmind_selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-007.json",
-    "qmind_run_id":  "5c2033d5-64a4-4f7b-b1d3-90929a78a882",
+    "qmind_run_id":  "5e153640-3ce1-4f39-aec2-3e54e411c511",
     "changed_files":  [
                           "src/adservice/src/main/java/hipstershop/AdService.java"
                       ],

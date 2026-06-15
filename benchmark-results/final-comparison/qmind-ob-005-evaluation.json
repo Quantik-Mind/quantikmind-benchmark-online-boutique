@@ -15,7 +15,6 @@
       "detected": true,
       "selected_detecting_tests": [
         "homepage-has-multiple-links",
-        "homepage-has-visible-text-content",
         "smoke-homepage-loads"
       ],
       "detecting_tests_used": [

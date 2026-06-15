@@ -105,6 +105,21 @@ function Write-Json {
     [System.IO.File]::WriteAllText((Resolve-ParentPath $Path), $json + "`n", [System.Text.UTF8Encoding]::new($false))
 }
 
+function Copy-JsonWithoutBom {
+    param(
+        [string]$Source,
+        [string]$Destination
+    )
+
+    $content = Get-Content -LiteralPath $Source -Raw
+    $content = $content -replace "`r`n", "`n"
+    [System.IO.File]::WriteAllText(
+        (Resolve-ParentPath $Destination),
+        $content,
+        [System.Text.UTF8Encoding]::new($false)
+    )
+}
+
 function Format-Percent {
     param([double]$Value)
 
@@ -681,6 +696,15 @@ $libraryIds = @($fullSuiteLibrary.tests | ForEach-Object { Get-TestId $_ } | Whe
 if ($UseExistingQMindSelections -or $SkipRun) {
     Assert-QMindCaseSelections $CaseIds $libraryIds
 }
+if (-not $UseExistingQMindSelections) {
+    $verifiedOb006Selection = Join-Path $RuntimeEvidenceDir "qmind-selection-ob-006.json"
+    Copy-JsonWithoutBom $verifiedOb006Selection (Get-QMindSelectionPath "OB-006")
+
+    if ($IncludeOb007) {
+        $verifiedOb007Selection = Join-Path $RuntimeEvidenceOb007Dir "qmind-selection-ob-007.json"
+        Copy-JsonWithoutBom $verifiedOb007Selection (Get-QMindSelectionPath "OB-007")
+    }
+}
 Assert-Ob006RuntimeEvidence `
     -EvidenceDir $RuntimeEvidenceDir `
     -Ob005SelectionPath (Get-QMindSelectionPath "OB-005") `
@@ -767,7 +791,13 @@ if (-not $SkipRun) {
             "--output", $historyEvaluation
         )
 
-        if (-not $UseExistingQMindSelections) {
+        if ($caseId -eq "OB-006") {
+            $verifiedOb006Selection = Join-Path $RuntimeEvidenceDir "qmind-selection-ob-006.json"
+            Copy-JsonWithoutBom $verifiedOb006Selection $qmindCaseSelection
+        } elseif ($caseId -eq "OB-007") {
+            $verifiedOb007Selection = Join-Path $RuntimeEvidenceOb007Dir "qmind-selection-ob-007.json"
+            Copy-JsonWithoutBom $verifiedOb007Selection $qmindCaseSelection
+        } elseif (-not $UseExistingQMindSelections) {
             Invoke-QMindSubset $caseId $qmindCaseSelection
         }
         Assert-QMindSelection $caseId $qmindCaseSelection $libraryIds
@@ -935,11 +965,17 @@ $comparison = [ordered]@{
         qmind = @("test library", "history", "changed files", "runtime metrics", "observability")
         oracle_only = @("defect identity", "oracle detecting tests", "expected benchmark outcome")
     }
-    qmind_selection_mode = if ($UseExistingQMindSelections) { "existing-per-case-artifacts" } else { "generated-by-run-qmind-subset" }
+    qmind_selection_mode = if ($UseExistingQMindSelections) {
+        "existing-per-case-artifacts"
+    } elseif ($IncludeOb007) {
+        "generated-with-pinned-runtime-evidence-ob006-ob007"
+    } else {
+        "generated-with-pinned-runtime-evidence-ob006"
+    }
     supporting_artifacts = @($expectedArtifacts | ForEach-Object { To-RepoPath $_ })
     limitations = @(
         "QMind is evaluated from one canonical selection artifact per benchmark case under benchmark-results/qmind-selections/qmind-selection-ob-*.json.",
-        "Normal generator mode creates QMind selections by invoking benchmark-pipeline/run-qmind-subset.ps1 for each case; -UseExistingQMindSelections reuses committed canonical per-case artifacts.",
+        "Normal generator mode invokes benchmark-pipeline/run-qmind-subset.ps1 for standard cases and pins runtime-evidence selections for OB-006/OB-007; -UseExistingQMindSelections reuses committed canonical per-case artifacts.",
         "OB-006 headline inclusion requires tracked runtime evidence under benchmark-results/runtime-evidence/ob-006 and a QMind selection that is not substantively identical to OB-005.",
         "OB-007 is conditionally included: present only when benchmark-results/runtime-evidence/ob-007/evidence-manifest.json exists and passes Assert-Ob007RuntimeEvidence validation.",
         "History + Code Change uses changed files and library/history metadata only; oracle detecting tests are used only by the evaluator.",
@@ -1096,7 +1132,7 @@ Random uses only the canonical test library and deterministic seed 42. It produc
 
 History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is ``src/currencyservice/data/currency_conversion.json``; the six direct homepage oracle tests map to ``src/frontend/**/*``, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is ``src/productcatalogservice/product_catalog.go``; QMind must use the productcatalogservice code-change signal together with live frontend impact rather than oracle detecting tests.
 
-Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1`` in normal mode. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to productcatalogservice while runtime observability points to frontend homepage/product-grid impact. OB-007 adds a second runtime-aware case where the declared changed file is harmless and only runtime observability reveals the behaviorally degraded recommendationservice path. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and preserves coverage for the combined-signal case while adding coverage for both runtime-aware cases.
+Quantik Mind uses one canonical selection artifact per benchmark case. Standard cases are generated from that case's changed-files and runtime context by ``benchmark-pipeline/run-qmind-subset.ps1``; OB-006 and OB-007 are pinned from verified runtime-evidence selections so the final comparison does not overwrite live injection evidence with a later non-injected run. The aggregate QMind result averages $($qmindAggregate.average_selected_tests) selected tests, gives $(Format-Percent $qmindAggregate.average_execution_reduction) average execution reduction, and detects $($qmindAggregate.recall_fraction) cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to productcatalogservice while runtime observability points to frontend homepage/product-grid impact. OB-007 adds a second runtime-aware case where the declared changed file is harmless and only runtime observability reveals the behaviorally degraded recommendationservice path. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and preserves coverage for the combined-signal case while adding coverage for both runtime-aware cases.
 
 OB-006 is included in the headline aggregate only when ``benchmark-pipeline/generate-final-comparison.ps1`` can validate tracked runtime evidence under ``$(To-RepoPath $RuntimeEvidenceDir)``. That evidence must show material productcatalogservice movement and material frontend movement in the same validation window, and the OB-006 QMind artifact must not be substantively identical to OB-005. QMind selected OB-006 from the productcatalogservice changed-file input plus runtime observability evidence, not from oracle detecting tests.
 
@@ -1109,6 +1145,7 @@ OB-006 is included in the headline aggregate only when ``benchmark-pipeline/gene
 - OB-006 uses the real upstream file ``src/productcatalogservice/product_catalog.go`` through a reversible injector.
 - The OB-006 oracle uses 19 homepage, product-grid, catalog, and product-detail detectors for the ProductCatalog ListProducts cascade.
 - OB-006 runtime evidence is stored under ``$(To-RepoPath $RuntimeEvidenceDir)`` and is required by the final comparison generator.
+$(if ($IncludeOb007) { "- OB-007 runtime evidence is stored under ``$(To-RepoPath $RuntimeEvidenceOb007Dir)`` and is pinned into the canonical QMind selection before scoring." })
 - The History + Code Change miss is explained by exact scoring mechanics, not hidden exclusions.
 - QMind detection must come from runtime observability, not oracle leakage.
 - The generator reports actual selected-suite outcomes; it does not hardcode winners.

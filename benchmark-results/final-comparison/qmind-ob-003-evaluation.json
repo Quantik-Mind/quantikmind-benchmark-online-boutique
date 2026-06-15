@@ -2,8 +2,8 @@
   "method": "qmind",
   "benchmark_case": "OB-003",
   "full_suite_size": 52,
-  "selected_test_count": 16,
-  "execution_reduction": 0.6923076923076923,
+  "selected_test_count": 19,
+  "execution_reduction": 0.6346153846153846,
   "total_scenarios": 1,
   "detected_scenarios_count": 1,
   "missed_scenarios_count": 0,
@@ -16,7 +16,8 @@
       "selected_detecting_tests": [
         "catalog-first-product-opens-detail-page",
         "catalog-open-first-product-detail",
-        "product-detail-page-has-add-to-cart-button"
+        "product-detail-page-has-add-to-cart-button",
+        "product-detail-page-has-price"
       ],
       "detecting_tests_used": [
         "catalog-first-product-opens-detail-page",

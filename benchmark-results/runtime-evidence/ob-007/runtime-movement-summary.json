@@ -1,5 +1,5 @@
 {
-    "captured_at_utc":  "2026-06-14T21:51:45.2692312Z",
+    "captured_at_utc":  "2026-06-15T11:53:54.5076890Z",
     "scenario":  "OB-007",
     "validation_thresholds":  {
                                   "product_detail_ok_rate_min":  0.8,
@@ -10,12 +10,12 @@
     "recommendationservice_latency":  {
                                           "key":  "recommendationservice.latency_p95",
                                           "baseline":  0.0475,
-                                          "injected":  0.47259900990099013,
-                                          "delta":  0.42509900990099014,
+                                          "injected":  0.471875,
+                                          "delta":  0.424375,
                                           "min_delta":  0.05,
                                           "has_data":  true,
                                           "passed":  true,
-                                          "ratio":  9.9494528400208448,
+                                          "ratio":  9.93421052631579,
                                           "min_ratio":  1.5,
                                           "delta_passed":  true,
                                           "ratio_passed":  true,
@@ -71,9 +71,9 @@
                                              },
     "frontend_error_rate":  {
                                 "key":  "frontend.error_rate",
-                                "baseline":  0.047337278106508784,
-                                "injected":  0.05555555555555558,
-                                "delta":  0.0082182774490467958,
+                                "baseline":  0.048048048048048075,
+                                "injected":  0.040247678018575872,
+                                "delta":  -0.0078003700294722034,
                                 "stable":  true,
                                 "note":  "Informational only; product detail HTTP probes are the graceful degradation gate.",
                                 "passed":  true

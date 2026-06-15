@@ -1,21 +1,21 @@
 {
     "detected":  true,
     "scenario":  "OB-007",
-    "qmind_run_id":  "5c2033d5-64a4-4f7b-b1d3-90929a78a882",
+    "qmind_run_id":  "5e153640-3ce1-4f39-aec2-3e54e411c511",
     "selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-007.json",
     "has_runtime_signal":  true,
     "signal_state":  "full",
     "skip_reason":  "",
     "business_metrics":  {
-                             "risk_coverage":  47.416469775181866,
+                             "risk_coverage":  50.850400949180752,
                              "top_risk_coverage":  76.923076923076934,
-                             "residual_risk":  52.583530224818134,
-                             "risk_efficiency":  1.174122108718789
+                             "residual_risk":  49.149599050819248,
+                             "risk_efficiency":  1.1496612388510432
                          },
     "observability_enabled":  true,
     "changed_files_file":  "benchmark-runs/scenario-ob-007-changed-files.json",
     "changed_files":  [
-                          "src/recommendationservice/logger.py"
+                          "src/adservice/src/main/java/hipstershop/AdService.java"
                       ],
     "expected_detector_ids":  [
                                   "recommendation-section-visible-on-detail"
