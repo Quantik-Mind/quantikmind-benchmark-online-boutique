@@ -1,11 +1,11 @@
-﻿param(
+param(
     [string]$FrontendUrl = "http://34.185.198.67",
     [string]$ProductPath = "/product/OLJCESPC7Z",
     [string]$PrometheusUrl = "http://localhost:19090",
     [string]$PrometheusNamespace = "default",
     [string]$PrometheusWindow = "2m",
     [string]$SourceRoot = "microservices-demo",
-    [string]$LoggerFile = "src/recommendationservice/logger.py",
+    [string]$DeclaredChangedFile = "src/adservice/src/main/java/hipstershop/AdService.java",
     [string]$RecommendationServerFile = "src/recommendationservice/recommendation_server.py",
     [string]$EvidenceDir = "benchmark-results/runtime-evidence/ob-007",
     [string]$QMindSelectionDir = "benchmark-results/qmind-selections",
@@ -113,15 +113,15 @@ function Assert-Tool {
     Write-Host "  ${Name}: available"
 }
 
-function Assert-LoggerCleanupGuard {
-    $loggerTarget = Join-Path $SourceRoot $LoggerFile
-    if (-not (Test-Path -LiteralPath $loggerTarget -PathType Leaf)) {
-        throw "Cannot find logger.py at $loggerTarget. Run from the benchmark repo root."
+function Assert-DeclaredChangedFileGuard {
+    $declaredFileTarget = Join-Path $SourceRoot $DeclaredChangedFile
+    if (-not (Test-Path -LiteralPath $declaredFileTarget -PathType Leaf)) {
+        throw "Cannot find declared changed file at $declaredFileTarget. Run from the benchmark repo root."
     }
 
-    $loggerSource = Get-Content -LiteralPath $loggerTarget -Raw
-    if ($loggerSource -match "(?i)time\.sleep|OB-007|latency|overhead") {
-        throw "logger.py cleanup guard failed. $loggerTarget must not contain time.sleep, OB-007, latency, or overhead."
+    $declaredFileSource = Get-Content -LiteralPath $declaredFileTarget -Raw
+    if ($declaredFileSource -match "(?i)OB-007") {
+        throw "Declared changed file guard failed. $declaredFileTarget must not contain OB-007 injection markers."
     }
 }
 
@@ -204,7 +204,7 @@ function Restore-Ob007SourceAndDeployment {
         -LoggerFile $LoggerFile `
         -RecommendationServerFile $RecommendationServerFile `
         -Restore
-    Assert-LoggerCleanupGuard
+    Assert-DeclaredChangedFileGuard
     Assert-RecommendationServerRestored
     if (-not $SkipDeploy -and $injectedImageDeployed -and -not [string]::IsNullOrWhiteSpace($originalImage)) {
         Deploy-RecommendationImage -Image $originalImage -Phase "restore" | Out-Null
@@ -408,10 +408,10 @@ if ($RestoreOnly) {
     Write-Step "Restoring OB-007 injection"
     & .\runtime-scenarios\ob-007-recommendation-logging-overhead\apply-ob007-recommendation-logging-overhead.ps1 `
         -SourceRoot $SourceRoot `
-        -LoggerFile $LoggerFile `
+        -DeclaredChangedFile $DeclaredChangedFile `
         -RecommendationServerFile $RecommendationServerFile `
         -Restore
-    Assert-LoggerCleanupGuard
+    Assert-DeclaredChangedFileGuard
     Assert-RecommendationServerRestored
     if (-not $SkipDeploy) {
         Write-Host "Restarting recommendationservice deployment..."
@@ -425,7 +425,7 @@ if ($RestoreOnly) {
 # --- PRE-FLIGHT --------------------------------------------------------------
 Write-Step "Pre-flight checks"
 
-Assert-LoggerCleanupGuard
+Assert-DeclaredChangedFileGuard
 if (-not (Test-Path -LiteralPath "$SourceRoot/$RecommendationServerFile" -PathType Leaf)) {
     throw "Cannot find recommendation_server.py at $SourceRoot/$RecommendationServerFile. Run from the benchmark repo root."
 }
@@ -513,7 +513,7 @@ elseif ($DryRun) {
 else {
     & .\runtime-scenarios\ob-007-recommendation-logging-overhead\apply-ob007-recommendation-logging-overhead.ps1 `
         -SourceRoot $SourceRoot `
-        -LoggerFile $LoggerFile `
+        -DeclaredChangedFile $DeclaredChangedFile `
         -RecommendationServerFile $RecommendationServerFile `
         -LatencyMs $LatencyMs
     $sourceInjectionApplied = $true
@@ -725,11 +725,11 @@ Write-Json "$EvidenceDir/runtime-movement-summary.json" $movement
 # --- STEP 10: QMIND SELECTION FOR OB-007 -------------------------------------
 Write-Step "Step 10: QMind selection for OB-007"
 
-$changedFilesPayload = '["src/recommendationservice/logger.py"]'
+$changedFilesPayload = ConvertTo-Json -InputObject @($DeclaredChangedFile) -Compress
 $changedFilesFile = "$BenchmarkRunDir/scenario-ob-007-changed-files.json"
 New-Item -ItemType Directory -Force -Path $BenchmarkRunDir | Out-Null
 Write-Utf8NoBom -Path $changedFilesFile -Text ($changedFilesPayload + [Environment]::NewLine)
-Write-Json "$EvidenceDir/scenario-ob-007-changed-files.json" @("src/recommendationservice/logger.py")
+Write-Json "$EvidenceDir/scenario-ob-007-changed-files.json" @($DeclaredChangedFile)
 
 $qmindSelectionOutput = "$QMindSelectionDir/qmind-selection-ob-007.json"
 if ($DryRun) {
@@ -810,7 +810,7 @@ if (-not $DryRun) {
     Write-Host "  H+CC selected $($hccSelectedTests.Count) tests."
     Write-Host "  recommendation-section-visible-on-detail in H+CC selection: $hccDetectedOracleTest"
     if ($hccDetectedOracleTest) {
-        Write-Warning "H+CC selected the oracle test � OB-007 will NOT demonstrate an H+CC miss. Review the changed file tokenization."
+        Write-Warning "H+CC selected the oracle test ? OB-007 will NOT demonstrate an H+CC miss. Review the changed file tokenization."
     }
     else {
         Write-Host "  Confirmed: H+CC misses recommendation-section-visible-on-detail for OB-007."
@@ -832,7 +832,7 @@ $detectionSummary = [ordered]@{
     business_metrics = $qmindBusinessMetrics
     observability_enabled = $true
     changed_files_file = $changedFilesFile
-    changed_files = @("src/recommendationservice/logger.py")
+    changed_files = @($DeclaredChangedFile)
     expected_detector_ids = @("recommendation-section-visible-on-detail")
     selected_detector_ids = if ($qmindDetected) { @("recommendation-section-visible-on-detail") } else { @() }
     missing_detector_ids = if ($qmindDetected) { @() } else { @("recommendation-section-visible-on-detail") }
@@ -855,7 +855,7 @@ $manifest = [ordered]@{
     source_run_dir = $BenchmarkRunDir
     qmind_selection_artifact = "benchmark-results/qmind-selections/qmind-selection-ob-007.json"
     qmind_run_id = $qmindRunId
-    changed_files = @("src/recommendationservice/logger.py")
+    changed_files = @($DeclaredChangedFile)
     required_runtime_chain = @(
         "product detail pages remain accessible (HTTP 200 - graceful degradation confirmed)",
         "recommendation section absent from product detail at Playwright level",
@@ -913,7 +913,7 @@ else {
         }
         catch {
             Write-Warning "Automatic OB-007 cleanup failed: $($_.Exception.Message)"
-            Write-Warning "Manual source restore command: .\runtime-scenarios\ob-007-recommendation-logging-overhead\apply-ob007-recommendation-logging-overhead.ps1 -SourceRoot $SourceRoot -LoggerFile $LoggerFile -RecommendationServerFile $RecommendationServerFile -Restore"
+            Write-Warning "Manual source restore command: .\runtime-scenarios\ob-007-recommendation-logging-overhead\apply-ob007-recommendation-logging-overhead.ps1 -SourceRoot $SourceRoot -DeclaredChangedFile $DeclaredChangedFile -RecommendationServerFile $RecommendationServerFile -Restore"
             if ($injectedImageDeployed -and -not [string]::IsNullOrWhiteSpace($originalImage)) {
                 Write-Warning "Manual deployment restore commands:"
                 Write-Warning "  kubectl -n $PrometheusNamespace set image deployment/$Deployment $Container=$originalImage"

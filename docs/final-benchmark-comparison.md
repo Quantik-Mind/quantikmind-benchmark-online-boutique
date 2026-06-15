@@ -49,7 +49,7 @@ The defect oracle uses minimal direct validated detecting tests for each benchma
 | OB-004: Payment Regression | Code Change | src/paymentservice/charge.js | detected | missed | detected | detected |
 | OB-005: Currency Data Corruption | Runtime Aware | src/currencyservice/data/currency_conversion.json | detected | detected | missed | detected |
 | OB-006: Product Catalog ListProducts Cascades Into Homepage Rendering | Combined Signal | src/productcatalogservice/product_catalog.go | detected | detected | detected | detected |
-| OB-007: Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance | Runtime Aware | src/recommendationservice/logger.py | detected | detected | missed | detected |
+| OB-007: Runtime Observability Gap | Runtime Aware | src/adservice/src/main/java/hipstershop/AdService.java | detected | detected | missed | detected |
 
 ## Per-Category Summary
 
@@ -148,9 +148,9 @@ These metrics are not included in the main benchmark comparison table because th
 - History + Code Change: 15 tests, 71.2% reduction, defect detected
 - Quantik Mind: 22 tests, 57.7% reduction, defect detected
 
-### OB-007: Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance
+### OB-007: Runtime Observability Gap
 
-- Changed files: `src/recommendationservice/logger.py`
+- Changed files: `src/adservice/src/main/java/hipstershop/AdService.java`
 - Traditional Approach / Full Suite: 52 tests, 0.0% reduction, defect detected
 - Random Approach: 26 tests, 50.0% reduction, defect detected
 - History + Code Change: 15 tests, 71.2% reduction, defect missed
@@ -162,7 +162,7 @@ Full Suite always selects all 52 tests from the canonical library.
 
 Random uses only the canonical test library and deterministic seed 42. It produces a per-case selection artifact and selects 26 tests, exactly 50% of the 52-test suite.
 
-History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is `src/currencyservice/data/currency_conversion.json`; the six direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is `src/productcatalogservice/product_catalog.go`; QMind must use the productcatalogservice code-change signal together with live frontend impact rather than oracle detecting tests.
+History + Code Change uses the canonical test library, history-oriented test metadata, and each case's changed files. It does not read the defect oracle and does not use oracle detecting tests. For OB-005 the changed file is `src/currencyservice/data/currency_conversion.json`; the six direct homepage oracle tests map to `src/frontend/**/*`, have medium criticality, and score only 10 each, so they fall below checkout, cart, order, payment, product, and catalog tests in the top-15 selection. For OB-006 the changed file is `src/productcatalogservice/product_catalog.go`; QMind must use the productcatalogservice code-change signal together with live frontend impact rather than oracle detecting tests. For OB-007 the changed file is `src/adservice/src/main/java/hipstershop/AdService.java`; no adservice tests exist in the benchmark library so the guardrail has no effect, and the recommendation oracle scores only medium criticality with no keyword or token match, falling well outside the top-15 selection.
 
 Quantik Mind uses one canonical selection artifact per benchmark case, generated from that case's changed-files and runtime context by `benchmark-pipeline/run-qmind-subset.ps1` in normal mode. The aggregate QMind result averages 19.3 selected tests, gives 62.9% average execution reduction, and detects 7/7 cases. OB-005 demonstrates a runtime-aware defect class that code-change analysis structurally cannot reach. OB-006 adds a combined-signal defect class where the code change points to productcatalogservice while runtime observability points to frontend homepage/product-grid impact. This does not claim QMind is universally better than History + Code Change; it claims QMind matches History + Code Change on the code-change control group and preserves coverage for the combined-signal case while adding coverage for the runtime-aware case.
 

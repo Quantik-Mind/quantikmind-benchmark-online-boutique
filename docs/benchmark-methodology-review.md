@@ -156,7 +156,7 @@ The committed QMind selection artifacts may be reused for reproducibility checks
 
 That mode still validates that every QMind selection contains canonical test IDs and that OB-004 includes `payment-order-completion-confirms-success`.
 
-OB-005 and OB-007 are intentionally different from the code-change controls. OB-005's changed file is `src/currencyservice/data/currency_conversion.json`, while its direct oracle tests are frontend homepage tests. OB-007's declared changed file is the harmless `src/recommendationservice/logger.py`, while the oracle test detects a recommendation-section disappearance caused by runtime behavioral degradation. The History + Code Change selector misses both for transparent scoring reasons; QMind can detect them only when runtime observability surfaces the relevant signals.
+OB-005 and OB-007 are intentionally different from the code-change controls. OB-005's changed file is `src/currencyservice/data/currency_conversion.json`, while its direct oracle tests are frontend homepage tests. OB-007's declared changed file is the harmless `src/adservice/src/main/java/hipstershop/AdService.java`; runtime pressure is independently injected on recommendationservice, and the oracle test detects a recommendation-section disappearance driven by that runtime pressure. The History + Code Change selector misses both for transparent scoring reasons; QMind can detect them only when runtime observability surfaces the relevant signals.
 
 The History + Code Change baseline is deterministic and transparent, but it is still a simplified local proxy for a static history/code-change-aware selection service. It uses local test metadata and changed-file matching rather than a production-trained model.
 

@@ -397,8 +397,8 @@ function Assert-Ob007RuntimeEvidence {
     }
 
     $changedFiles = @(Read-Json (Join-Path $EvidenceDir "scenario-ob-007-changed-files.json") | ForEach-Object { [string]$_ })
-    if ($changedFiles.Count -ne 1 -or $changedFiles[0] -ne "src/recommendationservice/logger.py") {
-        throw "OB-007 runtime evidence changed-files artifact must contain only src/recommendationservice/logger.py."
+    if ($changedFiles.Count -ne 1 -or $changedFiles[0] -ne "src/adservice/src/main/java/hipstershop/AdService.java") {
+        throw "OB-007 runtime evidence changed-files artifact must contain only src/adservice/src/main/java/hipstershop/AdService.java."
     }
 
     $detection = Read-Json (Join-Path $EvidenceDir "qmind-ob007-detection-summary.json")
