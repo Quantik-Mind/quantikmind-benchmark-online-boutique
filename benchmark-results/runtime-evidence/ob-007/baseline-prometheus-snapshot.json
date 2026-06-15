@@ -14,7 +14,7 @@
                                                           "deployment":  "recommendationservice"
                                                       },
                                            "value":  [
-                                                         1781473718.276,
+                                                         1781524244.390,
                                                          "0.0475"
                                                      ]
                                        }
@@ -32,7 +32,7 @@
                                                           "deployment":  "recommendationservice"
                                                       },
                                            "value":  [
-                                                         1781473718.361,
+                                                         1781524244.417,
                                                          "0"
                                                      ]
                                        }
@@ -41,7 +41,7 @@
                         "no_data":  false
                     },
                     {
-                        "value":  2.2545454545454544,
+                        "value":  2.3727272727272726,
                         "name":  "recommendationservice request rate",
                         "promql":  "sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"recommendationservice\"}[2m]))",
                         "result":  [
@@ -50,8 +50,8 @@
                                                           "deployment":  "recommendationservice"
                                                       },
                                            "value":  [
-                                                         1781473718.406,
-                                                         "2.2545454545454544"
+                                                         1781524244.445,
+                                                         "2.3727272727272726"
                                                      ]
                                        }
                                    ],
@@ -89,7 +89,7 @@
                         "no_data":  true
                     },
                     {
-                        "value":  0.41455056179775274,
+                        "value":  0.41766483516483516,
                         "name":  "frontend latency p95",
                         "promql":  "histogram_quantile(0.95, sum by (deployment, le) (rate(inbound_http_response_duration_seconds_bucket{namespace=\"default\",deployment=\"frontend\"}[2m])))",
                         "result":  [
@@ -98,8 +98,8 @@
                                                           "deployment":  "frontend"
                                                       },
                                            "value":  [
-                                                         1781473718.602,
-                                                         "0.41455056179775274"
+                                                         1781524244.553,
+                                                         "0.41766483516483516"
                                                      ]
                                        }
                                    ],
@@ -107,7 +107,7 @@
                         "no_data":  false
                     },
                     {
-                        "value":  0.047337278106508784,
+                        "value":  0.048048048048048075,
                         "name":  "frontend error rate",
                         "promql":  "1 - (sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\",status=~\"2..|3..\"}[2m])) / sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\"}[2m])))",
                         "result":  [
@@ -116,8 +116,8 @@
                                                           "deployment":  "frontend"
                                                       },
                                            "value":  [
-                                                         1781473718.653,
-                                                         "0.047337278106508784"
+                                                         1781524244.580,
+                                                         "0.048048048048048075"
                                                      ]
                                        }
                                    ],
@@ -125,7 +125,7 @@
                         "no_data":  false
                     },
                     {
-                        "value":  3.0727272727272723,
+                        "value":  3.0272727272727273,
                         "name":  "frontend request rate",
                         "promql":  "sum by (deployment) (rate(inbound_http_statuses_total{namespace=\"default\",deployment=\"frontend\"}[2m]))",
                         "result":  [
@@ -134,8 +134,8 @@
                                                           "deployment":  "frontend"
                                                       },
                                            "value":  [
-                                                         1781473718.701,
-                                                         "3.0727272727272723"
+                                                         1781524244.608,
+                                                         "3.0272727272727273"
                                                      ]
                                        }
                                    ],
@@ -144,5 +144,5 @@
                     }
                 ],
     "phase":  "baseline",
-    "captured_at_utc":  "2026-06-14T21:48:35.7757761Z"
+    "captured_at_utc":  "2026-06-15T11:50:44.4514011Z"
 }
