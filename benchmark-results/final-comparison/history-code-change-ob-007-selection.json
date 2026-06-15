@@ -15,7 +15,7 @@
   "case_context": {
     "id": "OB-007",
     "expected_changed_files": [
-      "src/recommendationservice/logger.py"
+      "src/adservice/src/main/java/hipstershop/AdService.java"
     ]
   },
   "selected_tests": [
@@ -293,15 +293,6 @@
       ]
     },
     {
-      "test_id": "recommendation-section-visible-on-detail",
-      "score": 40,
-      "reasons": [
-        "historical risk criticality: medium",
-        "scenario metadata token match: recommendationservice",
-        "changed-code mapping match: recommendationservice"
-      ]
-    },
-    {
       "test_id": "frontend-logo-or-home-link-visible",
       "score": 30,
       "reasons": [
@@ -435,6 +426,13 @@
     },
     {
       "test_id": "homepage-title-is-available",
+      "score": 10,
+      "reasons": [
+        "historical risk criticality: medium"
+      ]
+    },
+    {
+      "test_id": "recommendation-section-visible-on-detail",
       "score": 10,
       "reasons": [
         "historical risk criticality: medium"

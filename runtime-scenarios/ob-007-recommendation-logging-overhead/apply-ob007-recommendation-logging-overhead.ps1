@@ -1,6 +1,6 @@
 param(
     [string]$SourceRoot = "microservices-demo",
-    [string]$LoggerFile = "src/recommendationservice/logger.py",
+    [string]$DeclaredChangedFile = "src/adservice/src/main/java/hipstershop/AdService.java",
     [string]$RecommendationServerFile = "src/recommendationservice/recommendation_server.py",
     [string]$BackupPath,
     # Scoped ListRecommendations-only latency in milliseconds. Keep <=300ms to avoid health/liveness impact.
@@ -28,16 +28,16 @@ function Write-Utf8NoBom {
     )
 }
 
-function Assert-LoggerCleanupGuard {
+function Assert-DeclaredChangedFileGuard {
     param([string]$Path)
 
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        throw "Missing recommendationservice logger file: $Path"
+        throw "Missing declared changed file: $Path"
     }
 
-    $loggerSource = Get-Content -LiteralPath $Path -Raw
-    if ($loggerSource -match "(?i)time\.sleep|OB-007|latency|overhead") {
-        throw "logger.py cleanup guard failed. $Path must not contain time.sleep, OB-007, latency, or overhead."
+    $declaredFileSource = Get-Content -LiteralPath $Path -Raw
+    if ($declaredFileSource -match "(?i)OB-007") {
+        throw "Declared changed file guard failed. $Path must not contain OB-007 injection markers."
     }
 }
 
@@ -47,7 +47,7 @@ function Test-Ob007InjectionPresent {
 }
 
 $target = Join-Path $SourceRoot $RecommendationServerFile
-$loggerTarget = Join-Path $SourceRoot $LoggerFile
+$declaredChangedFileTarget = Join-Path $SourceRoot $DeclaredChangedFile
 if ([string]::IsNullOrWhiteSpace($BackupPath)) {
     $BackupPath = "$target.ob007.bak"
 }
@@ -70,7 +70,7 @@ if ($Restore) {
         Write-Host "No OB-007 recommendation_server.py backup found and no active injection detected."
     }
 
-    Assert-LoggerCleanupGuard -Path $loggerTarget
+    Assert-DeclaredChangedFileGuard -Path $declaredChangedFileTarget
     $restoredSource = Get-Content -LiteralPath $target -Raw
     if (Test-Ob007InjectionPresent -Text $restoredSource) {
         throw "OB-007 injection remains in $target after restore."
@@ -78,7 +78,7 @@ if ($Restore) {
     exit 0
 }
 
-Assert-LoggerCleanupGuard -Path $loggerTarget
+Assert-DeclaredChangedFileGuard -Path $declaredChangedFileTarget
 
 if (-not (Test-Path -LiteralPath $BackupPath -PathType Leaf)) {
     Copy-Item -LiteralPath $target -Destination $BackupPath
@@ -106,5 +106,5 @@ $updated = [regex]::Replace($source, $pattern, "`$1$($injectedBlock.Replace('__L
 Write-Utf8NoBom -Path $target -Text $updated
 
 Write-Host "Applied OB-007 recommendation runtime latency degradation to ${target}: ListRecommendations sleeps ${LatencyMs}ms and returns empty product_ids."
-Write-Host "Declared H+CC changed file remains: $LoggerFile"
+Write-Host "Declared changed file (CI trigger): $DeclaredChangedFile"
 Write-Host "Restore with: .\runtime-scenarios\ob-007-recommendation-logging-overhead\apply-ob007-recommendation-logging-overhead.ps1 -Restore"

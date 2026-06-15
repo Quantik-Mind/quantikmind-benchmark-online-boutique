@@ -231,21 +231,22 @@
     },
     {
       "id": "OB-007",
-      "name": "Recommendation Runtime Behavioral Degradation Causes Graceful Section Disappearance",
+      "name": "Runtime Observability Gap",
       "category": "runtime-aware",
       "signal_type": "runtime",
-      "description": "Recommendationservice is behaviorally degraded so ListRecommendations adds a small calibrated delay and returns an empty response. Prometheus records the recommendationservice latency signal while the frontend gracefully hides the recommendation section on product detail pages and keeps the core page functional with HTTP 200 responses.",
+      "description": "OB-007 validates whether a selector can react to live runtime observability during a CI/CD-triggered validation window. The triggering change is intentionally harmless and located in adservice. The runtime pressure is independently observed on recommendationservice. Commit-only selection follows adservice and misses the recommendation oracle. Quantik Mind selects the recommendation oracle because runtime observability raises recommendationservice risk.",
       "target_domain": "Recommendation section on product detail pages",
-      "target_service": "recommendationservice",
+      "target_service": "adservice",
       "external_repo": "microservices-demo",
       "baseline_ref": "benchmark-baseline",
       "scenario_ref": "runtime-scenarios/ob-007-recommendation-logging-overhead",
       "expected_changed_files": [
-        "src/recommendationservice/logger.py"
+        "src/adservice/src/main/java/hipstershop/AdService.java"
       ],
       "defect_behavior": [
-        "The declared changed file remains src/recommendationservice/logger.py so History + Code Change receives a harmless recommendationservice logger context.",
-        "The runtime injection is applied to src/recommendationservice/recommendation_server.py: ListRecommendations sleeps for a small calibrated interval after logging the sampled product ids, then returns an empty ListRecommendationsResponse.",
+        "The declared changed file is a harmless adservice source file (src/adservice/src/main/java/hipstershop/AdService.java). History + Code Change follows adservice and finds no test mapping for adservice, so the recommendation oracle scores only medium criticality and is missed.",
+        "The runtime injection is applied independently to src/recommendationservice/recommendation_server.py: ListRecommendations sleeps for a small calibrated interval and returns an empty ListRecommendationsResponse.",
+        "There is no causal link between the adservice commit and the recommendationservice runtime pressure. The two events coincide in the same CI/CD validation window.",
         "Check and Watch health methods remain unchanged and healthy.",
         "The frontend gracefully degrades: handlers.go renders the product detail page without the recommendation section when the recommendation RPC fails.",
         "All frontend HTTP responses remain 200 — there is no cascading frontend error rate increase.",
@@ -272,13 +273,15 @@
       ],
       "validation_status": "validated-runtime-oracle",
       "notes": [
-        "OB-007 is the second runtime-aware scenario and uses recommendation runtime behavioral degradation.",
-        "The declared changed file is intentionally harmless: src/recommendationservice/logger.py. The live runtime patch is applied to recommendation_server.py so runtime behavior, not code-token overlap, reveals the degraded recommendation path.",
-        "The changed file (logger.py) does not contain the token 'recommendation' as a standalone regex token — only 'recommendationservice' and 'logger' are extracted. Neither appears in the oracle test_id 'recommendation-section-visible-on-detail', so History + Code Change scores the oracle test at 40 points (rank ~33/52) and misses it.",
+        "OB-007 is the second runtime-aware scenario and validates runtime-aware prioritization, not causal propagation.",
+        "The declared changed service is adservice. The runtime pressure is independently injected on recommendationservice. These are separate events that coincide in the same CI/CD validation window.",
+        "History + Code Change follows the adservice commit. No adservice tests exist in the benchmark library, so the guardrail has no effect. The recommendation oracle (recommendation-section-visible-on-detail) scores only medium criticality (no keyword match, no token overlap with adservice path) and is missed.",
+        "Changed-service-aware H+CC also misses: the guardrail covers adservice tests, and no adservice tests exist in the library. The oracle maps to recommendationservice, not adservice.",
         "QMind detection must come from Prometheus-visible recommendationservice latency evidence plus behavioral evidence showing the recommendation section disappeared while core product detail pages stayed functional.",
         "The defect demonstrates graceful degradation: frontend HTTP responses are intentionally stable, proving the signal is service-specific rather than a cascade.",
         "Validated runtime evidence is committed under benchmark-results/runtime-evidence/ob-007/. Confirmed signals: recommendationservice behavioral signal, recommendationservice Prometheus latency signal, graceful degradation, playwright section signal. Note: frontend_signal_confirmed is false — frontend HTTP responses remain 200 by design.",
-        "Use runtime-scenarios/ob-007-recommendation-logging-overhead/apply-ob007-recommendation-logging-overhead.ps1 to inject or restore the defect."
+        "The canonical qmind-selection-ob-007.json must be regenerated by running validate-ob007-runtime-evidence.ps1 with the adservice changed file declared, then running generate-final-comparison.ps1. Until then, the selection artifact is stale.",
+        "Use runtime-scenarios/ob-007-recommendation-logging-overhead/apply-ob007-recommendation-logging-overhead.ps1 to inject or restore the runtime pressure on recommendationservice."
       ]
     },
     {

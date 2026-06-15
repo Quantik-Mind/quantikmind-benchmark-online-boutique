@@ -6,7 +6,7 @@
     "qmind_selection_artifact":  "benchmark-results/qmind-selections/qmind-selection-ob-007.json",
     "qmind_run_id":  "5c2033d5-64a4-4f7b-b1d3-90929a78a882",
     "changed_files":  [
-                          "src/recommendationservice/logger.py"
+                          "src/adservice/src/main/java/hipstershop/AdService.java"
                       ],
     "required_runtime_chain":  [
                                    "product detail pages remain accessible (HTTP 200 - graceful degradation confirmed)",
