@@ -269,19 +269,29 @@ benchmark-results/final-comparison/*-evaluation.json
 
 This mode is useful for checking that the published aggregate numbers are derived from the committed per-case selections and the benchmark oracle.
 
-### Mode 2: Live End-to-End Regeneration
+For this mode, you need a Quantik Mind account.
 
-Use this mode only if you want to regenerate the Quantik Mind selections from a live Quantik Mind project.
+Create or access your account here:
 
-This mode requires:
+https://app.quantikmind.com
 
-* a Quantik Mind project;
-* a Quantik Mind API key;
-* the Quantik Mind CLI/API endpoint;
-* the benchmark test library synced into the project;
-* benchmark history imported into the project;
-* observability configured for the benchmark environment;
-* the Online Boutique benchmark environment running.
+After signing in, the Quantik Mind onboarding flow guides you through the application-side setup required to:
+
+* create or select a Quantik Mind project;
+* generate a service account;
+* create an API key.
+
+After onboarding, the remaining benchmark setup is performed through the CLI/scripts in this repository.
+
+The repository scripts are used to:
+
+* configure the local Quantik Mind environment;
+* sync the benchmark test library into the Quantik Mind project;
+* import benchmark history when needed;
+* configure observability for the benchmark environment;
+* run the live benchmark selection flow.
+
+The Online Boutique benchmark environment must also be running before live regeneration.
 
 Run:
 
