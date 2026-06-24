@@ -267,7 +267,11 @@ docs/final-benchmark-comparison.md
 benchmark-results/final-comparison/*-evaluation.json
 ```
 
-This mode is useful for checking that the published aggregate numbers are derived from the committed per-case selections and the benchmark oracle.
+### Mode 2: Live End-to-End Regeneration
+
+Use this mode only if you want to regenerate the Quantik Mind selections from a live Quantik Mind project.
+
+Unlike artifact-level reproduction, this mode creates fresh per-case Quantik Mind selections by calling a live Quantik Mind project.
 
 For this mode, you need a Quantik Mind account.
 
@@ -529,8 +533,9 @@ To regenerate live Quantik Mind selections:
 * `git`;
 * `kubectl`;
 * Skaffold or equivalent Kubernetes deployment commands;
-* access to a Quantik Mind project;
-* a Quantik Mind API key;
+* a Quantik Mind account at https://app.quantikmind.com;
+* a Quantik Mind project created or selected through the onboarding flow;
+* a service account and API key generated through the application;
 * the Quantik Mind CLI/API endpoint;
 * the pinned upstream Google Online Boutique checkout at commit `b7ecc96372238b0dda6cefaf95cc2c3e9118ea73`.
 
